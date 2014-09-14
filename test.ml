@@ -53,9 +53,9 @@ let expect map result =
       else
         "\n%s[%2d]%s %s%s%s\n  != %s%s%s\n"
     ) in
-    printf format red !counter reset
-                  gray trial reset
-                  brown result reset
+    printf format red   !counter reset
+                  gray  trial    reset
+                  brown result   reset
 
 let expect_fail map =
   counter := !counter + 1;
@@ -67,7 +67,9 @@ let expect_fail map =
     | Invalid_argument _ -> true
     | _ -> false
   then printf "%s[%2d]%s OK\n" green !counter reset
-  else printf "%s[%2d]%s Expected %sInvalid_argument%s\n" red !counter reset brown reset
+  else printf "%s[%2d]%s Expected a %sInvalid_argument%s exception\n"
+    red   !counter reset
+    brown          reset
 ;;
 
 
