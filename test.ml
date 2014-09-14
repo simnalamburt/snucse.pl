@@ -4,7 +4,7 @@
  * Use Cases
  * --------
  *
- * a. Expect specific result
+ * 1. Expect specific result
  *
  *    expect
  *    (Branch (
