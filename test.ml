@@ -1,4 +1,4 @@
-#use "treasure.ml"
+#use "main.ml"
 
 (*
  * Use Cases
