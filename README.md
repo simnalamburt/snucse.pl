@@ -16,6 +16,8 @@ Exercise 4 of Homework 4
 1.  과제를 한다
 
     ```bash
+    rm -f main.ml
+    cp main.ml.example main.ml
     vim main.ml
     ```
 
