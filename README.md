@@ -21,6 +21,8 @@ Exercise 4 of Homework 4
 
 1.  테스트 해본다
 
+    ![Picture of a test result](/img/test.png?raw=true)
+
     ```bash
     ocaml test.ml
     ```
