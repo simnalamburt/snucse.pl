@@ -1,3 +1,5 @@
+#!/usr/bin/env ocaml
+
 #use ".ocamlinit";;
 
 (* Exercise 1 *)
@@ -12,6 +14,8 @@ assert (385 = (sigma (-10) (-1) (fun x -> x*x)));
 
 (* Exercise 3 *)
 assert (20 = (iter 10 (fun x->x+2)) 0);
+assert (100 = (iter 100 (fun x->x+1)) 0);
+assert (0 = (iter 10 (fun x->x)) 0);
 
 (* Exercise 4 *)
 assert (true = eval TRUE);
