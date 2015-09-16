@@ -1,5 +1,4 @@
 #!/usr/bin/env ocaml
-
 #use ".ocamlinit";;
 
 (* Exercise 1 *)
