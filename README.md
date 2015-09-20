@@ -2,6 +2,10 @@ Programming Languages
 ========
 4190.310 Programming Languages (Fall 2015)
 
+```sh
+./test
+```
+
 숙제 보러가기 &rarr; [2014][hw14], [2015][hw15]<br>
 게시판 가기 &rarr; [2014][bb14], [2015][bb15] (Self-signed Cert)
 
