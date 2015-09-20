@@ -1,6 +1,9 @@
 #!/usr/bin/env ocaml
 #use ".ocamlinit";;
 
+(*
+ * Homework 1
+ *)
 (* Exercise 1 *)
 assert ([10; 10; 4; 3; 2; 1] = (merge [10; 4; 2] [10; 3; 1]));
 assert ([10; 3; 2; -2; -3; -10] = (merge [3; -2; -10] [10; 2; -3]));
@@ -60,6 +63,32 @@ assert (0 = nat_to_int (natmul four ZERO));
 assert (0 = nat_to_int (natmul ZERO ZERO));
 assert (3 = nat_to_int (natmul one three));
 assert (4 = nat_to_int (natmul four one));
+
+(*
+ * Homework 2
+ *)
+(* Exercise 1 *)
+
+
+(*
+ * Homework 3
+ *)
+
+
+(*
+ * Homework 4
+ *)
+
+
+(*
+ * Homework 5
+ *)
+
+
+(*
+ * Homework 6
+ *)
+
 
 ;;
 print_string "\x1b[32mALL GREEN!\x1b[0m\n"
