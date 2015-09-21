@@ -12,9 +12,6 @@ Programming Languages
 ./test
 ```
 
-#### 테스트케이스 출처
-1.  Homework 1 &rarr; https://ropas.snu.ac.kr/phpbb/viewtopic.php?t=4276
-
 #### [제출하기][submit]
 - [x] [Homework 1][hw1]
 - [ ] [Homework 2][hw2]
@@ -22,6 +19,25 @@ Programming Languages
 - [ ] [Homework 4][hw4]
 - [ ] [Homework 5][hw5]
 - [ ] [Homework 6][hw6]
+
+#### 테스트케이스 출처
+1.  Homework 1
+    * https://ropas.snu.ac.kr/phpbb/viewtopic.php?t=4276
+1.  Homework 2
+    * https://ropas.snu.ac.kr/phpbb/viewtopic.php?t=4315
+1.  Homework 3
+    * https://ropas.snu.ac.kr/phpbb/viewtopic.php?t=4407
+    * https://ropas.snu.ac.kr/phpbb/viewtopic.php?t=4406
+    * https://ropas.snu.ac.kr/phpbb/viewtopic.php?t=4435
+1.  Homework 4
+    * https://ropas.snu.ac.kr/phpbb/viewtopic.php?t=4502
+    * https://ropas.snu.ac.kr/phpbb/viewtopic.php?t=4503
+1.  Homework 5
+    * https://ropas.snu.ac.kr/phpbb/viewtopic.php?t=4537
+    * https://ropas.snu.ac.kr/phpbb/viewtopic.php?t=4600
+1.  Homework 6
+    * https://ropas.snu.ac.kr/phpbb/viewtopic.php?t=4625
+    * https://ropas.snu.ac.kr/phpbb/viewtopic.php?t=4619
 
 [hw14]: http://ropas.snu.ac.kr/~kwang/4190.310/14/#숙제%20Homeworks
 [hw15]: http://ropas.snu.ac.kr/~kwang/4190.310/15/#숙제%20Homeworks
