@@ -2,13 +2,18 @@ Programming Languages
 ========
 4190.310 Programming Languages (Fall 2015)
 
-숙제 보러가기 &rarr; [2014][hw14], [2015][hw15]<br>
-게시판 가기 &rarr; [2014][bb14], [2015][bb15] (Self-signed Cert)
+숙제 보러가기 &rarr; [2015][hw15], [2014][hw14]<br>
+게시판 가기 &rarr; [2015][bb15], [2014][bb14]
+
+> Self signed certificate 에러는 곧 고쳐진다고함
 
 #### 테스트하기
 ```sh
 ./test
 ```
+
+#### 테스트케이스 출처
+1.  Homework 1 &rarr; https://ropas.snu.ac.kr/phpbb/viewtopic.php?t=4276
 
 #### [제출하기][submit]
 - [x] [Homework 1][hw1]
