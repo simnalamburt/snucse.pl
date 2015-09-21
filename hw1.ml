@@ -40,18 +40,18 @@ and expr = NUM of int
 let rec eval (form: formula): bool =
   let rec calc (exp: expr): int =
     match exp with
-    | NUM(i) -> i
+    | NUM i -> i
     | PLUS(e1, e2) -> (calc e1) + (calc e2)
     | MINUS(e1, e2) -> (calc e1) - (calc e2)
   in
   match form with
   | TRUE -> true
   | FALSE -> false
-  | NOT(f) -> not (eval f)
-  | ANDALSO(f1, f2) -> (eval f1) && (eval f2)
-  | ORELSE(f1, f2) -> (eval f1) || (eval f2)
-  | IMPLY(f1, f2) -> not (eval f1) || (eval f2)
-  | LESS(e1, e2) -> (calc e1) < (calc e2)
+  | NOT f -> not (eval f)
+  | ANDALSO (f1, f2) -> (eval f1) && (eval f2)
+  | ORELSE (f1, f2) -> (eval f1) || (eval f2)
+  | IMPLY (f1, f2) -> not (eval f1) || (eval f2)
+  | LESS (e1, e2) -> (calc e1) < (calc e2)
 
 (* Exercise 5 *)
 type nat = ZERO
@@ -60,9 +60,9 @@ type nat = ZERO
 let rec natadd ((left, right): nat * nat): nat =
   match right with
   | ZERO -> left
-  | SUCC(r1) -> natadd ((SUCC(left)), r1)
+  | SUCC r1 -> natadd ((SUCC(left)), r1)
 
 let rec natmul ((left, right): nat * nat): nat =
   match right with
   | ZERO -> ZERO
-  | SUCC(r1) -> natadd ((natmul (left, r1)), left)
+  | SUCC r1 -> natadd ((natmul (left, r1)), left)
