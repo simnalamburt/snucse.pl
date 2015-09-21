@@ -60,3 +60,7 @@ Programming Languages
 [hw4]: http://ropas.snu.ac.kr/~kwang/4190.310/15/hw4.pdf
 [hw5]: http://ropas.snu.ac.kr/~kwang/4190.310/15/hw5.pdf
 [hw6]: http://ropas.snu.ac.kr/~kwang/4190.310/15/hw6.pdf
+
+--------
+
+Licensed under GPLv3
