@@ -7,6 +7,17 @@ Programming Languages
 
 > Self signed certificate 에러는 곧 고쳐진다고함
 
+[hw15]: http://ropas.snu.ac.kr/~kwang/4190.310/15/#숙제%20Homeworks
+[hw14]: http://ropas.snu.ac.kr/~kwang/4190.310/14/#숙제%20Homeworks
+[hw13]: http://ropas.snu.ac.kr/~kwang/4190.310/13/#숙제%20Homeworks
+[hw12]: http://ropas.snu.ac.kr/~kwang/4190.310/12/#숙제%20Homeworks
+[hw11]: http://ropas.snu.ac.kr/~kwang/4190.310/11/#숙제%20Homeworks
+[hw10]: http://ropas.snu.ac.kr/~kwang/4190.310/10/#숙제%20Homeworks
+[hw09]: http://ropas.snu.ac.kr/~kwang/4190.310/09/#숙제%20Homeworks
+[hw08]: http://ropas.snu.ac.kr/~kwang/4190.310/08/#숙제%20Homeworks
+[bb15]: https://ropas.snu.ac.kr/phpbb/viewforum.php?f=37
+[bb14]: https://ropas.snu.ac.kr/phpbb/viewforum.php?f=34
+
 #### 테스트하기
 ```sh
 ./test
@@ -19,6 +30,14 @@ Programming Languages
 - [ ] [Homework 4][hw4]
 - [ ] [Homework 5][hw5]
 - [ ] [Homework 6][hw6]
+
+[submit]: http://ropas.snu.ac.kr/~ta/4190.310/15/submit/index.pl
+[hw1]: http://ropas.snu.ac.kr/~kwang/4190.310/15/hw1.pdf
+[hw2]: http://ropas.snu.ac.kr/~kwang/4190.310/15/hw2.pdf
+[hw3]: http://ropas.snu.ac.kr/~kwang/4190.310/15/hw3.pdf
+[hw4]: http://ropas.snu.ac.kr/~kwang/4190.310/15/hw4.pdf
+[hw5]: http://ropas.snu.ac.kr/~kwang/4190.310/15/hw5.pdf
+[hw6]: http://ropas.snu.ac.kr/~kwang/4190.310/15/hw6.pdf
 
 #### 테스트케이스 출처
 1.  Homework 1
@@ -44,24 +63,13 @@ Programming Languages
 1.  etc
     * https://github.com/kalaluthien/ProgrammingLanguage
 
-[hw15]: http://ropas.snu.ac.kr/~kwang/4190.310/15/#숙제%20Homeworks
-[hw14]: http://ropas.snu.ac.kr/~kwang/4190.310/14/#숙제%20Homeworks
-[hw13]: http://ropas.snu.ac.kr/~kwang/4190.310/13/#숙제%20Homeworks
-[hw12]: http://ropas.snu.ac.kr/~kwang/4190.310/12/#숙제%20Homeworks
-[hw11]: http://ropas.snu.ac.kr/~kwang/4190.310/11/#숙제%20Homeworks
-[hw10]: http://ropas.snu.ac.kr/~kwang/4190.310/10/#숙제%20Homeworks
-[hw09]: http://ropas.snu.ac.kr/~kwang/4190.310/09/#숙제%20Homeworks
-[hw08]: http://ropas.snu.ac.kr/~kwang/4190.310/08/#숙제%20Homeworks
-[bb15]: https://ropas.snu.ac.kr/phpbb/viewforum.php?f=37
-[bb14]: https://ropas.snu.ac.kr/phpbb/viewforum.php?f=34
-[submit]: http://ropas.snu.ac.kr/~ta/4190.310/15/submit/index.pl
-
-[hw1]: http://ropas.snu.ac.kr/~kwang/4190.310/15/hw1.pdf
-[hw2]: http://ropas.snu.ac.kr/~kwang/4190.310/15/hw2.pdf
-[hw3]: http://ropas.snu.ac.kr/~kwang/4190.310/15/hw3.pdf
-[hw4]: http://ropas.snu.ac.kr/~kwang/4190.310/15/hw4.pdf
-[hw5]: http://ropas.snu.ac.kr/~kwang/4190.310/15/hw5.pdf
-[hw6]: http://ropas.snu.ac.kr/~kwang/4190.310/15/hw6.pdf
+#### 테스트케이스 만드는데에 도움주신분들
+* [wook](https://github.com/wookayin)
+* [kcm1700](https://github.com/kcm1700)
+* [김형모](https://github.com/kalaluthien)
+* [이현준](https://github.com/guswns0528)
+* 윤용호 조교님
+* 그 외에 이름을 적지 못한 수많은 PL수업 수강생분들
 
 --------
 
