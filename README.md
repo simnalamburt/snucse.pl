@@ -27,6 +27,7 @@ Programming Languages
 1.  Homework 2
     * https://ropas.snu.ac.kr/phpbb/viewtopic.php?t=4315
     * http://ropas.snu.ac.kr/~ta/4190.310/11s/score/1-8.txt
+    * `crazy2add` 테스트는 만들었음
 1.  Homework 3
     * https://ropas.snu.ac.kr/phpbb/viewtopic.php?t=4407
     * https://ropas.snu.ac.kr/phpbb/viewtopic.php?t=4406

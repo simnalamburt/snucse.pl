@@ -158,12 +158,45 @@ assert (nat_to_int (natmul (int_to_nat 8, int_to_nat 12)) = 96);
 (*
  * Homework 2
  *)
-(* Exercise 1 *)
-assert (0 = crazy2val (ZERO NIL));
-assert (1 = crazy2val (MONE (ONE (ZERO NIL))));
-assert (4 = crazy2val (ZERO (ZERO (MONE (ONE NIL)))));
-assert ((-5) = crazy2val (ONE (MONE (ONE (MONE NIL)))));
-assert ((-1) = crazy2val (ONE(ONE(ONE(ONE(ONE(ONE(ONE(ONE(ONE(ONE(ONE(ONE(ONE(ONE(ONE(ONE(ONE(ONE(ONE(ONE(ONE(ONE(ONE(ONE(ONE(ONE(ONE(ONE(ONE(MONE NIL)))))))))))))))))))))))))))))));
+(* Exercise 1, 2 *)
+let zero = ZERO NIL
+let one = MONE (ONE (ZERO NIL))
+let four = ZERO (ZERO (MONE (ONE NIL)))
+let m_five = ONE (MONE (ONE (MONE NIL)))
+let m_one = (ONE(ONE(ONE(ONE(ONE(ONE(ONE(ONE(ONE(ONE(ONE(ONE(ONE(ONE(ONE(ONE(ONE(ONE(ONE(ONE(ONE(ONE(ONE(ONE(ONE(ONE(ONE(ONE(ONE(MONE NIL))))))))))))))))))))))))))))))
+;;
+
+assert ( 0 = crazy2val zero);
+assert ( 1 = crazy2val one);
+assert ( 4 = crazy2val four);
+assert (-5 = crazy2val m_five);
+assert (-1 = crazy2val m_one);
+
+assert (  0 = crazy2val (crazy2add (zero, zero)));
+assert (  1 = crazy2val (crazy2add (zero, one)));
+assert (  4 = crazy2val (crazy2add (zero, four)));
+assert ( -5 = crazy2val (crazy2add (zero, m_five)));
+assert ( -1 = crazy2val (crazy2add (zero, m_one)));
+assert (  1 = crazy2val (crazy2add (one, zero)));
+assert (  2 = crazy2val (crazy2add (one, one)));
+assert (  5 = crazy2val (crazy2add (one, four)));
+assert ( -4 = crazy2val (crazy2add (one, m_five)));
+assert (  0 = crazy2val (crazy2add (one, m_one)));
+assert (  4 = crazy2val (crazy2add (four, zero)));
+assert (  5 = crazy2val (crazy2add (four, one)));
+assert (  8 = crazy2val (crazy2add (four, four)));
+assert ( -1 = crazy2val (crazy2add (four, m_five)));
+assert (  3 = crazy2val (crazy2add (four, m_one)));
+assert ( -5 = crazy2val (crazy2add (m_five, zero)));
+assert ( -4 = crazy2val (crazy2add (m_five, one)));
+assert ( -1 = crazy2val (crazy2add (m_five, four)));
+assert (-10 = crazy2val (crazy2add (m_five, m_five)));
+assert ( -6 = crazy2val (crazy2add (m_five, m_one)));
+assert ( -1 = crazy2val (crazy2add (m_one, zero)));
+assert (  0 = crazy2val (crazy2add (m_one, one)));
+assert (  3 = crazy2val (crazy2add (m_one, four)));
+assert ( -6 = crazy2val (crazy2add (m_one, m_five)));
+assert ( -2 = crazy2val (crazy2add (m_one, m_one)));
 ;;
 
 
