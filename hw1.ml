@@ -1,16 +1,16 @@
 (* Exercise 1 *)
-let rec merge (a: int list) (b: int list): int list =
+let rec merge ((a, b): int list * int list): int list =
   match a, b with
   | [], b -> b
   | a, [] -> a
   | a0::ax, b0::bx ->
       if a0 > b0 then
-        a0::(merge ax (b0::bx))
+        a0::(merge (ax, (b0::bx)))
       else
-        b0::(merge (a0::ax) bx)
+        b0::(merge ((a0::ax), bx))
 
 (* Exercise 2 *)
-let sigma (a: int) (b: int) (f: int -> int): int =
+let sigma ((a, b, f): int * int * (int -> int)): int =
   let sum = ref 0 in
   for i = a to b do
     sum := !sum + (f i)
@@ -18,12 +18,12 @@ let sigma (a: int) (b: int) (f: int -> int): int =
   !sum
 
 (* Exercise 3 *)
-let rec iter (n: int) (f: 'a -> 'a): ('a -> 'a) =
+let rec iter ((n, f): int * ('a -> 'a)): ('a -> 'a) =
   if n <= 0 then
     function x -> x
   else
     let compose f g x = f(g(x)) in
-    compose f (iter (n-1) f)
+    compose f (iter ((n-1), f))
 
 (* Exercise 4 *)
 type formula = TRUE
@@ -57,12 +57,12 @@ let rec eval (form: formula): bool =
 type nat = ZERO
          | SUCC of nat
 
-let rec natadd (left: nat) (right: nat): nat =
+let rec natadd ((left, right): nat * nat): nat =
   match right with
   | ZERO -> left
-  | SUCC(r1) -> natadd (SUCC(left)) r1
+  | SUCC(r1) -> natadd ((SUCC(left)), r1)
 
-let rec natmul (left: nat) (right: nat): nat =
+let rec natmul ((left, right): nat * nat): nat =
   match right with
   | ZERO -> ZERO
-  | SUCC(r1) -> natadd (natmul left r1) left
+  | SUCC(r1) -> natadd ((natmul (left, r1)), left)

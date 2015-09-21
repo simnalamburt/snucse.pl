@@ -5,21 +5,79 @@
  * Homework 1
  *)
 (* Exercise 1 *)
-assert ([10; 10; 4; 3; 2; 1] = (merge [10; 4; 2] [10; 3; 1]));
-assert ([10; 3; 2; -2; -3; -10] = (merge [3; -2; -10] [10; 2; -3]));
+let l0 = []
+let l1 = [5; 3; 1]
+let l2 = [4; 2; 0]
+let l3 = [10; 7; 6]
+let l4 = [11; 9; 8]
+;;
+
+assert ([10; 10; 4; 3; 2; 1] = (merge ([10; 4; 2], [10; 3; 1])));
+assert ([10; 3; 2; -2; -3; -10] = (merge ([3; -2; -10], [10; 2; -3])));
+assert (merge (l0, l0) = l0);
+assert (merge (l1, l0) = l1);
+assert (merge (l0, l2) = l2);
+assert (merge (l1, l2) = [5; 4; 3; 2; 1; 0]);
+assert (merge (l2, l1) = [5; 4; 3; 2; 1; 0]);
+assert (merge (l3, l4) = [11; 10; 9; 8; 7; 6]);
+assert (merge (l4, l3) = [11; 10; 9; 8; 7; 6]);
+assert (merge (l1, l4) = [11; 9; 8; 5; 3; 1]);
+assert (merge (merge (l1, l2), l4) = [11; 9; 8; 5; 4; 3; 2; 1; 0]);
+assert (merge (merge (l1, l2), merge (l4, l3)) = [11; 10; 9; 8; 7; 6; 5; 4; 3; 2; 1; 0]);
+;;
 
 (* Exercise 2 *)
-assert (385 = (sigma 1 10 (fun x -> x*x)));
-assert (0 = (sigma 3 1 (fun x -> x*x)));
-assert (27 = (sigma 3 3 (fun x -> x*x*x)));
-assert (385 = (sigma (-10) (-1) (fun x -> x*x)));
+let foo = fun n -> n * 2
+let bar = fun n -> n * n
+;;
+
+assert (385 = sigma (1, 10, fun x -> x*x));
+assert (0 = sigma (3, 1, fun x -> x*x));
+assert (27 = sigma (3, 3, fun x -> x*x*x));
+assert (385 = sigma (-10, -1, fun x -> x*x));
+assert (sigma (3, 1, foo) = 0);
+assert (sigma (4, 2, bar) = 0);
+assert (sigma (8, 8, foo) = 16);
+assert (sigma (3, 4, bar) = 25);
+assert (sigma (1, 10, foo) = 110);
+assert (sigma (1, 10, bar) = 5 * 7 * 11);
+assert (sigma (5, 10, foo) = 90);
+assert (sigma (1, 100, foo) = 10100);
+;;
 
 (* Exercise 3 *)
-assert (20 = (iter 10 (fun x->x+2)) 0);
-assert (100 = (iter 100 (fun x->x+1)) 0);
-assert (0 = (iter 10 (fun x->x)) 0);
+let f1 = fun x -> 2 + x
+let f2 = fun x -> fun y -> x * y
+;;
+
+assert (20 = (iter (10, (fun x->x+2))) 0);
+assert (100 = (iter (100, (fun x->x+1))) 0);
+assert (0 = (iter (10, (fun x->x))) 0);
+assert ((iter (10, f1)) 3 = 23);
+assert ((iter (2, f1)) 121 = f1 (f1 121));
+assert ((iter (3, f1)) 177 = f1 (f1 (f1 177)));
+assert ((iter (4, f2 1)) 44 = 44);
+assert (((iter (2, f2 7)) 4 = f2 7 (f2 7 4)));
+;;
 
 (* Exercise 4 *)
+let f1 = TRUE
+let f2 = FALSE
+let f3 = NOT f1
+let f4 = ANDALSO (NOT f2, ANDALSO (f3, f1))
+let f5 = ORELSE (ORELSE (f3, f1), f4)
+let f6 = IMPLY (f4, f5)
+let f7 = IMPLY (f5, ORELSE (f4, FALSE))
+let f8 = ORELSE (IMPLY (NOT f6, f2), ANDALSO (ORELSE (f3, NOT f4), NOT f7))
+let f9 = LESS (NUM 1, NUM 2)
+let fa = LESS (PLUS (NUM 1, NUM 2), MINUS (NUM 0, NUM 121))
+let fb =
+  LESS
+    (MINUS
+      (PLUS (NUM 5, MINUS (NUM 1, NUM 21)),
+       MINUS (NUM 0, NUM 100)), NUM 2)
+;;
+
 assert (true = eval TRUE);
 assert (false = eval FALSE);
 assert (false = eval (NOT TRUE));
@@ -41,9 +99,20 @@ assert (false = eval (LESS (NUM 3, NUM 3)));
 assert (false = eval (LESS (NUM 3, NUM 1)));
 assert (false = eval (LESS (PLUS (NUM 3, NUM 4), MINUS (NUM 5, NUM 1))));
 assert (true = eval (LESS (PLUS (NUM 10, NUM 12), MINUS (NUM 10, NUM (-13)))));
+assert (eval f1 = true);
+assert (eval f2 = false);
+assert (eval f3 = false);
+assert (eval f4 = false);
+assert (eval f5 = true);
+assert (eval f6 = true);
+assert (eval f7 = false);
+assert (eval f8 = true);
+assert (eval f9 = true);
+assert (eval fa = false);
+assert (eval fb = false);
+;;
 
 (* Exercise 5 *)
-;;
 let one = SUCC ZERO
 let three = SUCC (SUCC (SUCC ZERO))
 let four = SUCC three
@@ -51,18 +120,40 @@ let rec nat_to_int (input: nat): int =
   match input with
   | ZERO -> 0
   | SUCC(i1) -> 1 + (nat_to_int i1)
+let rec int_to_nat (input: int): nat =
+  match input with
+  | 0 -> ZERO
+  | _ -> SUCC (int_to_nat (input - 1))
 ;;
 
-assert (7 = nat_to_int (natadd three four));
-assert (0 = nat_to_int (natadd ZERO ZERO));
-assert (3 = nat_to_int (natadd ZERO three));
-assert (4 = nat_to_int (natadd four ZERO));
-assert (12 = nat_to_int (natmul three four));
-assert (0 = nat_to_int (natmul ZERO three));
-assert (0 = nat_to_int (natmul four ZERO));
-assert (0 = nat_to_int (natmul ZERO ZERO));
-assert (3 = nat_to_int (natmul one three));
-assert (4 = nat_to_int (natmul four one));
+assert (7 = nat_to_int (natadd (three, four)));
+assert (0 = nat_to_int (natadd (ZERO, ZERO)));
+assert (3 = nat_to_int (natadd (ZERO, three)));
+assert (4 = nat_to_int (natadd (four, ZERO)));
+
+assert (12 = nat_to_int (natmul (three, four)));
+assert (0 = nat_to_int (natmul (ZERO, three)));
+assert (0 = nat_to_int (natmul (four, ZERO)));
+assert (0 = nat_to_int (natmul (ZERO, ZERO)));
+assert (3 = nat_to_int (natmul (SUCC ZERO, three)));
+assert (4 = nat_to_int (natmul (four, SUCC ZERO)));
+
+assert (nat_to_int (natadd (int_to_nat 0, int_to_nat 0)) = 0);
+assert (nat_to_int (natadd (int_to_nat 2, int_to_nat 0)) = 2);
+assert (nat_to_int (natadd (int_to_nat 0, int_to_nat 3)) = 3);
+assert (nat_to_int (natadd (int_to_nat 1, int_to_nat 5)) = 6);
+assert (nat_to_int (natadd (int_to_nat 3, int_to_nat 3)) = 6);
+assert (nat_to_int (natadd (int_to_nat 12, int_to_nat 7)) = 19);
+assert (nat_to_int (natadd (int_to_nat 34, int_to_nat 19)) = 53);
+
+assert (nat_to_int (natmul (int_to_nat 0, int_to_nat 0)) = 0);
+assert (nat_to_int (natmul (int_to_nat 2, int_to_nat 0)) = 0);
+assert (nat_to_int (natmul (int_to_nat 0, int_to_nat 3)) = 0);
+assert (nat_to_int (natmul (int_to_nat 1, int_to_nat 5)) = 5);
+assert (nat_to_int (natmul (int_to_nat 3, int_to_nat 3)) = 9);
+assert (nat_to_int (natmul (int_to_nat 11, int_to_nat 7)) = 77);
+assert (nat_to_int (natmul (int_to_nat 8, int_to_nat 12)) = 96);
+;;
 
 (*
  * Homework 2
@@ -90,5 +181,4 @@ assert (4 = nat_to_int (natmul four one));
  *)
 
 
-;;
 print_string "\x1b[32mALL GREEN!\x1b[0m\n"
