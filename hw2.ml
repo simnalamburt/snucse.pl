@@ -27,6 +27,20 @@ let rec crazy2add ((left, right): crazy2 * crazy2): crazy2 =
   | MONE l0, MONE r0 -> ZERO (crazy2add (crazy2add (l0, r0), MONE NIL))
 
 (* Exercise 3 *)
+type metro = STATION of name
+           | AREA of name * metro
+           | CONNECT of metro * metro
+and name = string
+
+let checkMetro (input: metro): bool =
+  let rec check (input: metro) (rules: string list): bool =
+    match input with
+    | STATION name -> List.exists ((=) name) rules
+    | AREA (name, m0) -> check m0 (name::rules)
+    | CONNECT (m0, m1) -> (check m0 rules) && (check m1 rules)
+  in
+  check input []
+
 
 (* Exercise 4 *)
 

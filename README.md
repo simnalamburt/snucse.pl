@@ -23,11 +23,11 @@ Programming Languages
 #### 테스트케이스 출처
 1.  Homework 1
     * https://ropas.snu.ac.kr/phpbb/viewtopic.php?t=4276
-    * https://github.com/kalaluthien/ProgrammingLanguage
 1.  Homework 2
     * https://ropas.snu.ac.kr/phpbb/viewtopic.php?t=4315
     * http://ropas.snu.ac.kr/~ta/4190.310/11s/score/1-8.txt
     * `crazy2add` 테스트는 만들었음
+    * 숙제 PDF 안내자료에 있는 예제
 1.  Homework 3
     * https://ropas.snu.ac.kr/phpbb/viewtopic.php?t=4407
     * https://ropas.snu.ac.kr/phpbb/viewtopic.php?t=4406
@@ -41,6 +41,8 @@ Programming Languages
 1.  Homework 6
     * https://ropas.snu.ac.kr/phpbb/viewtopic.php?t=4625
     * https://ropas.snu.ac.kr/phpbb/viewtopic.php?t=4619
+1.  etc
+    * https://github.com/kalaluthien/ProgrammingLanguage
 
 [hw15]: http://ropas.snu.ac.kr/~kwang/4190.310/15/#숙제%20Homeworks
 [hw14]: http://ropas.snu.ac.kr/~kwang/4190.310/14/#숙제%20Homeworks

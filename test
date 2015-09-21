@@ -199,6 +199,19 @@ assert ( -6 = crazy2val (crazy2add (m_one, m_five)));
 assert ( -2 = crazy2val (crazy2add (m_one, m_one)));
 ;;
 
+(* Exercise 3 *)
+assert (checkMetro (AREA("a", STATION "a") ));
+assert (checkMetro (AREA("a", AREA("a", STATION "a")) ));
+assert (checkMetro (AREA("a", AREA("b", CONNECT(STATION "a", STATION "b"))) ));
+assert (checkMetro (AREA("a", CONNECT(STATION "a", AREA("b", STATION "a"))) ));
+assert (checkMetro ( CONNECT (AREA ("a", STATION "a"), AREA ("b", AREA("a", CONNECT(STATION "b", STATION "a")))) ));
+
+assert (not (checkMetro (AREA("a", STATION "b") )));
+assert (not (checkMetro (AREA("a", CONNECT(STATION "a", AREA("b", STATION "c"))) )));
+assert (not (checkMetro (AREA("a", AREA("b", CONNECT(STATION "a", STATION "c"))) )));
+assert (not (checkMetro ( CONNECT (AREA ("c", STATION "c"), AREA ("b", AREA("a", CONNECT(STATION "b", STATION "c")))) )));
+;;
+
 
 (*
  * Homework 3
