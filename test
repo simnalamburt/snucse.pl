@@ -159,6 +159,12 @@ assert (nat_to_int (natmul (int_to_nat 8, int_to_nat 12)) = 96);
  * Homework 2
  *)
 (* Exercise 1 *)
+assert (0 = crazy2val (ZERO NIL));
+assert (1 = crazy2val (MONE (ONE (ZERO NIL))));
+assert (4 = crazy2val (ZERO (ZERO (MONE (ONE NIL)))));
+assert ((-5) = crazy2val (ONE (MONE (ONE (MONE NIL)))));
+assert ((-1) = crazy2val (ONE(ONE(ONE(ONE(ONE(ONE(ONE(ONE(ONE(ONE(ONE(ONE(ONE(ONE(ONE(ONE(ONE(ONE(ONE(ONE(ONE(ONE(ONE(ONE(ONE(ONE(ONE(ONE(ONE(MONE NIL)))))))))))))))))))))))))))))));
+;;
 
 
 (*
