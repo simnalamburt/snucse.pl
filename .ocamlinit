@@ -1,4 +1,9 @@
-#use "hw1/hw1.ml"
+#use "hw1/ex1.ml"
+#use "hw1/ex2.ml"
+#use "hw1/ex3.ml"
+#use "hw1/ex4.ml"
+#use "hw1/ex5.ml"
+
 #use "hw2/hw2.ml"
 #use "hw3/hw3.ml"
 #use "hw4/hw4.ml"
