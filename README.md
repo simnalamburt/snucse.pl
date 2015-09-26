@@ -5,8 +5,6 @@ Programming Languages
 숙제 보러가기 &rarr; [**2015**][hw15], [2014][hw14], [2013][hw13], [2012][hw12], [2011][hw11], [2010][hw10], [2009][hw09], [2008][hw08]<br>
 게시판 가기 &rarr; [**2015**][bb15], [2014][bb14]
 
-> Self signed certificate 에러는 곧 고쳐진다고함
-
 [hw15]: http://ropas.snu.ac.kr/~kwang/4190.310/15/#숙제%20Homeworks
 [hw14]: http://ropas.snu.ac.kr/~kwang/4190.310/14/#숙제%20Homeworks
 [hw13]: http://ropas.snu.ac.kr/~kwang/4190.310/13/#숙제%20Homeworks
