@@ -24,6 +24,12 @@ assert (merge (l4, l3) = [11; 10; 9; 8; 7; 6]);
 assert (merge (l1, l4) = [11; 9; 8; 5; 3; 1]);
 assert (merge (merge (l1, l2), l4) = [11; 9; 8; 5; 4; 3; 2; 1; 0]);
 assert (merge (merge (l1, l2), merge (l4, l3)) = [11; 10; 9; 8; 7; 6; 5; 4; 3; 2; 1; 0]);
+
+assert (merge ([], [5;4;3;2;1]) = [5;4;3;2;1]);
+assert (merge ([10;8;6;4;2], []) = [10;8;6;4;2]);
+assert (merge ([3;2;1], [6;5;4]) = [6;5;4;3;2;1]);
+assert (merge ([5;3;1], [4;2]) = [5;4;3;2;1]);
+assert (merge ([10;2;1], [10;4;3]) = [10;10;4;3;2;1]);
 ;;
 
 (* Exercise 2 *)
@@ -43,6 +49,12 @@ assert (sigma (1, 10, foo) = 110);
 assert (sigma (1, 10, bar) = 5 * 7 * 11);
 assert (sigma (5, 10, foo) = 90);
 assert (sigma (1, 100, foo) = 10100);
+
+assert (sigma (10, 10, fun x -> x) = 10);
+assert (sigma (11, 10, fun x -> x) = 0);
+assert (sigma (10, 5, fun x -> x) = 0);
+assert (sigma (1, 10, fun x -> if x mod 2 = 0 then 1 else 0 ) = 5);
+assert (sigma (1, 10, fun x -> x * x) = 385);
 ;;
 
 (* Exercise 3 *)
@@ -58,6 +70,12 @@ assert ((iter (2, f1)) 121 = f1 (f1 121));
 assert ((iter (3, f1)) 177 = f1 (f1 (f1 177)));
 assert ((iter (4, f2 1)) 44 = 44);
 assert (((iter (2, f2 7)) 4 = f2 7 (f2 7 4)));
+
+assert (iter(10, fun x -> x + 3) 100 = 130);
+assert (iter(0, fun x -> x + 3) 200 = 200);
+assert (iter (3, List.tl) [1;2;3;4;5;6] = [4;5;6]);
+assert (iter (4, (fun s -> s ^ s)) "a" = "aaaaaaaaaaaaaaaa");
+assert (iter (5, fun (x,y,z) -> (z, x, y)) (1,2,3) = (2, 3, 1));
 ;;
 
 (* Exercise 4 *)
@@ -110,6 +128,17 @@ assert (eval f8 = true);
 assert (eval f9 = true);
 assert (eval fa = false);
 assert (eval fb = false);
+
+assert (eval (IMPLY(FALSE, FALSE)) = true);
+assert (eval (ANDALSO (ORELSE(TRUE, FALSE), NOT (IMPLY(TRUE, FALSE)))) = true);
+assert ((eval (ANDALSO (TRUE, TRUE))) && (not (eval (ANDALSO (TRUE, FALSE)))) && (not (eval (ANDALSO (FALSE, TRUE)))) && (not (eval (ANDALSO (FALSE, FALSE)))) = true);
+assert ((eval (ORELSE (TRUE, TRUE))) && (eval (ORELSE (TRUE, FALSE))) && (eval (ORELSE (FALSE, TRUE))) && (not (eval (ORELSE (FALSE, FALSE)))) = true);
+assert ((eval (IMPLY (TRUE, TRUE))) && (not (eval (IMPLY (TRUE, FALSE)))) && (eval (IMPLY (FALSE, TRUE))) && (eval (IMPLY (FALSE, FALSE))) = true);
+assert (eval (LESS (NUM 3, NUM 5)) = true);
+assert (eval (LESS (PLUS (NUM 3, NUM 5), PLUS (NUM 1, NUM 2))) = false);
+assert (eval (LESS (MINUS (NUM 3, NUM 5), MINUS (NUM 1, NUM 2))) = true);
+assert (eval (ORELSE (LESS (PLUS (MINUS (NUM 3, NUM 2), NUM 9), NUM 10), FALSE)) = false);
+assert (eval (IMPLY(LESS (NUM 1, NUM 0), ANDALSO(TRUE, ORELSE(NOT TRUE, LESS(NUM 2, NUM 1))))) = true);
 ;;
 
 (* Exercise 5 *)
@@ -153,6 +182,12 @@ assert (nat_to_int (natmul (int_to_nat 1, int_to_nat 5)) = 5);
 assert (nat_to_int (natmul (int_to_nat 3, int_to_nat 3)) = 9);
 assert (nat_to_int (natmul (int_to_nat 11, int_to_nat 7)) = 77);
 assert (nat_to_int (natmul (int_to_nat 8, int_to_nat 12)) = 96);
+
+assert (natadd (ZERO, ZERO) = ZERO);
+assert (natadd (ZERO, (SUCC (SUCC ZERO))) = (SUCC (SUCC ZERO)));
+assert (natadd ((SUCC (SUCC ZERO)), (SUCC (SUCC (SUCC ZERO)))) = (SUCC (SUCC (SUCC (SUCC (SUCC ZERO))))));
+assert (natmul (ZERO, (SUCC (SUCC ZERO))) = ZERO);
+assert (natmul ((SUCC (SUCC ZERO)), (SUCC (SUCC (SUCC ZERO)))) = (SUCC (SUCC (SUCC (SUCC (SUCC (SUCC ZERO)))))));
 ;;
 
 (*
