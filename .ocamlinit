@@ -4,7 +4,14 @@
 #use "hw1/ex4.ml"
 #use "hw1/ex5.ml"
 
-#use "hw2/hw2.ml"
+#use "hw2/ex1.ml"
+#use "hw2/ex2.ml"
+#use "hw2/ex3.ml"
+#use "hw2/ex4.ml"
+#use "hw2/ex5.ml"
+#use "hw2/ex6.ml"
+#use "hw2/ex7.ml"
+
 #use "hw3/hw3.ml"
 #use "hw4/hw4.ml"
 #use "hw5/hw5.ml"
