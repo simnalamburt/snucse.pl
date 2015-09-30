@@ -24,8 +24,7 @@ let goRight (loc: location): location =
 let goUp (loc: location): location =
   match loc with
   | LOC (_, TOP) -> raise (NOMOVE "")
-  | LOC (_, HAND(_, TOP, _)) -> raise (NOMOVE "")
-  | LOC (t, HAND(left, up, right)) -> LOC(NODE ((List.rev left)@[t]@right), up)
+  | LOC (t, HAND(left, up, right)) -> LOC(NODE (List.rev left@[t]@right), up)
 
 let goDown (LOC(t, up): location): location =
   match t with
