@@ -11,6 +11,24 @@ exception NOMOVE of string
 
 let goLeft (loc: location): location =
   match loc with
-  | LOC (t, TOP) -> raise (NOMOVE "left of top")
+  | LOC (_, TOP) -> raise (NOMOVE "")
+  | LOC (_, HAND([], _, _)) -> raise (NOMOVE "")
   | LOC (t, HAND(l::left, up, right)) -> LOC(l, HAND(left, up, t::right))
-  | LOC (t, HAND([], up, right)) -> raise (NOMOVE "left of first")
+
+let goRight (loc: location): location =
+  match loc with
+  | LOC (_, TOP) -> raise (NOMOVE "")
+  | LOC (_, HAND(_, _, [])) -> raise (NOMOVE "")
+  | LOC (t, HAND(left, up, r::right)) -> LOC(r, HAND(t::left, up, right))
+
+let goUp (loc: location): location =
+  match loc with
+  | LOC (_, TOP) -> raise (NOMOVE "")
+  | LOC (_, HAND(_, TOP, _)) -> raise (NOMOVE "")
+  | LOC (t, HAND(left, up, right)) -> LOC(NODE ((List.rev left)@[t]@right), up)
+
+let goDown (LOC(t, up): location): location =
+  match t with
+  | LEAF _
+  | NODE [] -> raise (NOMOVE "")
+  | NODE (c0::children) -> LOC(c0, HAND([], up, children))
