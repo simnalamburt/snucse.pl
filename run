@@ -1,3 +1,4 @@
 #!/bin/sh
 ocaml tests/basic.ml
 ocaml tests/hw2-ex2.ml
+ocaml tests/hw2-ex7.ml
