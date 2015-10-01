@@ -40,7 +40,3 @@ assert (  0 = crazy2val (crazy2add (m_one, one)));
 assert (  3 = crazy2val (crazy2add (m_one, four)));
 assert ( -6 = crazy2val (crazy2add (m_one, m_five)));
 assert ( -2 = crazy2val (crazy2add (m_one, m_one)));
-;;
-
-
-print_string "\x1b[32mALL GREEN! (2)\x1b[0m\n"

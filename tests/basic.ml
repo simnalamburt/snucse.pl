@@ -475,6 +475,3 @@ assert (q3 = ([], [[2; 3]; [4; 5; 6]]));
 (*
  * Homework 6
  *)
-
-
-print_string "\x1b[32mALL GREEN! (1)\x1b[0m\n"
