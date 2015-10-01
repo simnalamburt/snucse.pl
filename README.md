@@ -18,7 +18,7 @@ Programming Languages
 
 #### 테스트하기
 ```sh
-./test
+./run
 ```
 
 #### [제출하기][submit]

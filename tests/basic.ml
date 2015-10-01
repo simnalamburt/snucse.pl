@@ -1,4 +1,3 @@
-#!/usr/bin/env ocaml
 #use ".ocamlinit";;
 
 (*

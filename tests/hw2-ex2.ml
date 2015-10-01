@@ -1,10 +1,6 @@
-#!/usr/bin/env ocaml
 #use "hw2/ex2.ml"
 
-(*
- * Homework 2
- *)
-(* Exercise 2 *)
+(* Homework 2 - Exercise 2 *)
 let zero = ZERO NIL
 let one = MONE (ONE (ZERO NIL))
 let four = ZERO (ZERO (MONE (ONE NIL)))
