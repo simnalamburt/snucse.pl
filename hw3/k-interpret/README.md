@@ -1,17 +1,43 @@
 K- interpreter
 ========
+제공되는 k.ml 파일에는 숙제 구현 부분은 비워져 있습니다. 이 파일을 수정해서
+interpreter를 완성하고 다음과 같이 컴파일 및 실행을 하면 됩니다.
 
-### 문법
+```console
+make
+./run examples/test1.k-
+```
+
+k.ml만 제출하면 됩니다.
+
+### Pretty printer
+입력 프로그램을 간단히 화면에 출력시켜주는 pretty printer가 제공된 `pp.ml`
+파일에 포함되어 있습니다.
+
+```console
+./run -pp test1.k-
+```
+
+이를 실행하면 `main.ml`에서 run 함수를 불러서 intepreter를 돌리는 것이 아니라
+`test1.k-`를 파싱 해서 입력된 프로그램을 화면에 출력해주고 마치게 됩니다. 이를
+통해 파싱이 의도한 대로 되고 있는지 확인해 보실 수 있을 겁니다.
+
+
+언어 스펙
+--------
 제공되는 파서가 정의하고 있는 문법은 조교가 제공한 문서에
 있는 expression과 statement가 합쳐있는 언어입니다.
 
+### 주석
+아래와 같이 주석을 쓸 수 있습니다.
+
+```
+(* 주석 *)
+```
 
 ### 우선 순위
-사용되는 기호들의 우선순위는 아래와 같습니다.
 
-위에 있는 기호가 우선 순위가 가장 높고,
-아래로 갈수록 우선 순위가 낮아집니다.
-
+    -- 높은 우선순위
     .      (오른쪽)
     not    (오른쪽)
     *, /   (왼쪽)
@@ -24,14 +50,21 @@ K- interpreter
     do
     ;      (왼쪽)
     in
+    -- 낮은 우선순위
 
-우선순위를 고려해야 되는 몇가지 일반적인 경우를 보여드리면
-다음과 같습니다.
+##### 예시
 
-    x := e1 ; e2        =>    (x := e1) ; e2   ( := 이 ; 보다 우선 순위가 높기때문 )
-    while e do e1;e2    =>    (while e do e1);e2
-    if e1 then e2 else e3;e4    =>    (if e1 then e2 else e3); e4
-    let x := e1 in e2 ; e3      =>    let x :=e in (e2;e3)
+    x := e1 ; e2
+    => (x := e1) ; e2
+
+    while e do e1;e2
+    => (while e do e1);e2
+
+    if e1 then e2 else e3;e4
+    => (if e1 then e2 else e3); e4
+
+    let x := e1 in e2 ; e3
+    => let x :=e in (e2;e3)
 
 즉 :=, while, for, if 의 바디로 sequence를 쓰고 싶으면 sequence를
 다음과 같이 괄호로 묶어 줘야 합니다.
@@ -48,47 +81,6 @@ K- interpreter
     x := y := 1    =>   x := (y := 1)
 
 이 되게 됩니다.
-
-우선순위를 잘 모르겠을시에는 괄호를 쳐주는 것이 한가지 방편이 될 수 있습니다.
-
-
-### 컴파일 및 실행 방법
-제공되는 k.ml 파일에는 숙제 구현 부분은 비워져 있습니다.  이 파일을 수정해서
-interpreter를 완성하고 다음과 같이 컴파일 및 실행을 하면 됩니다.
-
-##### UNIX
-```console
-make
-./run examples/test1.k-
-```
-
-##### WINDOWS
-```console
-make.bat
-run.exe examples\test1.k-
-```
-
-
-### 숙제 제출 방법
-숙제 제출은 k.ml 파일만 해주세요.
-
-즉, 조교가 여기서 제공되고 있는 파일 중 k.ml만 각자가 제출한 것으로
-바꿔서 컴파일 및 실행이 되도록 해서 제출해 주시기 바랍니다.
-
-
-### pretty-printer
-입력 프로그램을 간단히 화면에 출력시켜주는 pretty-printer가
-제공된 pp.ml 파일에 포함되어 있습니다.
-
-사용법은 'run -pp test1.k-'를 실행하면 main.ml에서 run 함수를 불러서
-intepreter를 돌리는 것이 아니라 test1.k-를 파싱 해서 입력된 프로그램을
-화면에 출력해주고 마치게 됩니다.
-
-이를 통해 파싱이 의도한 대로 되고 있는지 확인해 보실 수 있을 겁니다.
-
-
-### 주석
-K- 프로그램 안에서 (*  *) 로 주석을 사용할 수 있습니다.
 
 
 --------
