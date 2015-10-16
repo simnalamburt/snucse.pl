@@ -190,13 +190,13 @@ module K : KMINUS = struct
     with Env.Not_bound -> raise (Error "Unbound")
 
   let rec eval (mem: memory) (env: env) (einput: exp): value * memory =
-    let calc_int (mem: memory) (env: env) (e1: exp) (e2: exp) (f: int -> int -> int): value * memory =
+    let calc_int (e1: exp) (e2: exp) (f: int -> int -> int): value * memory =
       let v1, mem = eval mem env e1 in
       let v2, mem = eval mem env e2 in
       let result = Num (f (value_int v1) (value_int v2)) in
       result, mem
     in
-    let calc_bool (mem: memory) (env: env) (e1: exp) (e2: exp) (f: int -> int -> bool): value * memory =
+    let calc_bool (e1: exp) (e2: exp) (f: int -> int -> bool): value * memory =
       let v1, mem = eval mem env e1 in
       let v2, mem = eval mem env e2 in
       let result = Bool (f (value_int v1) (value_int v2)) in
@@ -232,12 +232,12 @@ module K : KMINUS = struct
     | FALSE     -> Bool false, mem
     | UNIT      -> Unit, mem
     | VAR name -> Mem.load mem (lookup_env_loc env name), mem
-    | ADD   (eleft, eright) -> calc_int  mem env eleft eright ( + )
-    | SUB   (eleft, eright) -> calc_int  mem env eleft eright ( - )
-    | MUL   (eleft, eright) -> calc_int  mem env eleft eright ( * )
-    | DIV   (eleft, eright) -> calc_int  mem env eleft eright ( / )
-    | EQUAL (eleft, eright) -> calc_bool mem env eleft eright ( = )
-    | LESS  (eleft, eright) -> calc_bool mem env eleft eright ( < )
+    | ADD   (eleft, eright) -> calc_int  eleft eright ( + )
+    | SUB   (eleft, eright) -> calc_int  eleft eright ( - )
+    | MUL   (eleft, eright) -> calc_int  eleft eright ( * )
+    | DIV   (eleft, eright) -> calc_int  eleft eright ( / )
+    | EQUAL (eleft, eright) -> calc_bool eleft eright ( = )
+    | LESS  (eleft, eright) -> calc_bool eleft eright ( < )
     | NOT exp -> begin
       let value, mem = eval mem env exp in
       Bool (not (value_bool value)), mem
