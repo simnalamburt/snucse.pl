@@ -269,8 +269,21 @@ module K : KMINUS = struct
         let value, mem = eval mem env exp in
         values@[value], mem
       in
+      let batch_assign ((mem, env): memory * env) (name: id) (value: value): memory * env =
+        let loc, mem = Mem.alloc mem in
+        let mem = Mem.store mem loc value in
+        let env = Env.bind env name (Addr loc) in
+        mem, env
+      in
       let values, mem = List.fold_left batch_eval ([], mem) eparams in
-      Unit, mem (* TODO *)
+      let names, ebody, env = lookup_env_proc env name in
+      let (mem: memory), env =
+        try
+          List.fold_left2 batch_assign (mem, env) names values
+        with
+        | Invalid_argument _ -> raise (Error "InvalidArg")
+      in
+      eval mem env ebody
     end
     | _ -> failwith "Unimplemented" (* TODO : Implement rest of the cases *)
 
