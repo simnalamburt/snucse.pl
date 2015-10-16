@@ -189,25 +189,89 @@ module K : KMINUS = struct
       | Proc (id_list, exp, env) -> (id_list, exp, env))
     with Env.Not_bound -> raise (Error "Unbound")
 
-  let rec eval mem env e =
-    match e with
-    | READ x ->
-        let v = Num (read_int()) in
-        let l = lookup_env_loc env x in
-        (v, Mem.store mem l v)
-    | WRITE e ->
-        let (v, mem') = eval mem env e in
-        let n = value_int v in
-        let _ = print_endline (string_of_int n) in
-        (v, mem')
-    | LETV (x, e1, e2) ->
-        let (v, mem') = eval mem env e1 in
-        let (l, mem'') = Mem.alloc mem' in
-        eval (Mem.store mem'' l v) (Env.bind env x (Addr l)) e2
-    | ASSIGN (x, e) ->
-        let (v, mem') = eval mem env e in
-        let l = lookup_env_loc env x in
-        (v, Mem.store mem' l v)
+  let rec eval (mem: memory) (env: env) (einput: exp): value * memory =
+    let calc_int (mem: memory) (env: env) (e1: exp) (e2: exp) (f: int -> int -> int): value * memory =
+      let v1, mem = eval mem env e1 in
+      let v2, mem = eval mem env e2 in
+      let result = Num (f (value_int v1) (value_int v2)) in
+      result, mem
+    in
+    let calc_bool (mem: memory) (env: env) (e1: exp) (e2: exp) (f: int -> int -> bool): value * memory =
+      let v1, mem = eval mem env e1 in
+      let v2, mem = eval mem env e2 in
+      let result = Bool (f (value_int v1) (value_int v2)) in
+      result, mem
+    in
+    match einput with
+    | READ name -> begin
+      let value = Num (read_int()) in
+      let loc = lookup_env_loc env name in
+      let mem = Mem.store mem loc value in
+      value, mem
+    end
+    | WRITE exp -> begin
+      let value, mem = eval mem env exp in
+      print_endline (string_of_int (value_int value));
+      value, mem
+    end
+    | LETV (name, exp, enext) -> begin
+      let value, mem = eval mem env exp in
+      let loc, mem = Mem.alloc mem in
+      let mem = Mem.store mem loc value in
+      let env = Env.bind env name (Addr loc) in
+      eval mem env enext
+    end
+    | ASSIGN (name, e) -> begin
+      let value, mem = eval mem env e in
+      let loc = lookup_env_loc env name in
+      let mem = Mem.store mem loc value in
+      value, mem
+    end
+    | NUM value -> Num value, mem
+    | TRUE      -> Bool true, mem
+    | FALSE     -> Bool false, mem
+    | UNIT      -> Unit, mem
+    | VAR name -> Mem.load mem (lookup_env_loc env name), mem
+    | ADD   (eleft, eright) -> calc_int  mem env eleft eright ( + )
+    | SUB   (eleft, eright) -> calc_int  mem env eleft eright ( - )
+    | MUL   (eleft, eright) -> calc_int  mem env eleft eright ( * )
+    | DIV   (eleft, eright) -> calc_int  mem env eleft eright ( / )
+    | EQUAL (eleft, eright) -> calc_bool mem env eleft eright ( = )
+    | LESS  (eleft, eright) -> calc_bool mem env eleft eright ( < )
+    | NOT exp -> begin
+      let value, mem = eval mem env exp in
+      Bool (not (value_bool value)), mem
+    end
+    | SEQ (exp, enext) -> begin
+      let _, mem = eval mem env exp in
+      eval mem env enext
+    end
+    | IF (econd, ethen, eotherwise) -> begin
+      let cond, mem = eval mem env econd in
+      let enext = if value_bool cond then ethen else eotherwise in
+      eval mem env enext
+    end
+    | WHILE (econd, ebody) -> begin
+      let cond, mem = eval mem env econd in
+      if value_bool cond then
+        let _, mem = eval mem env ebody in
+        eval mem env einput
+      else
+        Unit, mem
+    end
+    | LETF (name, params, eimpl, enext) -> begin
+      let entry = Proc (params, eimpl, env) in
+      let env = Env.bind env name entry in
+      eval mem env enext
+    end
+    | CALLV (name, eparams) -> begin
+      let batch_eval ((values, mem): value list * memory) (exp: exp): value list * memory =
+        let value, mem = eval mem env exp in
+        values@[value], mem
+      in
+      let values, mem = List.fold_left batch_eval ([], mem) eparams in
+      Unit, mem (* TODO *)
+    end
     | _ -> failwith "Unimplemented" (* TODO : Implement rest of the cases *)
 
   let run (mem, env, pgm) =
