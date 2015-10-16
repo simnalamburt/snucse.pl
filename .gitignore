@@ -1,2 +1,6 @@
 *.cmo
 *.cmi
+hw3/lexer.ml
+hw3/parser.ml
+hw3/parser.mli
+hw3/run
