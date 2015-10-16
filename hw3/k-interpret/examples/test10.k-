@@ -1,0 +1,9 @@
+(* Public test case 10 : Record *)
+
+let x := {i := 10, b := true} in
+if x.b then 
+  write x.i
+else
+  write 0
+
+(* Output : prints out "10\n" *)

@@ -1,0 +1,7 @@
+(* Public test case 3 *)
+
+let x := 1 in
+(x := true; 
+x + 1)
+
+(* Output : raises Error "TypeError : not int" *)

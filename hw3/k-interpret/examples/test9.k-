@@ -1,0 +1,8 @@
+(* Public test case 9 : return value of write() *)
+
+if (write (1)) = 1 then
+  write 100
+else
+  write 200
+
+(* Output : prints out "1\n100\n" *)

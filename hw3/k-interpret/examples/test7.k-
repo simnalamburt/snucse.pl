@@ -1,0 +1,15 @@
+(* Public test case 7 : call by reference *)
+
+let proc f (a,b,c) =
+  write a;
+  write b;
+  write c;
+  b := 5;
+  (a * b) + c
+in
+let x := 1 in
+let y := 2 in
+let z := 3 in
+write(f <x,y,z> + y)
+
+(* Output : prints out "1\n2\n3\n13\n" *)

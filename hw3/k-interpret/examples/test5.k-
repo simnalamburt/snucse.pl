@@ -1,0 +1,12 @@
+(* Public test case 5 : Exception in false branch should be ignored *)
+
+if (not true) then
+  unit
+else (
+	if (1 < 2) then
+	  write (3 - 4)
+	else 
+    write (5 + true)
+)
+
+(* Output : prints out "-1\n" *)

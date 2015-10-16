@@ -1,0 +1,7 @@
+(* Public test case 1 *)
+
+let x := 1 in
+let y := 2 in
+write x + y
+
+(* Output : prints out "3\n" *)
