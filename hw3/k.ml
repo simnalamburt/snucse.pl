@@ -1,12 +1,5 @@
-(*
- * SNU 4190.310 Programming Languages 2015 Fall
- *  K- Interpreter Skeleton Code
- * Jaeseung Choi (jschoi@ropas.snu.ac.kr)
- *)
-
 (* Location Signature *)
-module type LOC =
-sig
+module type LOC = sig
   type t
   val base : t
   val equal : t -> t -> bool
@@ -14,8 +7,7 @@ sig
   val increase : t -> int -> t
 end
 
-module Loc : LOC =
-struct
+module Loc : LOC = struct
   type t = Location of int
   let base = Location(0)
   let equal (Location(a)) (Location(b)) = (a = b)
@@ -24,8 +16,7 @@ struct
 end
 
 (* Memory Signature *)
-module type MEM =
-sig
+module type MEM = sig
   type 'a t
   exception Not_allocated
   exception Not_initialized
@@ -36,8 +27,7 @@ sig
 end
 
 (* Environment Signature *)
-module type ENV =
-sig
+module type ENV = sig
   type ('a, 'b) t
   exception Not_bound
   val empty : ('a, 'b) t (* get empty environment *)
@@ -46,8 +36,7 @@ sig
 end
 
 (* Memory Implementation *)
-module Mem : MEM =
-struct
+module Mem : MEM = struct
   exception Not_allocated
   exception Not_initialized
   type 'a content = V of 'a | U
@@ -72,8 +61,7 @@ struct
 end
 
 (* Environment Implementation *)
-module Env : ENV=
-struct
+module Env : ENV = struct
   exception Not_bound
   type ('a, 'b) t = E of ('a -> 'b)
   let empty = E (fun x -> raise Not_bound)
@@ -84,8 +72,7 @@ end
 (*
  * K- Interpreter
  *)
-module type KMINUS =
-sig
+module type KMINUS = sig
   exception Error of string
   type id = string
   type exp =
@@ -125,8 +112,7 @@ sig
   val run : memory * env * program -> value
 end
 
-module K : KMINUS =
-struct
+module K : KMINUS = struct
   exception Error of string
 
   type id = string
@@ -180,12 +166,12 @@ struct
     | _ -> raise (Error "TypeError : not bool")
 
   let value_unit v =
-      match v with
+    match v with
       | Unit -> ()
       | _ -> raise (Error "TypeError : not unit")
 
   let value_record v =
-      match v with
+    match v with
       | Record r -> r
       | _ -> raise (Error "TypeError : not record")
 
@@ -206,22 +192,22 @@ struct
   let rec eval mem env e =
     match e with
     | READ x ->
-      let v = Num (read_int()) in
-      let l = lookup_env_loc env x in
-      (v, Mem.store mem l v)
+        let v = Num (read_int()) in
+        let l = lookup_env_loc env x in
+        (v, Mem.store mem l v)
     | WRITE e ->
-      let (v, mem') = eval mem env e in
-      let n = value_int v in
-      let _ = print_endline (string_of_int n) in
-      (v, mem')
+        let (v, mem') = eval mem env e in
+        let n = value_int v in
+        let _ = print_endline (string_of_int n) in
+        (v, mem')
     | LETV (x, e1, e2) ->
-      let (v, mem') = eval mem env e1 in
-      let (l, mem'') = Mem.alloc mem' in
-      eval (Mem.store mem'' l v) (Env.bind env x (Addr l)) e2
+        let (v, mem') = eval mem env e1 in
+        let (l, mem'') = Mem.alloc mem' in
+        eval (Mem.store mem'' l v) (Env.bind env x (Addr l)) e2
     | ASSIGN (x, e) ->
-      let (v, mem') = eval mem env e in
-      let l = lookup_env_loc env x in
-      (v, Mem.store mem' l v)
+        let (v, mem') = eval mem env e in
+        let l = lookup_env_loc env x in
+        (v, Mem.store mem' l v)
     | _ -> failwith "Unimplemented" (* TODO : Implement rest of the cases *)
 
   let run (mem, env, pgm) =
