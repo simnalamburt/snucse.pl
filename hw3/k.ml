@@ -202,6 +202,9 @@ module K : KMINUS = struct
       let result = Bool (f (value_int v1) (value_int v2)) in
       result, mem
     in
+    let fold_left2 f o a b =
+      try List.fold_left2 f o a b with | Invalid_argument _ -> raise (Error "InvalidArg")
+    in
     match einput with
     | READ name -> begin
       let value = Num (read_int()) in
@@ -277,12 +280,16 @@ module K : KMINUS = struct
       in
       let values, mem = List.fold_left batch_eval ([], mem) eparams in
       let names, ebody, env = lookup_env_proc env name in
-      let (mem: memory), env =
-        try
-          List.fold_left2 batch_assign (mem, env) names values
-        with
-        | Invalid_argument _ -> raise (Error "InvalidArg")
+      let mem, env = fold_left2 batch_assign (mem, env) names values in
+      eval mem env ebody
+    end
+    | CALLR (name, givens) -> begin
+      let batch_alias (env: env) (param: id) (given: id): env =
+        let loc = lookup_env_loc env given in
+        Env.bind env param (Addr loc)
       in
+      let params, ebody, env = lookup_env_proc env name in
+      let env = fold_left2 batch_alias env params givens in
       eval mem env ebody
     end
     | _ -> failwith "Unimplemented" (* TODO : Implement rest of the cases *)
