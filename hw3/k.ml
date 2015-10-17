@@ -202,6 +202,16 @@ module K : KMINUS = struct
       let result = Bool (f (value_int v1) (value_int v2)) in
       result, mem
     in
+    let batch_eval ((values, mem): value list * memory) (exp: exp): value list * memory =
+      let value, mem = eval mem env exp in
+      values@[value], mem
+    in
+    let batch_assign ((mem, env): memory * env) (name: id) (value: value): memory * env =
+      let loc, mem = Mem.alloc mem in
+      let mem = Mem.store mem loc value in
+      let env = Env.bind env name (Addr loc) in
+      mem, env
+    in
     let fold_left2 f o a b =
       try List.fold_left2 f o a b with | Invalid_argument _ -> raise (Error "InvalidArg")
     in
@@ -268,16 +278,6 @@ module K : KMINUS = struct
       eval mem env enext
     end
     | CALLV (name, eparams) -> begin
-      let batch_eval ((values, mem): value list * memory) (exp: exp): value list * memory =
-        let value, mem = eval mem env exp in
-        values@[value], mem
-      in
-      let batch_assign ((mem, env): memory * env) (name: id) (value: value): memory * env =
-        let loc, mem = Mem.alloc mem in
-        let mem = Mem.store mem loc value in
-        let env = Env.bind env name (Addr loc) in
-        mem, env
-      in
       let values, mem = List.fold_left batch_eval ([], mem) eparams in
       let names, ebody, env = lookup_env_proc env name in
       let mem, env = fold_left2 batch_assign (mem, env) names values in
@@ -291,6 +291,15 @@ module K : KMINUS = struct
       let params, ebody, env = lookup_env_proc env name in
       let env = fold_left2 batch_alias env params givens in
       eval mem env ebody
+    end
+    | RECORD [] -> Unit, mem
+    | RECORD (defs: (id * exp) list) -> begin
+      let names, expressions = List.split defs in
+      let values, mem = List.fold_left batch_eval ([], mem) expressions in
+      let renv = emptyEnv in
+      let mem, renv = fold_left2 batch_assign (mem, renv) names values in
+      let record = Record (lookup_env_loc renv) in
+      record, mem
     end
     | _ -> failwith "Unimplemented" (* TODO : Implement rest of the cases *)
 
