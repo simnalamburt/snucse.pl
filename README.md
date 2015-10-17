@@ -21,6 +21,7 @@ Programming Languages
 gem install diffy
 ./run
 ```
+![](http://i.imgur.com/7uk7NG3.png)
 
 #### [제출하기][submit]
 - [x] [Homework 1][hw1]
