@@ -24,8 +24,8 @@ end
 
 
 
-puts  'Homework 1'
-print 'Homework 2 ... '
+puts  'Homework 1.*'
+print 'Homework 2.* ... '
 assert system 'ocaml tests/basic.ml'
 
 
@@ -38,7 +38,7 @@ assert_eq `ocaml tests/hw2-ex7.ml`, File.read('tests/hw2-ex7')
 print 'Homework 3.1 ... '
 assert_eq `sh tests/hw3.sh < tests/hw3-input`, File.read('tests/hw3-output')
 
-print 'Homework 3.2 (COINS) ...   /100'
+print 'Homework 3.2 ...   /100'
 system 'g++ -std=c++0x -O3 tests/hw3-ex2.cc -o tests/hw3-ex2'
 result = true
 def test num
