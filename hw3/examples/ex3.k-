@@ -1,0 +1,26 @@
+let proc makeTree(value, left, right) =
+  { value := value, left := left, right := right }
+in
+let proc leaf(value)            = makeTree(value, (), ()) in
+let proc makeLtree(value, tree) = makeTree(value, tree, ()) in
+let proc makeRtree(value, tree) = makeTree(value, (), tree) in
+
+let proc isEmpty(tree) =
+  unit
+in
+let proc rTree(tree) =
+  unit
+in
+let proc lTree(tree) =
+  unit
+in
+let proc nodeVal(tree) =
+  unit
+in
+let proc dft(tree) =
+  unit
+in
+let proc bft(tree) =
+  unit
+in
+()
