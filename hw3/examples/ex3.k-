@@ -1,26 +1,59 @@
 let proc makeTree(value, left, right) =
   { value := value, left := left, right := right }
 in
+
 let proc leaf(value)            = makeTree(value, (), ()) in
 let proc makeLtree(value, tree) = makeTree(value, tree, ()) in
 let proc makeRtree(value, tree) = makeTree(value, (), tree) in
+let proc isEmpty(tree) = tree = () in
+let proc lTree(tree)   = tree.left in
+let proc rTree(tree)   = tree.right in
+let proc nodeVal(tree) = tree.value in
 
-let proc isEmpty(tree) =
-  unit
-in
-let proc rTree(tree) =
-  unit
-in
-let proc lTree(tree) =
-  unit
-in
-let proc nodeVal(tree) =
-  unit
-in
 let proc dft(tree) =
-  unit
+  if isEmpty(tree) then
+    ()
+  else (
+    write nodeVal(tree);
+    dft(lTree(tree));
+    dft(rTree(tree))
+  )
 in
 let proc bft(tree) =
   unit
 in
+2015
+
+;
+write if isEmpty(()) then 1 else 0;
+write if isEmpty(leaf(100)) then 1 else 0;
+let one_two_three := makeTree(100, leaf(200), leaf(300)) in
+write (lTree(one_two_three)).value;
+write (rTree(one_two_three)).value;
+write nodeVal(leaf(1000));
+
+let l1 := leaf(1) in
+let l2 := leaf(2) in
+let t1 := makeTree(3, l1, l2) in
+let t2 := makeLtree(11, t1) in
+let t3 := makeRtree(19, leaf(39)) in
+let t4 := makeTree(27, t3, t2) in
+dft(t4);
 ()
+
+(*
+
+1
+0
+200
+300
+1000
+27
+19
+39
+11
+3
+1
+2
+
+*)
