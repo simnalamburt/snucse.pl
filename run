@@ -51,3 +51,12 @@ for i in 0...100
 end
 print "\b"*6 + ' '*6 + "\b"*6
 assert result
+
+print 'Homework 3.3 ... '
+tmp_path = 'tests/hw3-ex3.tmp'
+code = File.read('hw3/examples/ex3.k-')
+test = File.read('tests/hw3-ex3.k-')
+File.write(tmp_path, code + ';' + test)
+actual = `hw3/run tests/hw3-ex3.tmp`
+File.delete tmp_path
+assert_eq actual, File.read('tests/hw3-ex3.out')
