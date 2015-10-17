@@ -196,12 +196,6 @@ module K : KMINUS = struct
       let result = Num (f (value_int v1) (value_int v2)) in
       result, mem
     in
-    let calc_bool (e1: exp) (e2: exp) (f: int -> int -> bool): value * memory =
-      let v1, mem = eval mem env e1 in
-      let v2, mem = eval mem env e2 in
-      let result = Bool (f (value_int v1) (value_int v2)) in
-      result, mem
-    in
     let batch_eval ((values, mem): value list * memory) (exp: exp): value list * memory =
       let value, mem = eval mem env exp in
       values@[value], mem
@@ -248,12 +242,22 @@ module K : KMINUS = struct
       let value = Mem.load mem (lookup_env_loc env name) in
       value, mem
     end
-    | ADD   (eleft, eright) -> calc_int  eleft eright ( + )
-    | SUB   (eleft, eright) -> calc_int  eleft eright ( - )
-    | MUL   (eleft, eright) -> calc_int  eleft eright ( * )
-    | DIV   (eleft, eright) -> calc_int  eleft eright ( / )
-    | EQUAL (eleft, eright) -> calc_bool eleft eright ( = )
-    | LESS  (eleft, eright) -> calc_bool eleft eright ( < )
+    | ADD   (e1, e2) -> calc_int e1 e2 ( + )
+    | SUB   (e1, e2) -> calc_int e1 e2 ( - )
+    | MUL   (e1, e2) -> calc_int e1 e2 ( * )
+    | DIV   (e1, e2) -> calc_int e1 e2 ( / )
+    | EQUAL (e1, e2) -> begin
+      let v1, mem = eval mem env e1 in
+      let v2, mem = eval mem env e2 in
+      let result = Bool (v1 == v2) in
+      result, mem
+    end
+    | LESS  (e1, e2) -> begin
+      let v1, mem = eval mem env e1 in
+      let v2, mem = eval mem env e2 in
+      let result = Bool ((value_int v1) < (value_int v2)) in
+      result, mem
+    end
     | NOT exp -> begin
       let value, mem = eval mem env exp in
       Bool (not (value_bool value)), mem
