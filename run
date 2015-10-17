@@ -1,28 +1,35 @@
 #!/usr/bin/env ruby
-result = true
-result &&= system 'ocaml tests/basic.ml'
-puts 'Homework 1 ... OK'
-result &&= system 'ocaml tests/hw2-ex2.ml'
-result &&= `ocaml tests/hw2-ex7.ml` == File.read('tests/hw2-ex7')
-puts 'Homework 2 ... OK'
+def assert result
+  unless result
+    puts 'Failed'
+    exit 1
+  end
+  puts 'OK'
+end
 
-result &&= `sh tests/hw3.sh < tests/hw3-input` == File.read('tests/hw3-output')
-puts 'Homework 3.1 (K- interpret) ... OK'
+puts  'Homework 1'
+print 'Homework 2 ... '
+assert system 'ocaml tests/basic.ml'
+
+
+print 'Homework 2.2 ... '
+assert system 'ocaml tests/hw2-ex2.ml'
+
+print 'Homework 2.7 ... '
+assert `ocaml tests/hw2-ex7.ml` == File.read('tests/hw2-ex7')
+
+print 'Homework 3.1 ... '
+assert `sh tests/hw3.sh < tests/hw3-input` == File.read('tests/hw3-output')
+
+print 'Homework 3.2 (COINS)   /100 ... '
 system 'g++ -std=c++0x -O3 tests/hw3-ex2.cc -o tests/hw3-ex2'
+result = true
 def test num
   `tests/hw3-ex2 #{num}` == `echo #{num} | hw3/run hw3/examples/ex2.k-`
 end
 test 10000
-print 'Homework 3.2 (COINS) ... ( 0/100)'
 for i in 0...100
-  test rand(1..10000)
-  print "\b"*8 + '(%2d/100)' % i
+  result &&= test rand(1..10000)
+  print "\b"*11 + '%2d/100 ... ' % i
 end
-puts "\b"*8 + 'OK' + ' '*6
-
-puts ''
-if result
-  puts 'OK'
-else
-  puts 'Test Failed!'
-end
+assert result
