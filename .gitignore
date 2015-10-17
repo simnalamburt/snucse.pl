@@ -4,3 +4,5 @@ hw3/lexer.ml
 hw3/parser.ml
 hw3/parser.mli
 hw3/run
+
+tests/hw3-ex2
