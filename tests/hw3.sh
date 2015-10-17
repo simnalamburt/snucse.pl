@@ -22,3 +22,5 @@ echo ''
 echo ''
 ./run examples/kcm.k-
 echo ''
+./run examples/func.k-
+echo ''
