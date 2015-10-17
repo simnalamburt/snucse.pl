@@ -3,6 +3,7 @@ result = true
 result &&= system 'ocaml tests/basic.ml'
 result &&= system 'ocaml tests/hw2-ex2.ml'
 result &&= `ocaml tests/hw2-ex7.ml` == File.read('tests/hw2-ex7')
+result &&= `sh tests/hw3.sh < tests/hw3-input` == File.read('tests/hw3-output')
 
 if result
   puts 'OK'

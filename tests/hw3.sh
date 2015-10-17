@@ -1,8 +1,8 @@
-cd ../hw3
+cd hw3
 make 1>/dev/null
 ./run examples/test1.k-
 echo ''
-./run examples/test2.k- < hw3-test2-input
+./run examples/test2.k-
 echo ''
 ./run examples/test3.k-
 echo ''

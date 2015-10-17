@@ -11,10 +11,6 @@
 #use "hw2/ex6.ml"
 #use "hw2/ex7.ml"
 
-#use "hw3/ex1.ml"
-#use "hw3/ex2.ml"
-#use "hw3/ex3.ml"
-
 #use "hw4/hw4.ml"
 #use "hw5/hw5.ml"
 #use "hw6/hw6.ml"
