@@ -244,7 +244,10 @@ module K : KMINUS = struct
     | TRUE      -> Bool true, mem
     | FALSE     -> Bool false, mem
     | UNIT      -> Unit, mem
-    | VAR name -> Mem.load mem (lookup_env_loc env name), mem
+    | VAR name -> begin
+      let value = Mem.load mem (lookup_env_loc env name) in
+      value, mem
+    end
     | ADD   (eleft, eright) -> calc_int  eleft eright ( + )
     | SUB   (eleft, eright) -> calc_int  eleft eright ( - )
     | MUL   (eleft, eright) -> calc_int  eleft eright ( * )
@@ -301,7 +304,21 @@ module K : KMINUS = struct
       let record = Record (lookup_env_loc renv) in
       record, mem
     end
-    | _ -> failwith "Unimplemented" (* TODO : Implement rest of the cases *)
+    | FIELD (erecord, key) -> begin
+      let record, mem = eval mem env erecord in
+      let func = value_record record in
+      let loc = func key in
+      let value = Mem.load mem loc in
+      value, mem
+    end
+    | ASSIGNF (erecord, key, evalue) -> begin
+      let record, mem = eval mem env erecord in
+      let value, mem = eval mem env evalue in
+      let func = value_record record in
+      let loc = func key in
+      let mem = Mem.store mem loc value in
+      value, mem
+    end
 
   let run (mem, env, pgm) =
     let (v, _ ) = eval mem env pgm in
