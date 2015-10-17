@@ -282,8 +282,10 @@ module K : KMINUS = struct
     end
     | CALLV (name, eparams) -> begin
       let values, mem = List.fold_left batch_eval ([], mem) eparams in
-      let names, ebody, env = lookup_env_proc env name in
-      let mem, env = fold_left2 batch_assign (mem, env) names values in
+      let params, ebody, env = lookup_env_proc env name in
+      let fenv = env in
+      let mem, env = fold_left2 batch_assign (mem, env) params values in
+      let env = Env.bind env name (Proc (params, ebody, fenv)) in
       eval mem env ebody
     end
     | CALLR (name, givens) -> begin
@@ -293,7 +295,9 @@ module K : KMINUS = struct
         Env.bind env param (Addr loc)
       in
       let params, ebody, env = lookup_env_proc env name in
+      let fenv = env in
       let env = fold_left2 batch_alias env params givens in
+      let env = Env.bind env name (Proc (params, ebody, fenv)) in
       eval mem env ebody
     end
     | RECORD [] -> Unit, mem
