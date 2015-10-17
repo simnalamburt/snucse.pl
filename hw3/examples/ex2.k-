@@ -34,5 +34,4 @@ let proc numch(n) = numch50000(n) in
 
 let input := 0 in
 read input;
-write numch(input);
-unit
+write numch(input)
