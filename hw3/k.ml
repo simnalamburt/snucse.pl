@@ -249,7 +249,7 @@ module K : KMINUS = struct
     | EQUAL (e1, e2) -> begin
       let v1, mem = eval mem env e1 in
       let v2, mem = eval mem env e2 in
-      let result = Bool (v1 == v2) in
+      let result = Bool (v1 = v2) in
       result, mem
     end
     | LESS  (e1, e2) -> begin

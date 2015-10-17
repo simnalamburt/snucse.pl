@@ -1,5 +1,5 @@
 cd hw3
-make 1>/dev/null
+make 1>/dev/null 2>/dev/null
 ./run examples/test1.k-
 echo ''
 ./run examples/test2.k-

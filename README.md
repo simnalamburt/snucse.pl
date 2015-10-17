@@ -18,6 +18,7 @@ Programming Languages
 
 #### 테스트하기
 ```sh
+gem install diffy
 ./run
 ```
 
