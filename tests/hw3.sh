@@ -20,3 +20,5 @@ echo ''
 echo ''
 ./run examples/test10.k-
 echo ''
+./run examples/kcm.k-
+echo ''
