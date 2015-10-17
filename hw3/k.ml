@@ -287,8 +287,9 @@ module K : KMINUS = struct
       eval mem env ebody
     end
     | CALLR (name, givens) -> begin
+      let oldenv = env in
       let batch_alias (env: env) (param: id) (given: id): env =
-        let loc = lookup_env_loc env given in
+        let loc = lookup_env_loc oldenv given in
         Env.bind env param (Addr loc)
       in
       let params, ebody, env = lookup_env_proc env name in
