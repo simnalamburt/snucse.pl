@@ -26,7 +26,7 @@ gem install diffy
 #### [제출하기][submit]
 - [x] [Homework 1][hw1]
 - [x] [Homework 2][hw2]
-- [ ] [Homework 3][hw3]
+- [x] [Homework 3][hw3]
 - [ ] [Homework 4][hw4]
 - [ ] [Homework 5][hw5]
 - [ ] [Homework 6][hw6]
