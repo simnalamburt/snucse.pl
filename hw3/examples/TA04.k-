@@ -1,0 +1,2 @@
+let proc f (x) = x + 1 in
+g(1)

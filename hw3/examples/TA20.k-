@@ -1,0 +1,11 @@
+let x := 1 in
+let y := 5 in
+let proc f (z) =
+  if z then (x := x + 1) else (y := y - 2)
+in
+let x := 10 in
+let y := 50 in
+let proc g (z) =
+  if z then (x := x + 5) else (y := y - 10)
+in
+write (g (true) + g (false) + x + y + f (true) + f (false) + x + y)

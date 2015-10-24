@@ -1,0 +1,6 @@
+let x := 1 in
+let sum := 0 in
+while (x < 11) do (
+   sum := sum + x;
+   x := x + 1
+); write sum

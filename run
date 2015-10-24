@@ -6,6 +6,7 @@ Diffy::Diff.default_format = :color
 def assert result
   if result; return; end
 
+  puts
   puts 'Failed'
   exit 1
 end
@@ -13,6 +14,7 @@ end
 def assert_eq left, right
   if left == right; return; end
 
+  puts
   puts 'Failed'
   puts " \e[32mEXPECTED\e[0m  \e[31mACTUAL\e[0m"
   puts '-'*40

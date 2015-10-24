@@ -1,0 +1,5 @@
+let proc f (x, y, z) = x + y + z in
+(f (1, 2, 3) +
+  let proc f (x, y) = x + y in
+  f (1, 2, 3)
+)

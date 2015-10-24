@@ -1,0 +1,6 @@
+let proc f (x) = (x := 3) in
+let proc g (x) = (x := 3) in
+let x := 1 in
+let y := 2 in
+f <x>; g (y);
+write (x + y)

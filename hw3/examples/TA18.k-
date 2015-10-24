@@ -1,0 +1,3 @@
+let proc f (x) = x + 1 in
+let f := 2 in
+write (f + f)

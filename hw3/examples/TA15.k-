@@ -1,0 +1,2 @@
+let x := {i1 := 1, i2 := 2, i3 := {ii1 := true, ii2 := unit} } in
+if x.i3.ii2 = unit then write 100 else write 200

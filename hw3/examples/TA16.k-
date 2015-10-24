@@ -1,0 +1,3 @@
+let x := 1 in
+let proc f (x, y, z) = x + y + z in
+write (f (x := x + 1, x := x + 1, x := x + 1))

@@ -1,0 +1,6 @@
+let x := 1 in
+let proc f (x, y, z) =
+  (x := x + (y := y + 1) + (z := z + 1))
+in
+f <x, x, x>;
+write x

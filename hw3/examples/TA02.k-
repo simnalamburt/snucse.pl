@@ -1,0 +1,14 @@
+if (3 < 5) then (
+  write 1;
+  if (not false) then (
+    write 11;
+    if (20 < 10) then
+      write 111
+    else
+      write 222
+  )
+  else
+    write 22
+)
+else
+  unit
