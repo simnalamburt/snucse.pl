@@ -80,7 +80,7 @@ puts 'OK'
 
 
 print 'Homework 3.1 ... '
-`cd hw3 && make`
+`cd hw3 && make 2>/dev/null`
 glob = Dir.glob('hw3/examples/*.out')
 counter = Counter.new glob.count
 glob.each_with_index do |name, i|
