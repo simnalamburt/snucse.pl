@@ -104,10 +104,11 @@ puts 'OK'
 
 print 'Homework 3.2 ... '
 
-tmp = TempMsg.new 'Compiling'
+tmp = TempMsg.new 'Compiling reference program'
 system 'g++ -std=c++0x -O3 tests/hw3-ex2.cc -o tests/hw3-ex2'
 tmp.clean
 
+tmp = TempMsg.new 'Testing '
 try = 120
 counter = Counter.new try
 def test num
@@ -121,6 +122,7 @@ try.times do
   counter.tick
   test rand(1..10000)
 end
+tmp.clean
 counter.clean
 puts 'OK'
 
