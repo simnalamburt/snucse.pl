@@ -107,14 +107,15 @@ puts 'OK'
 print 'Homework 3.2 ... '
 
 tmp = TempMsg.new 'Compiling reference program'
-system 'g++ -std=c++0x -O3 tests/hw3-ex2.cc -o tests/hw3-ex2'
+@exename = "tests/coin"
+system "g++ -std=c++0x -O3 tests/hw3-ex2.cc -o #{@exename}"
 tmp.clean
 
 tmp = TempMsg.new 'Testing '
 try = 120
 counter = Counter.new try
 def test num
-  assert_eq `echo #{num} | hw3/run hw3/examples/ex2.k-`, `tests/hw3-ex2 #{num}`
+  assert_eq `echo #{num} | hw3/run hw3/examples/ex2.k-`, `#{@exename} #{num}`
 end
 
 try -= 1
@@ -124,8 +125,11 @@ try.times do
   counter.tick
   test rand(1..10000)
 end
+
 tmp.clean
 counter.clean
+File.delete @exename
+
 puts 'OK'
 
 

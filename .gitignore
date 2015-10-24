@@ -5,5 +5,5 @@ hw3/parser.ml
 hw3/parser.mli
 hw3/run
 
-tests/hw3-ex2
+tests/coin
 tests/hw3-ex3.tmp
