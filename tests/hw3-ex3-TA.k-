@@ -1,0 +1,40 @@
+(* nodeval *)
+let tr := makeTree(1, leaf(2), leaf(3)) in
+write (nodeVal (lTree(tr)))
+;
+
+(* makeRtree + lTree + isEmpty *)
+let tr := makeRtree (1, (leaf (2))) in
+if isEmpty (lTree (tr)) then write (1) else write (0)
+;
+
+(* makeRtree + rTree + nodeVal *)
+let tr1 := makeRtree (1, leaf (2)) in
+let tr2 := makeTree (3, tr1, leaf (4)) in
+let n1 := nodeVal (rTree (lTree (tr2))) in
+let n2 := nodeVal (tr2) in
+write (n1 + n2)
+;
+
+(* dft *)
+let t6 := leaf (7) in
+let t5 := makeLtree (6, t6) in
+let t2 := makeLtree (5, t5) in
+let t4 := leaf (4) in
+let t3 := makeRtree (2, leaf (3)) in
+let t1 := makeTree (1, t3, t4) in
+let t0 := makeTree (0, t1, t2) in
+dft (t0)
+;
+
+(* bft *)
+let t6 := leaf (7) in
+let t5 := makeLtree (6, t6) in
+let t2 := makeLtree (5, t5) in
+let t4 := leaf (4) in
+let t3 := makeRtree (2, leaf (3)) in
+let t1 := makeTree (1, t3, t4) in
+let t0 := makeTree (0, t1, t2) in
+bft (t0)
+;
+()

@@ -6,4 +6,4 @@ hw3/parser.mli
 hw3/run
 
 tests/coin
-tests/hw3-ex3.tmp
+tests/tmp

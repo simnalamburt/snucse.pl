@@ -11,15 +11,15 @@ def assert result
   exit 1
 end
 
-def assert_eq left, right
-  if left == right; return; end
+def assert_eq actual, expected
+  if actual == expected; return; end
 
   puts
   puts 'Failed'
   puts " \e[32mEXPECTED\e[0m  \e[31mACTUAL\e[0m"
   puts '-'*40
   puts
-  puts Diffy::Diff.new left, right
+  puts Diffy::Diff.new actual, expected
   exit 1
 end
 
@@ -134,11 +134,19 @@ puts 'OK'
 
 
 print 'Homework 3.3 ... '
-tmp_path = 'tests/hw3-ex3.tmp'
-code = File.read('hw3/examples/ex3.k-')
-test = File.read('tests/hw3-ex3.k-')
-File.write(tmp_path, code + ';' + test)
-actual = `hw3/run tests/hw3-ex3.tmp`
-File.delete tmp_path
-assert_eq actual, File.read('tests/hw3-ex3.out')
+def test name
+  code = File.read('hw3/examples/ex3.k-')
+  test = File.read("tests/#{name}.k-")
+
+  tmp = 'tests/tmp'
+  File.write(tmp, code + ';' + test)
+  actual = `hw3/run #{tmp}`
+  File.delete tmp
+
+  expected = File.read("tests/#{name}.out")
+
+  assert_eq actual, expected
+end
+test 'hw3-ex3'
+test 'hw3-ex3-TA'
 puts 'OK'
