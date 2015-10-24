@@ -6,24 +6,28 @@ type map = End of treasure
 
 exception IMPOSSIBLE
 
+module Dict = Map.Make(String)
+type dict = key Dict.t
+
 let getReady (expression: map): key list =
-  let rec inference (expression: map): key =
+  let rec inference (expression: map) (env: dict): key =
     match expression with
     | End(value) -> begin
       (* Term *)
       match value with
       | StarBox -> (* Constant *) Bar
       | NameBox(name) -> begin
-        (* Variable, TODO *)
-        Bar
+        (* Variable *)
+        try Dict.find name env
+        with Not_found -> Bar
       end
     end
     | Branch(efunc, eparam) -> begin
-      let tfunc = inference efunc in
+      let tfunc = inference efunc env in
       match tfunc with
       | Bar -> raise IMPOSSIBLE
       | Node(tparam_expected, treturn) -> begin
-        let tparam_actual = inference eparam in
+        let tparam_actual = inference eparam env in
         if tparam_expected = tparam_actual then
           treturn
         else
@@ -35,4 +39,4 @@ let getReady (expression: map): key list =
       Bar
     end
   in
-  [inference expression]
+  [inference expression Dict.empty]
