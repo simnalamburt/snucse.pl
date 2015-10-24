@@ -4,15 +4,14 @@ require 'diffy'
 Diffy::Diff.default_format = :color
 
 def assert result
-  unless result
-    puts 'Failed'
-    exit 1
-  end
-  puts 'OK'
+  if result; return; end
+
+  puts 'Failed'
+  exit 1
 end
 
 def assert_eq left, right
-  if left == right; puts 'OK'; return; end
+  if left == right; return; end
 
   puts 'Failed'
   puts " \e[32mEXPECTED\e[0m  \e[31mACTUAL\e[0m"
@@ -22,35 +21,109 @@ def assert_eq left, right
   exit 1
 end
 
+class Fixnum
+  def digits
+    Math.log10(self).to_i + 1
+  end
+end
+
+class Counter
+  def initialize total
+    @format = "%#{(total - 1).digits}d/#{total}"
+    @iter = 0
+    @total = total
+    @print_length = 0
+  end
+
+  def tick
+    msg = @format % @iter
+    print "\b"*@print_length + msg
+
+    @iter += 1
+    @print_length = msg.length
+  end
+
+  def clean
+    print "\b"*@print_length + ' '*@print_length + "\b"*@print_length
+
+    @iter = @total
+    @print_length = 0
+  end
+end
+
+class TempMsg
+  def initialize string
+    print string
+    @clean = "\b"*string.length + ' '*string.length + "\b"*string.length
+  end
+
+  def clean
+    print @clean
+  end
+end
 
 
 puts  'Homework 1.*'
 print 'Homework 2.* ... '
 assert system 'ocaml tests/basic.ml'
+puts 'OK'
 
 
 print 'Homework 2.2 ... '
 assert system 'ocaml tests/hw2-ex2.ml'
+puts 'OK'
+
 
 print 'Homework 2.7 ... '
 assert_eq `ocaml tests/hw2-ex7.ml`, File.read('tests/hw2-ex7')
+puts 'OK'
+
 
 print 'Homework 3.1 ... '
-assert_eq `sh tests/hw3.sh < tests/hw3-input`, File.read('tests/hw3-output')
+`cd hw3 && make`
+glob = Dir.glob('hw3/examples/*.out')
+counter = Counter.new glob.count
+glob.each_with_index do |name, i|
+  code = File.basename(name, '.out')
 
-print 'Homework 3.2 ...   /100'
+  input = File.join('hw3', 'examples', File.basename(name, '.out') + '.in')
+  actual = unless File.exist?(input)
+    `hw3/run hw3/examples/#{code}.k-`
+  else
+    `hw3/run hw3/examples/#{code}.k- < #{input}`
+  end
+
+  expected = File.read(name)
+
+  assert_eq actual, expected
+  counter.tick
+end
+counter.clean
+puts 'OK'
+
+
+print 'Homework 3.2 ... '
+
+tmp = TempMsg.new 'Compiling'
 system 'g++ -std=c++0x -O3 tests/hw3-ex2.cc -o tests/hw3-ex2'
-result = true
+tmp.clean
+
+try = 120
+counter = Counter.new try
 def test num
-  `tests/hw3-ex2 #{num}` == `echo #{num} | hw3/run hw3/examples/ex2.k-`
+  assert_eq `echo #{num} | hw3/run hw3/examples/ex2.k-`, `tests/hw3-ex2 #{num}`
 end
+
+try -= 1
+counter.tick
 test 10000
-for i in 0...100
-  result &&= test rand(1..10000)
-  print "\b"*6 + '%2d/100' % i
+try.times do
+  counter.tick
+  test rand(1..10000)
 end
-print "\b"*6 + ' '*6 + "\b"*6
-assert result
+counter.clean
+puts 'OK'
+
 
 print 'Homework 3.3 ... '
 tmp_path = 'tests/hw3-ex3.tmp'
@@ -60,3 +133,4 @@ File.write(tmp_path, code + ';' + test)
 actual = `hw3/run tests/hw3-ex3.tmp`
 File.delete tmp_path
 assert_eq actual, File.read('tests/hw3-ex3.out')
+puts 'OK'
