@@ -457,15 +457,6 @@ assert (e1 = [1]);
 assert (q3 = ([], [[2; 3]; [4; 5; 6]]));
 ;;
 
-(*
- * Homework 3
- *)
-
-
-(*
- * Homework 4
- *)
-
 
 (*
  * Homework 5
