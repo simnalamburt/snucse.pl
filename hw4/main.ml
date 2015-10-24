@@ -19,8 +19,16 @@ let getReady (expression: map): key list =
       end
     end
     | Branch(efunc, eparam) -> begin
-      (* Function call, TODO *)
-      Bar
+      let tfunc = inference efunc in
+      match tfunc with
+      | Bar -> raise IMPOSSIBLE
+      | Node(tparam_expected, treturn) -> begin
+        let tparam_actual = inference eparam in
+        if tparam_expected = tparam_actual then
+          treturn
+        else
+          raise IMPOSSIBLE
+      end
     end
     | Guide(name, body) -> begin
       (* Function definition, TODO *)
