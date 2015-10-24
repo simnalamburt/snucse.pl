@@ -29,7 +29,7 @@ end
 
 class Counter
   def initialize total
-    @format = "%#{(total - 1).digits}d/#{total}"
+    @format = "%0#{(total - 1).digits}d/#{total}"
     @iter = 0
     @total = total
     @print_length = 0
