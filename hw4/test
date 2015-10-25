@@ -28,11 +28,12 @@ let reset = "\x1b[0m"
 let red   = "\x1b[31m"
 let green = "\x1b[32m"
 let brown = "\x1b[33m"
+let good  = "\x1b[38;5;045m"
 let gray  = "\x1b[37m"
 
 let counter = ref 0
 
-let expect map result =
+let expect map expected =
   counter := !counter + 1;
   try
     let rec s key =
@@ -43,24 +44,24 @@ let expect map result =
     let keylist = getReady map in
     let stringlist = List.map s keylist in
     let concated = String.concat ", " stringlist in
-    let trial = sprintf "{%s}" concated in
+    let actual = sprintf "{%s}" concated in
 
 
-    if compare trial result == 0 then
-      printf "%s[%2d]%s OK\n" green !counter reset
+    if compare actual expected == 0 then
+      printf "%s[%2d]%s %s%s%s\n" green !counter reset good expected reset
     else
       let format = format_of_string begin
-        if String.length trial + String.length result <= 80 then
+        if String.length actual + String.length expected <= 80 then
           "%s[%2d]%s %s%s%s != %s%s%s\n"
         else
           "\n%s[%2d]%s %s%s%s\n  != %s%s%s\n"
       end in
       printf format red   !counter reset
-                    gray  trial    reset
-                    brown result   reset
+                    gray  actual    reset
+                    brown expected   reset
   with
   | IMPOSSIBLE -> printf "%s[%2d]%s Expected %s%s%s, but recieved IMPOSSIBLE\n"
-                        red !counter reset  brown result reset
+                        red !counter reset  brown expected reset
 
 let expect_fail map =
   counter := !counter + 1;
@@ -71,7 +72,7 @@ let expect_fail map =
     with
     | IMPOSSIBLE -> true
     | _ -> false
-  then printf "%s[%2d]%s OK\n" green !counter reset
+  then printf "%s[%2d]%s %sIMPOSSIBLE%s\n" green !counter reset good reset
   else printf "%s[%2d]%s Expected a %sInvalid_argument%s exception\n"
     red   !counter reset
     brown          reset
