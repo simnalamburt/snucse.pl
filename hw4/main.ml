@@ -49,14 +49,6 @@ let apply_env (subst: substitution) (tyenv: tyenv): tyenv =
   in
   List.map apply_entity tyenv
 
-let new_variable: unit -> ty =
-  let counter = ref 0 in
-  fun () -> begin
-    let str = Printf.sprintf "__temporary_variable_%d" !counter in
-    counter := !counter + 1;
-    TyVar str
-  end
-
 
 let rec occurs (var: tyvar) (ty: ty): bool =
   match ty with
@@ -78,13 +70,24 @@ let rec unify (left: ty) (right: ty): substitution =
 
 
 (*
- * The *M* Algorithm
- *
- * LEE, Oukseh; YI, Kwangkeun. Proofs about a folklore let-polymorphic type
- * inference algorithm. ACM Transactions on Programming Languages and Systems
- * (TOPLAS), 1998, 20.4: 707-723.
+ * Inference type of given expression
  *)
 let inference (exp: expression): substitution =
+  let new_variable: unit -> ty =
+    let counter = ref 0 in
+    fun () -> begin
+      let str = Printf.sprintf "__temporary_variable_%d" !counter in
+      counter := !counter + 1;
+      TyVar str
+    end
+  in
+  (*
+   * The *M* Algorithm
+   *
+   * LEE, Oukseh; YI, Kwangkeun. Proofs about a folklore let-polymorphic type
+   * inference algorithm. ACM Transactions on Programming Languages and Systems
+   * (TOPLAS), 1998, 20.4: 707-723.
+   *)
   let rec m_algorithm (tyenv: tyenv) (exp: expression) (ty: ty): substitution =
     match exp with
     | Term Number -> unify Constant ty
