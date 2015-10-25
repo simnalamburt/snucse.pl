@@ -44,8 +44,10 @@ let rec apply (subst: substitution) (ty: ty): ty =
   | _ -> ty
 
 let apply_env (subst: substitution) (tyenv: tyenv): tyenv =
-  (* TODO *)
-  tyenv
+  let apply_entity ((name, ty): (id * ty)): (id * ty) =
+    (name, apply subst ty)
+  in
+  List.map apply_entity tyenv
 
 
 let rec occurs (var: tyvar) (ty: ty): bool =
