@@ -37,12 +37,16 @@ type tyenv = (id * ty) list
 
 type substitution = (tyvar * ty) list
 
-
 let rec apply (subst: substitution) (ty: ty): ty =
   match ty with
   | TyVar right -> List.assoc right subst (* TODO: 예외처리 *)
   | Constant -> Constant
   | Function(_, ret) -> apply subst ret
+
+let apply_env (subst: substitution) (tyenv: tyenv): tyenv =
+  (* TODO *)
+  tyenv
+
 
 let rec occurs (var: tyvar) (ty: ty): bool =
   match ty with
@@ -62,6 +66,7 @@ let rec unify (left: ty) (right: ty): substitution =
   end
   | _ -> raise IMPOSSIBLE
 
+
 (*
  * The *M* Algorithm
  *
@@ -69,11 +74,28 @@ let rec unify (left: ty) (right: ty): substitution =
  * inference algorithm. ACM Transactions on Programming Languages and Systems
  * (TOPLAS), 1998, 20.4: 707-723.
  *)
-let m_algorithm (tyenv: tyenv) (exp: expression) (ty: ty): substitution =
+let new_variable: ty =
+  (* TODO *)
+  TyVar ""
+
+let rec m_algorithm (tyenv: tyenv) (exp: expression) (ty: ty): substitution =
   match exp with
   | Term Number -> unify Constant ty
   | Term Variable x when List.mem_assoc x tyenv -> begin
     let tright = List.assoc x tyenv in
     unify ty tright
   end
-  | _ -> [] (* TODO *)
+  | FnDef(name, edef) -> begin
+    let alpha1 = new_variable in
+    let alpha2 = new_variable in
+    let subst1 = unify (Function(alpha1, alpha2)) ty in
+    let subst2 = m_algorithm (apply_env subst1 tyenv @ [(name, apply subst1 alpha1)]) edef (apply subst1 alpha2) in
+    subst2 @ subst1 (* Note: tyvar 중복체크 안해도 됨 *)
+  end
+  | FnCall(efunc, eparam) -> begin
+    let alpha = new_variable in
+    let subst1 = m_algorithm tyenv efunc (Function(alpha, ty)) in
+    let subst2 = m_algorithm (apply_env subst1 tyenv) eparam (apply subst1 alpha) in
+    subst2 @ subst1 (* Note: tyvar 중복체크 안해도 됨 *)
+  end
+  | _ -> raise IMPOSSIBLE
