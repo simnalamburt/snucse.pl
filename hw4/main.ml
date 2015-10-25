@@ -31,7 +31,7 @@ type expression = Term of term
 
 type tyvar = id
 type ty = TyVar of tyvar
-        | Constant
+        | T
         | Function of ty * ty
 type tyenv = (id * ty) list
 
@@ -53,7 +53,7 @@ let apply_env (subst: substitution) (tyenv: tyenv): tyenv =
 let rec occurs (var: tyvar) (ty: ty): bool =
   match ty with
   | TyVar right -> var = right
-  | Constant -> false
+  | T -> false
   | Function(tparam, tret) -> occurs var tparam || occurs var tret
 
 let rec unify (left: ty) (right: ty): substitution =
@@ -93,7 +93,7 @@ let dedup ?(compare=Pervasives.compare) list =
 let rec print_ty (ty: ty) =
   match ty with
   | TyVar name -> print_string name
-  | Constant -> print_string "T"
+  | T -> print_string "T"
   | Function(tparam, tret) -> begin
     print_ty tparam;
     print_string " -> ";
@@ -148,7 +148,7 @@ let getReady (map: map): key list =
      *)
     let rec m_algorithm (tyenv: tyenv) (exp: expression) (ty: ty): substitution =
       match exp with
-      | Term Number -> unify Constant ty
+      | Term Number -> unify T ty
       | Term Variable x -> begin
         if List.mem_assoc x tyenv then
           let tright = List.assoc x tyenv in
