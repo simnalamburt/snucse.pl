@@ -105,3 +105,21 @@ let rec m_algorithm (tyenv: tyenv) (exp: expression) (ty: ty): substitution =
     subst2 @ subst1 (* Note: tyvar 중복체크 안해도 됨 *)
   end
   | _ -> raise IMPOSSIBLE
+
+
+(*
+ * Interface
+ *)
+let getReady (map: map): key list =
+  let rec map_to_exp (map: map): expression =
+    match map with
+    | End StarBox -> Term Number
+    | End NameBox name -> Term(Variable name)
+    | Branch(mleft, mright) -> FnCall(map_to_exp mleft, map_to_exp mright)
+    | Guide(name, minner) -> FnDef(name, map_to_exp minner)
+  in
+  let exp = map_to_exp map in
+  let alpha = new_variable () in
+  let result: substitution = m_algorithm [] exp alpha in
+  (* TODO *)
+  []
