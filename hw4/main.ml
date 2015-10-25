@@ -106,20 +106,32 @@ let rec m_algorithm (tyenv: tyenv) (exp: expression) (ty: ty): substitution =
   end
   | _ -> raise IMPOSSIBLE
 
+let inference (exp: expression): substitution =
+  let alpha = new_variable () in
+  m_algorithm [] exp alpha
+
 
 (*
  * Interface
  *)
-let getReady (map: map): key list =
-  let rec map_to_exp (map: map): expression =
-    match map with
-    | End StarBox -> Term Number
-    | End NameBox name -> Term(Variable name)
-    | Branch(mleft, mright) -> FnCall(map_to_exp mleft, map_to_exp mright)
-    | Guide(name, minner) -> FnDef(name, map_to_exp minner)
-  in
-  let exp = map_to_exp map in
-  let alpha = new_variable () in
-  let result: substitution = m_algorithm [] exp alpha in
+let rec map_to_exp (map: map): expression =
+  match map with
+  | End StarBox -> Term Number
+  | End NameBox name -> Term(Variable name)
+  | Branch(mleft, mright) -> FnCall(map_to_exp mleft, map_to_exp mright)
+  | Guide(name, minner) -> FnDef(name, map_to_exp minner)
+
+let rec ty_to_key (ty: ty): key =
+  match ty with
+  | Constant -> Bar
+  | Function(tleft, tright) -> Node(ty_to_key tleft, ty_to_key tright)
   (* TODO *)
-  []
+  | TyVar name -> Bar
+
+let getReady (map: map): key list =
+  let exp = map_to_exp map in
+  let result = inference exp in
+  let subst_to_keylist ((tyvar, ty): (tyvar * ty)): key =
+    ty_to_key ty
+  in
+  List.map subst_to_keylist result
