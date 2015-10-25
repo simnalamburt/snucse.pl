@@ -69,8 +69,6 @@ let rec unify (left: ty) (right: ty): substitution =
   | _ -> raise IMPOSSIBLE
 
 
-
-
 (*
  * Utility functions from Core.Std
  *)
@@ -102,15 +100,9 @@ let rec map_to_exp (map: map): expression =
   | Branch(mleft, mright) -> FnCall(map_to_exp mleft, map_to_exp mright)
   | Guide(name, minner) -> FnDef(name, map_to_exp minner)
 
-let rec ty_to_key (ty: ty): key =
-  match ty with
-  | Constant -> Bar
-  | Function(tleft, tright) -> Node(ty_to_key tleft, ty_to_key tright)
-  | TyVar _ -> Bar (* Note: Undifined variable은 Bar로 가정 *)
-
 let getReady (map: map): key list =
   (* Stateful functions *)
-  let types = ref [] in
+  let keys = ref [] in
   let new_variable: unit -> ty =
     let counter = ref 0 in
     fun () -> begin
@@ -154,8 +146,15 @@ let getReady (map: map): key list =
     and m_wrapped (tyenv: tyenv) (exp: expression) (ty: ty): substitution =
       match exp with
       | Term term -> begin
+        (* Note: (List.length result) is always 1 *)
         let result = m_algorithm tyenv exp ty in
-        types := !types @ List.map (fun (_, ty) -> ty) result;
+        let types = List.map (fun (_, ty) -> ty) result in
+        let rec ty_to_key (ty: ty): key =
+          match ty with
+          | Function(tleft, tright) -> Node(ty_to_key tleft, ty_to_key tright)
+          | _ -> Bar
+        in
+        keys := !keys @ List.map ty_to_key types;
         result
       end
       | _ -> m_algorithm tyenv exp ty
@@ -164,5 +163,4 @@ let getReady (map: map): key list =
   in
   let exp = map_to_exp map in
   let _ = inference exp in
-  let keys = List.map ty_to_key !types in
-  dedup keys
+  dedup !keys
