@@ -1,17 +1,42 @@
+(*
+ * Spec
+ *)
+(* Term *)
+type treasure = StarBox (* constant *)
+              | NameBox of string (* variable *)
+
+(* Type *)
+type key = Bar (* arbitrary type *)
+         | Node of key * key (* function *)
+
+(* Expression *)
+type map = End of treasure (* term *)
+         | Branch of map * map (* function call *)
+         | Guide of string * map (* function definition *)
+
 exception IMPOSSIBLE
 
-type tyvar = string
+
+(*
+ * Implementation
+ *)
+type id = string
+
+type term = Number
+          | Variable of id
+
+type expression = Term of term
+                | FnCall of expression * expression
+                | FnDef of id * expression
+
+type tyvar = id
 type ty = TyVar of tyvar
         | Constant
         | Function of ty * ty
+type tyenv = (id * ty) list
 
 type substitution = (tyvar * ty) list
 
-let rec occurs (var: tyvar) (ty: ty): bool =
-  match ty with
-  | TyVar(right) -> var = right
-  | Constant -> false
-  | Function(_, ret) -> occurs var ret
 
 let rec apply (subst: substitution) (ty: ty): ty =
   match ty with
@@ -20,6 +45,12 @@ let rec apply (subst: substitution) (ty: ty): ty =
   end
   | Constant -> Constant
   | Function(_, ret) -> apply subst ret
+
+let rec occurs (var: tyvar) (ty: ty): bool =
+  match ty with
+  | TyVar(right) -> var = right
+  | Constant -> false
+  | Function(_, ret) -> occurs var ret
 
 let rec unify (left: ty) (right: ty): substitution =
   if left = right then
@@ -40,51 +71,13 @@ let rec unify (left: ty) (right: ty): substitution =
     end
     | _ -> raise IMPOSSIBLE
 
-
-
-
-
-
 (*
-type treasure = StarBox | NameBox of string
-type key = Bar | Node of key * key
-type map = End of treasure
-         | Branch of map * map
-         | Guide of string * map
-
-
-module Dict = Map.Make(String)
-type dict = key Dict.t
-
-let getReady (expression: map): key list =
-  let rec inference (expression: map) (env: dict): key =
-    match expression with
-    | End(value) -> begin
-      (* Term *)
-      match value with
-      | StarBox -> (* Constant *) Bar
-      | NameBox(name) -> begin
-        (* Variable *)
-        try Dict.find name env
-        with Not_found -> Bar
-      end
-    end
-    | Branch(efunc, eparam) -> begin
-      let tfunc = inference efunc env in
-      match tfunc with
-      | Bar -> raise IMPOSSIBLE
-      | Node(tparam_expected, treturn) -> begin
-        let tparam_actual = inference eparam env in
-        if tparam_expected = tparam_actual then
-          treturn
-        else
-          raise IMPOSSIBLE
-      end
-    end
-    | Guide(name, body) -> begin
-      (* Function definition, TODO *)
-      Bar
-    end
-  in
-  [inference expression Dict.empty]
-*)
+ * The *M* Algorithm
+ *
+ * LEE, Oukseh; YI, Kwangkeun. Proofs about a folklore let-polymorphic type
+ * inference algorithm. ACM Transactions on Programming Languages and Systems
+ * (TOPLAS), 1998, 20.4: 707-723.
+ *)
+let m_algorithm (tyenv: tyenv) (exp: expression) (ty: ty): substitution =
+  (* TODO *)
+  []
