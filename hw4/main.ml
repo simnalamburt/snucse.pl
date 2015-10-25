@@ -69,50 +69,6 @@ let rec unify (left: ty) (right: ty): substitution =
   | _ -> raise IMPOSSIBLE
 
 
-(*
- * Inference type of given expression
- *)
-let inference (exp: expression): substitution =
-  let new_variable: unit -> ty =
-    let counter = ref 0 in
-    fun () -> begin
-      let str = Printf.sprintf "α%d" !counter in
-      counter := !counter + 1;
-      TyVar str
-    end
-  in
-  (*
-   * The *M* Algorithm
-   *
-   * LEE, Oukseh; YI, Kwangkeun. Proofs about a folklore let-polymorphic type
-   * inference algorithm. ACM Transactions on Programming Languages and Systems
-   * (TOPLAS), 1998, 20.4: 707-723.
-   *)
-  let rec m_algorithm (tyenv: tyenv) (exp: expression) (ty: ty): substitution =
-    match exp with
-    | Term Number -> unify Constant ty
-    | Term Variable x -> begin
-      if List.mem_assoc x tyenv then
-        let tright = List.assoc x tyenv in
-        unify ty tright
-      else
-        unify ty (TyVar x)
-    end
-    | FnDef(name, edef) -> begin
-      let alpha1 = new_variable () in
-      let alpha2 = new_variable () in
-      let subst1 = unify (Function(alpha1, alpha2)) ty in
-      let subst2 = m_algorithm (apply_env subst1 tyenv @ [(name, apply subst1 alpha1)]) edef (apply subst1 alpha2) in
-      subst2 @ subst1 (* Note: tyvar 중복체크 안해도 됨 *)
-    end
-    | FnCall(efunc, eparam) -> begin
-      let alpha = new_variable () in
-      let subst1 = m_algorithm tyenv efunc (Function(alpha, ty)) in
-      let subst2 = m_algorithm (apply_env subst1 tyenv) eparam (apply subst1 alpha) in
-      subst2 @ subst1 (* Note: tyvar 중복체크 안해도 됨 *)
-    end
-  in
-  m_algorithm [] exp (new_variable ())
 
 
 (*
@@ -150,11 +106,63 @@ let rec ty_to_key (ty: ty): key =
   match ty with
   | Constant -> Bar
   | Function(tleft, tright) -> Node(ty_to_key tleft, ty_to_key tright)
-  (* TODO *)
-  | TyVar name -> Bar
+  | TyVar _ -> Bar (* Note: Undifined variable은 Bar로 가정 *)
 
 let getReady (map: map): key list =
+  (* Stateful functions *)
+  let types = ref [] in
+  let new_variable: unit -> ty =
+    let counter = ref 0 in
+    fun () -> begin
+      let str = Printf.sprintf "α%d" !counter in
+      counter := !counter + 1;
+      TyVar str
+    end
+  in
+  (* Inference type of given expression *)
+  let inference (exp: expression): substitution =
+    (*
+     * The *M* Algorithm
+     *
+     * LEE, Oukseh; YI, Kwangkeun. Proofs about a folklore let-polymorphic type
+     * inference algorithm. ACM Transactions on Programming Languages and Systems
+     * (TOPLAS), 1998, 20.4: 707-723.
+     *)
+    let rec m_algorithm (tyenv: tyenv) (exp: expression) (ty: ty): substitution =
+      match exp with
+      | Term Number -> unify Constant ty
+      | Term Variable x -> begin
+        if List.mem_assoc x tyenv then
+          let tright = List.assoc x tyenv in
+          unify ty tright
+        else
+          unify ty (TyVar x)
+      end
+      | FnDef(name, edef) -> begin
+        let alpha1 = new_variable () in
+        let alpha2 = new_variable () in
+        let subst1 = unify (Function(alpha1, alpha2)) ty in
+        let subst2 = m_wrapped (apply_env subst1 tyenv @ [(name, apply subst1 alpha1)]) edef (apply subst1 alpha2) in
+        subst2 @ subst1 (* Note: tyvar 중복체크 안해도 됨 *)
+      end
+      | FnCall(efunc, eparam) -> begin
+        let alpha = new_variable () in
+        let subst1 = m_wrapped tyenv efunc (Function(alpha, ty)) in
+        let subst2 = m_wrapped (apply_env subst1 tyenv) eparam (apply subst1 alpha) in
+        subst2 @ subst1 (* Note: tyvar 중복체크 안해도 됨 *)
+      end
+    and m_wrapped (tyenv: tyenv) (exp: expression) (ty: ty): substitution =
+      match exp with
+      | Term term -> begin
+        let result = m_algorithm tyenv exp ty in
+        types := !types @ List.map (fun (_, ty) -> ty) result;
+        result
+      end
+      | _ -> m_algorithm tyenv exp ty
+    in
+    m_wrapped [] exp (new_variable ())
+  in
   let exp = map_to_exp map in
-  let result = inference exp in
-  let keys = List.map (fun (_, ty) -> ty_to_key ty) result in
+  let _ = inference exp in
+  let keys = List.map ty_to_key !types in
   dedup keys
