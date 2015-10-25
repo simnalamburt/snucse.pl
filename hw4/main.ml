@@ -50,7 +50,7 @@ let rec occurs (var: tyvar) (ty: ty): bool =
   match ty with
   | TyVar(right) -> var = right
   | Constant -> false
-  | Function(_, ret) -> occurs var ret
+  | Function(tparam, tret) -> occurs var tparam || occurs var tret
 
 let rec unify (left: ty) (right: ty): substitution =
   if left = right then
