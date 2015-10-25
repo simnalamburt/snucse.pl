@@ -48,12 +48,12 @@ let expect map result =
   if compare trial result == 0 then
     printf "%s[%2d]%s OK\n" green !counter reset
   else
-    let format = format_of_string (
+    let format = format_of_string begin
       if String.length trial + String.length result <= 80 then
         "%s[%2d]%s %s%s%s != %s%s%s\n"
       else
         "\n%s[%2d]%s %s%s%s\n  != %s%s%s\n"
-    ) in
+    end in
     printf format red   !counter reset
                   gray  trial    reset
                   brown result   reset
@@ -65,7 +65,7 @@ let expect_fail map =
       let _ = getReady map in
       false
     with
-    | Invalid_argument _ -> true
+    | IMPOSSIBLE -> true
     | _ -> false
   then printf "%s[%2d]%s OK\n" green !counter reset
   else printf "%s[%2d]%s Expected a %sInvalid_argument%s exception\n"
