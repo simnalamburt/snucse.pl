@@ -1,4 +1,3 @@
-#!/usr/bin/env ocaml
 #use "main.ml";;
 
 let exp01 =
