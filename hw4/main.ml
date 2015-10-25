@@ -49,6 +49,14 @@ let apply_env (subst: substitution) (tyenv: tyenv): tyenv =
   in
   List.map apply_entity tyenv
 
+let new_variable: unit -> ty =
+  let counter = ref 0 in
+  fun () -> begin
+    let str = Printf.sprintf "__temporary_variable_%d" !counter in
+    counter := !counter + 1;
+    TyVar str
+  end
+
 
 let rec occurs (var: tyvar) (ty: ty): bool =
   match ty with
@@ -76,10 +84,6 @@ let rec unify (left: ty) (right: ty): substitution =
  * inference algorithm. ACM Transactions on Programming Languages and Systems
  * (TOPLAS), 1998, 20.4: 707-723.
  *)
-let new_variable: ty =
-  (* TODO *)
-  TyVar ""
-
 let rec m_algorithm (tyenv: tyenv) (exp: expression) (ty: ty): substitution =
   match exp with
   | Term Number -> unify Constant ty
@@ -88,14 +92,14 @@ let rec m_algorithm (tyenv: tyenv) (exp: expression) (ty: ty): substitution =
     unify ty tright
   end
   | FnDef(name, edef) -> begin
-    let alpha1 = new_variable in
-    let alpha2 = new_variable in
+    let alpha1 = new_variable () in
+    let alpha2 = new_variable () in
     let subst1 = unify (Function(alpha1, alpha2)) ty in
     let subst2 = m_algorithm (apply_env subst1 tyenv @ [(name, apply subst1 alpha1)]) edef (apply subst1 alpha2) in
     subst2 @ subst1 (* Note: tyvar 중복체크 안해도 됨 *)
   end
   | FnCall(efunc, eparam) -> begin
-    let alpha = new_variable in
+    let alpha = new_variable () in
     let subst1 = m_algorithm tyenv efunc (Function(alpha, ty)) in
     let subst2 = m_algorithm (apply_env subst1 tyenv) eparam (apply subst1 alpha) in
     subst2 @ subst1 (* Note: tyvar 중복체크 안해도 됨 *)
