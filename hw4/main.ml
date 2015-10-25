@@ -89,6 +89,32 @@ let dedup ?(compare=Pervasives.compare) list =
   let sorted = List.sort (fun x y -> compare y x) list in
   dedup_without_sorting ~compare sorted
 
+(* TODO: Remove debug codes *)
+let rec print_ty (ty: ty) =
+  match ty with
+  | TyVar name -> print_string name
+  | Constant -> print_string "T"
+  | Function(tparam, tret) -> begin
+    print_ty tparam;
+    print_string " -> ";
+    print_ty tret;
+  end
+
+(* TODO: Remove debug codes *)
+let print_tyenv (tyenv: tyenv) =
+  if List.length tyenv = 0 then
+    print_endline "[]"
+  else begin
+    print_string "[";
+    List.iter (fun (name, ty) -> begin
+      print_string name;
+      print_string ": ";
+      print_ty ty;
+      print_string ", ";
+    end) tyenv;
+    print_endline "\b\b]"
+  end
+
 
 (*
  * Interface
@@ -144,6 +170,7 @@ let getReady (map: map): key list =
         subst2 @ subst1 (* Note: tyvar 중복체크 안해도 됨 *)
       end
     and m_wrapped (tyenv: tyenv) (exp: expression) (ty: ty): substitution =
+      print_tyenv tyenv;
       match exp with
       | Term term -> begin
         (* Note: (List.length result) is always 1 *)
