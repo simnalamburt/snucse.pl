@@ -40,21 +40,21 @@ type substitution = (tyvar * ty) list
 
 let rec apply (subst: substitution) (ty: ty): ty =
   match ty with
-  | TyVar(right) -> List.assoc right subst (* TODO: 예외처리 *)
+  | TyVar right -> List.assoc right subst (* TODO: 예외처리 *)
   | Constant -> Constant
   | Function(_, ret) -> apply subst ret
 
 let rec occurs (var: tyvar) (ty: ty): bool =
   match ty with
-  | TyVar(right) -> var = right
+  | TyVar right -> var = right
   | Constant -> false
   | Function(tparam, tret) -> occurs var tparam || occurs var tret
 
 let rec unify (left: ty) (right: ty): substitution =
   match left, right with
   | left, right when left = right -> []
-  | TyVar(alpha), ty
-  | ty, TyVar(alpha) when not (occurs alpha ty) -> [(alpha, ty)]
+  | TyVar alpha, ty
+  | ty, TyVar alpha when not (occurs alpha ty) -> [(alpha, ty)]
   | Function(tleft1, tleft2), Function(tright1, tright2) -> begin
     let subst1 = unify tleft1 tright1 in
     let subst2 = unify (apply subst1 tleft2) (apply subst1 tright2) in
