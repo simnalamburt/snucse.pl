@@ -84,34 +84,33 @@ let rec unify (left: ty) (right: ty): substitution =
  * inference algorithm. ACM Transactions on Programming Languages and Systems
  * (TOPLAS), 1998, 20.4: 707-723.
  *)
-let rec m_algorithm (tyenv: tyenv) (exp: expression) (ty: ty): substitution =
-  match exp with
-  | Term Number -> unify Constant ty
-  | Term Variable x -> begin
-    if List.mem_assoc x tyenv then
-      let tright = List.assoc x tyenv in
-      unify ty tright
-    else
-      (* TODO: 확실하지 않음 *)
-      unify ty (TyVar x) @ [(x, Constant)]
-  end
-  | FnDef(name, edef) -> begin
-    let alpha1 = new_variable () in
-    let alpha2 = new_variable () in
-    let subst1 = unify (Function(alpha1, alpha2)) ty in
-    let subst2 = m_algorithm (apply_env subst1 tyenv @ [(name, apply subst1 alpha1)]) edef (apply subst1 alpha2) in
-    subst2 @ subst1 (* Note: tyvar 중복체크 안해도 됨 *)
-  end
-  | FnCall(efunc, eparam) -> begin
-    let alpha = new_variable () in
-    let subst1 = m_algorithm tyenv efunc (Function(alpha, ty)) in
-    let subst2 = m_algorithm (apply_env subst1 tyenv) eparam (apply subst1 alpha) in
-    subst2 @ subst1 (* Note: tyvar 중복체크 안해도 됨 *)
-  end
-
 let inference (exp: expression): substitution =
-  let alpha = new_variable () in
-  m_algorithm [] exp alpha
+  let rec m_algorithm (tyenv: tyenv) (exp: expression) (ty: ty): substitution =
+    match exp with
+    | Term Number -> unify Constant ty
+    | Term Variable x -> begin
+      if List.mem_assoc x tyenv then
+        let tright = List.assoc x tyenv in
+        unify ty tright
+      else
+        (* TODO: 확실하지 않음 *)
+        unify ty (TyVar x) @ [(x, Constant)]
+    end
+    | FnDef(name, edef) -> begin
+      let alpha1 = new_variable () in
+      let alpha2 = new_variable () in
+      let subst1 = unify (Function(alpha1, alpha2)) ty in
+      let subst2 = m_algorithm (apply_env subst1 tyenv @ [(name, apply subst1 alpha1)]) edef (apply subst1 alpha2) in
+      subst2 @ subst1 (* Note: tyvar 중복체크 안해도 됨 *)
+    end
+    | FnCall(efunc, eparam) -> begin
+      let alpha = new_variable () in
+      let subst1 = m_algorithm tyenv efunc (Function(alpha, ty)) in
+      let subst2 = m_algorithm (apply_env subst1 tyenv) eparam (apply subst1 alpha) in
+      subst2 @ subst1 (* Note: tyvar 중복체크 안해도 됨 *)
+    end
+  in
+  m_algorithm [] exp (new_variable ())
 
 
 (*
