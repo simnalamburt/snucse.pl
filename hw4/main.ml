@@ -114,6 +114,27 @@ let inference (exp: expression): substitution =
 
 
 (*
+ * Utility functions from Core.Std
+ *)
+(* returns list without adjacent duplicates *)
+let dedup_without_sorting ?(compare=Pervasives.compare) list =
+  let rec loop list accum = match list with
+    | [] -> accum
+    | hd :: [] -> hd :: accum
+    | hd1 :: hd2 :: tl ->
+        if compare hd1 hd2 = 0
+        then loop (hd2 :: tl) accum
+        else loop (hd2 :: tl) (hd1 :: accum)
+  in
+  loop list []
+
+(** returns sorted version of list with duplicates removed *)
+let dedup ?(compare=Pervasives.compare) list =
+  let sorted = List.sort (fun x y -> compare y x) list in
+  dedup_without_sorting ~compare sorted
+
+
+(*
  * Interface
  *)
 let rec map_to_exp (map: map): expression =
@@ -133,7 +154,5 @@ let rec ty_to_key (ty: ty): key =
 let getReady (map: map): key list =
   let exp = map_to_exp map in
   let result = inference exp in
-  let subst_to_keylist ((tyvar, ty): (tyvar * ty)): key =
-    ty_to_key ty
-  in
-  List.map subst_to_keylist result
+  let keys = List.map (fun (_, ty) -> ty_to_key ty) result in
+  dedup keys
