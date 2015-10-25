@@ -87,9 +87,13 @@ let rec unify (left: ty) (right: ty): substitution =
 let rec m_algorithm (tyenv: tyenv) (exp: expression) (ty: ty): substitution =
   match exp with
   | Term Number -> unify Constant ty
-  | Term Variable x when List.mem_assoc x tyenv -> begin
-    let tright = List.assoc x tyenv in
-    unify ty tright
+  | Term Variable x -> begin
+    if List.mem_assoc x tyenv then
+      let tright = List.assoc x tyenv in
+      unify ty tright
+    else
+      (* TODO: 확실하지 않음 *)
+      unify ty (TyVar x) @ [(x, Constant)]
   end
   | FnDef(name, edef) -> begin
     let alpha1 = new_variable () in
@@ -104,7 +108,6 @@ let rec m_algorithm (tyenv: tyenv) (exp: expression) (ty: ty): substitution =
     let subst2 = m_algorithm (apply_env subst1 tyenv) eparam (apply subst1 alpha) in
     subst2 @ subst1 (* Note: tyvar 중복체크 안해도 됨 *)
   end
-  | _ -> raise IMPOSSIBLE
 
 let inference (exp: expression): substitution =
   let alpha = new_variable () in
