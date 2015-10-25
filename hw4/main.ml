@@ -40,7 +40,7 @@ type substitution = (tyvar * ty) list
 
 let rec apply (subst: substitution) (ty: ty): ty =
   match ty with
-  | TyVar(right) -> List.assoc right subst
+  | TyVar(right) -> List.assoc right subst (* TODO: 예외처리 *)
   | Constant -> Constant
   | Function(_, ret) -> apply subst ret
 
@@ -70,5 +70,10 @@ let rec unify (left: ty) (right: ty): substitution =
  * (TOPLAS), 1998, 20.4: 707-723.
  *)
 let m_algorithm (tyenv: tyenv) (exp: expression) (ty: ty): substitution =
-  (* TODO *)
-  []
+  match exp with
+  | Term Number -> unify Constant ty
+  | Term Variable x when List.mem_assoc x tyenv -> begin
+    let tright = List.assoc x tyenv in
+    unify ty tright
+  end
+  | _ -> [] (* TODO *)
