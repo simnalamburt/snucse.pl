@@ -76,7 +76,7 @@ let inference (exp: expression): substitution =
   let new_variable: unit -> ty =
     let counter = ref 0 in
     fun () -> begin
-      let str = Printf.sprintf "__temporary_variable_%d" !counter in
+      let str = Printf.sprintf "α%d" !counter in
       counter := !counter + 1;
       TyVar str
     end
