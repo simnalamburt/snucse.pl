@@ -96,8 +96,7 @@ let inference (exp: expression): substitution =
         let tright = List.assoc x tyenv in
         unify ty tright
       else
-        (* TODO: 확실하지 않음 *)
-        unify ty (TyVar x) @ [(x, Constant)]
+        unify ty (TyVar x)
     end
     | FnDef(name, edef) -> begin
       let alpha1 = new_variable () in
