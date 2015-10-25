@@ -71,6 +71,11 @@ gem install diffy
 * 윤용호 조교님
 * 그 외에 이름을 적지 못한 수많은 PL수업 수강생분들
 
+#### References
+* [LEE, Oukseh; YI, Kwangkeun. Proofs about a folklore let-polymorphic type
+  inference algorithm. ACM Transactions on Programming Languages and Systems
+  (TOPLAS), 1998, 20.4: 707-723.](http://ropas.snu.ac.kr/~kwang/paper/98-toplas-leyi.pdf)
+
 --------
 
 Licensed under GPLv3
