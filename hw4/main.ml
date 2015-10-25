@@ -39,9 +39,9 @@ type substitution = (tyvar * ty) list
 
 let rec apply (subst: substitution) (ty: ty): ty =
   match ty with
-  | TyVar right -> List.assoc right subst (* TODO: 예외처리 *)
-  | Constant -> Constant
+  | TyVar right when List.mem_assoc right subst -> List.assoc right subst
   | Function(_, ret) -> apply subst ret
+  | _ -> ty
 
 let apply_env (subst: substitution) (tyenv: tyenv): tyenv =
   (* TODO *)
