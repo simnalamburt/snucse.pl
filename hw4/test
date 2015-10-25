@@ -34,29 +34,33 @@ let counter = ref 0
 
 let expect map result =
   counter := !counter + 1;
-  let rec s key =
-    match key with
-    | Bar -> "-"
-    | Node (left, right) -> sprintf "(%s,%s)" (s left) (s right)
-  in
-  let keylist = getReady map in
-  let stringlist = List.map s keylist in
-  let concated = String.concat ", " stringlist in
-  let trial = sprintf "{%s}" concated in
+  try
+    let rec s key =
+      match key with
+      | Bar -> "-"
+      | Node (left, right) -> sprintf "(%s,%s)" (s left) (s right)
+    in
+    let keylist = getReady map in
+    let stringlist = List.map s keylist in
+    let concated = String.concat ", " stringlist in
+    let trial = sprintf "{%s}" concated in
 
 
-  if compare trial result == 0 then
-    printf "%s[%2d]%s OK\n" green !counter reset
-  else
-    let format = format_of_string begin
-      if String.length trial + String.length result <= 80 then
-        "%s[%2d]%s %s%s%s != %s%s%s\n"
-      else
-        "\n%s[%2d]%s %s%s%s\n  != %s%s%s\n"
-    end in
-    printf format red   !counter reset
-                  gray  trial    reset
-                  brown result   reset
+    if compare trial result == 0 then
+      printf "%s[%2d]%s OK\n" green !counter reset
+    else
+      let format = format_of_string begin
+        if String.length trial + String.length result <= 80 then
+          "%s[%2d]%s %s%s%s != %s%s%s\n"
+        else
+          "\n%s[%2d]%s %s%s%s\n  != %s%s%s\n"
+      end in
+      printf format red   !counter reset
+                    gray  trial    reset
+                    brown result   reset
+  with
+  | IMPOSSIBLE -> printf "%s[%2d]%s Expected %s%s%s, but recieved IMPOSSIBLE\n"
+                        red !counter reset  brown result reset
 
 let expect_fail map =
   counter := !counter + 1;
