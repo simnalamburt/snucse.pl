@@ -16,6 +16,10 @@ ocaml test
 
 ![](http://i.imgur.com/UvtE9py.png)
 
+프로그램을 실행할때 인자와 함께 넘기면, 특정 번호의 테스트만 실행할수도 있습니다.
+
+![](http://i.imgur.com/e40I7ay.png)
+
 --------
 
 ### References

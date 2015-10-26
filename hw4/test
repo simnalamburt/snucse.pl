@@ -1,6 +1,12 @@
 #!/usr/bin/env ocaml
 #use "main.ml"
 
+let testno =
+  if Array.length Sys.argv = 2 then
+    int_of_string Sys.argv.(1)
+  else
+    0
+
 (*
  * Use Cases
  * --------
@@ -72,18 +78,19 @@ let rec wrap_str (input: string): string =
 let test_results = ref []
 
 let expect_str: map -> string -> unit =
-  let test_count = ref 1 in
+  let test_count = ref 0 in
   fun map expected -> begin
-    let actual = begin
-      try
-        let actual = getReady map in
-        let actual = List.sort_uniq compare actual in
-        keylist_to_string actual
-      with
-      | IMPOSSIBLE -> "IMPOSSIBLE"
-    end in
-    test_results := !test_results @ [(!test_count, map, expected, actual)];
-    test_count := !test_count + 1
+    test_count := !test_count + 1;
+    if testno = 0 || testno = !test_count then
+      let actual = begin
+        try
+          let actual = getReady map in
+          let actual = List.sort_uniq compare actual in
+          keylist_to_string actual
+        with
+        | IMPOSSIBLE -> "IMPOSSIBLE"
+      end in
+      test_results := !test_results @ [(!test_count, map, expected, actual)]
   end
 
 let expect (map: map) (expected: key list) =
