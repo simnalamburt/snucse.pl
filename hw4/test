@@ -7,7 +7,7 @@
  *
  * 1. Expect specific result
  *
- *    expect
+ *    expect_str
  *    (Branch (
  *      Guide ("x", End (NameBox "x")),
  *      Branch (Guide ("y", End (NameBox "y")), End StarBox)
@@ -54,7 +54,7 @@ let rec wrap_string (input: string): string =
 
 let test_results = ref []
 
-let expect: map -> string -> unit =
+let expect_str: map -> string -> unit =
   let test_count = ref 0 in
   fun map expected -> begin
     let problem = map_to_str map in
@@ -65,7 +65,7 @@ let expect: map -> string -> unit =
     test_count := !test_count + 1
   end
 
-let expect_fail (map: map) = expect map "IMPOSSIBLE"
+let expect_fail (map: map) = expect_str map "IMPOSSIBLE"
 
 let print_results ((): unit) =
   let good = "\x1b[38;5;083m" in
@@ -200,19 +200,19 @@ let ex10 = Guide("x",Guide("z",Guide("y", Branch(Branch(Branch(End(NameBox"x"),E
 (*
  * Test cases by @wookayin
  *)
-expect
+expect_str
 (End StarBox)
 "{-}";;
 
-expect
+expect_str
 (End (NameBox "x"))
 "{-}";;
 
-expect
+expect_str
 (Guide ("x", End (NameBox "x")))
 "{-}";;
 
-expect
+expect_str
 (Branch (Guide ("x", End (NameBox "x")), End StarBox))
 "{-}";;
 
@@ -222,43 +222,43 @@ expect_fail
   End StarBox
 ));;
 
-expect
+expect_str
 (Branch (
   Guide ("x", End (NameBox "x")),
   Branch (Guide ("y", End (NameBox "y")), End StarBox)
 ))
 "{-}";;
 
-expect
+expect_str
 (Branch (
   Guide ("x", End (NameBox "x")),
   Guide ("y", End (NameBox"y"))
 ))
 "{-, (-,-)}";;
 
-expect
+expect_str
 (Branch (End (NameBox "x"), End StarBox))
 "{-, (-,-)}";;
 
-expect
+expect_str
 (Guide ("x", Guide ("y",
   Branch (End (NameBox "x"),End (NameBox "y"))
 )))
 "{-, (-,-)}";;
 
-expect
+expect_str
 (Guide ("x", Guide ("y", Guide ("z",
   Branch (Branch (End (NameBox "x"), End (NameBox "y")), End (NameBox "z"))
 ))))
 "{-, (-,(-,-))}";;
 
-expect
+expect_str
 (Guide ("x", Guide ("y", Guide ("z",
   Branch (End (NameBox "x"),Branch (End (NameBox "y"), End (NameBox "z")))
 ))))
 "{-, (-,-)}";;
 
-expect
+expect_str
 (Branch(
   Guide ("x", Guide ("y", Branch (End (NameBox "y"), End (NameBox "x")))),
   Branch (End (NameBox "z"), End (NameBox "w"))
@@ -296,7 +296,7 @@ expect_fail
   Guide ("a", End StarBox)
 ));;
 
-expect
+expect_str
 (Branch(
   Guide ("x", (Guide ("y", Guide ("z", Guide ("w", Branch (Branch
     (End (NameBox "x"), End (NameBox "y")), Branch (End (NameBox "z"),
@@ -305,14 +305,14 @@ expect
 ))
 "{-, (-,-), (-,(-,-)), ((-,(-,-)),(-,-))}";;
 
-expect
+expect_str
 (Branch(
   Branch(Branch(End (NameBox "a"), End(NameBox "b")), End(NameBox "c")),
   Branch(Branch(End (NameBox "d"), End(NameBox "e")), End(NameBox "f"))
 ))
 "{-, (-,(-,-)), (-,(-,(-,-)))}";;
 
-expect
+expect_str
 (Branch(
   Branch(
     Branch(Branch(End (NameBox "a"), End(NameBox "b")), End(NameBox "c")),
@@ -331,7 +331,7 @@ expect_fail
   Branch(End (NameBox "a"), End StarBox)
 ));;
 
-expect
+expect_str
 (Branch(
   Branch(
     Branch(Branch(End (NameBox "a"), End(NameBox "b")), End(NameBox "c")),
@@ -341,7 +341,7 @@ expect
 ))
 "{-, (-,-), (-,(-,-)), ((-,-),(-,(-,(-,-))))}";;
 
-expect
+expect_str
 (Branch(
   Branch(
     Branch(Branch(End (NameBox "a"), End(NameBox "b")), End(NameBox "c")),
@@ -351,7 +351,7 @@ expect
 ))
 "{-, (-,-), (-,(-,-)), (-,((-,-),(-,(-,-))))}";;
 
-expect
+expect_str
 (Branch(
   Branch(
     Branch(Branch(End (NameBox "a"), End(NameBox "b")), End(NameBox "c")),
@@ -361,7 +361,7 @@ expect
 ))
 "{-, (-,(-,-)), (-,(-,(-,((-,-),-))))}";;
 
-expect
+expect_str
 (Branch(
   Branch(
     Branch(Branch(End (NameBox "a"), End(NameBox "b")), End(NameBox "c")),
@@ -371,7 +371,7 @@ expect
 ))
 "{-, (-,-), (-,(-,(-,(-,-)))), ((-,-),(-,-))}";;
 
-expect
+expect_str
 (Branch(
   Branch(
     Branch(Branch(End (NameBox "a"), End(NameBox "b")), End(NameBox "c")),
@@ -382,7 +382,7 @@ expect
 "{-, (-,-), (-,(-,(-,(-,-)))), (-,((-,-),-))}";;
 
 (* 19 boxes, 90 nodes *)
-expect
+expect_str
 (Branch ((Guide ("Bill", (End (NameBox "Bill")))) , (Branch ((Branch
   ((Guide ("Claudette", (Branch ((Branch ((End (NameBox "Claudette")) , (End
   (NameBox "Danny")))) , (Branch ((End (NameBox "Erika")) , (Guide ("Fred", (End
@@ -398,7 +398,7 @@ expect
   ",-),-)),(-,-))}");;
 
 (* 40 boxes, about 190 nodes *)
-expect
+expect_str
 (Branch ((End (NameBox "ab")) , (Branch ((Branch ((Branch ((Branch ((Guide
   ("ac", (Guide ("ad", (Guide ("ae", (Guide ("af", (Guide ("ag", (End (NameBox
   "ag")))))))))))) , (End (NameBox "ah")))) , (Branch ((Branch ((Branch ((Branch
@@ -424,7 +424,7 @@ expect
   "((-,-),(-,-))), (-,((-,-),(-,(-,(-,(-,-)))))), ((-,-),-)}");;
 
 (* 74 nodes, ~350 nodes *)
-expect
+expect_str
 (Guide ("ab", (Branch ((End (NameBox "ab")) , (Guide ("ac", (Branch ((Guide
   ("ad", (Branch ((Guide ("ae", (Guide ("af", (Branch ((End (NameBox "af")) ,
   (Branch ((Branch ((Branch ((Guide ("ag", (Branch ((End (NameBox "ag")) , (End
@@ -471,7 +471,7 @@ expect
   "-))), ((-,((-,-),-)),-)}");;
 
 (* 514 nodes, 120 boxes *)
-expect
+expect_str
 (Branch ((Guide ("xebec", (End (NameBox "xebec")))) , (Branch ((End
   (NameBox "xenia")) , (Branch ((Branch ((Branch ((Branch ((Branch ((Branch ((
   Guide ("xenon", (Branch ((Branch ((Branch ((End (NameBox "xenon")) , (End (
