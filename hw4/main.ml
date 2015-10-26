@@ -115,6 +115,21 @@ let print_tyenv (tyenv: tyenv) =
     print_endline "\b\b]"
   end
 
+(* TODO: Remove debug codes *)
+let print_subst (subst: substitution) =
+  if List.length subst = 0 then
+    print_endline "[]"
+  else begin
+    print_string "[";
+    List.iter (fun (name, ty) -> begin
+      print_string name;
+      print_string ": ";
+      print_ty ty;
+      print_string ", ";
+    end) subst;
+    print_endline "\b\b]"
+  end
+
 
 (*
  * Interface
@@ -128,7 +143,8 @@ let rec map_to_exp (map: map): expression =
 
 let getReady (map: map): key list =
   (* Stateful functions *)
-  let keys = ref [] in
+  let tyenv: tyenv ref = ref [] in
+  let names = ref [] in
   let new_variable: unit -> ty =
     let counter = ref 0 in
     fun () -> begin
@@ -146,12 +162,12 @@ let getReady (map: map): key list =
      * inference algorithm. ACM Transactions on Programming Languages and Systems
      * (TOPLAS), 1998, 20.4: 707-723.
      *)
-    let rec m_algorithm (tyenv: tyenv) (exp: expression) (ty: ty): substitution =
+    let rec m_algorithm (exp: expression) (ty: ty): substitution =
       match exp with
       | Term Number -> unify T ty
       | Term Variable x -> begin
-        if List.mem_assoc x tyenv then
-          let tright = List.assoc x tyenv in
+        if List.mem_assoc x !tyenv then
+          let tright = List.assoc x !tyenv in
           unify ty tright
         else
           unify ty (TyVar x)
@@ -160,34 +176,44 @@ let getReady (map: map): key list =
         let alpha1 = new_variable () in
         let alpha2 = new_variable () in
         let subst1 = unify (Function(alpha1, alpha2)) ty in
-        let subst2 = m_wrapped (apply_env subst1 tyenv @ [(name, apply subst1 alpha1)]) edef (apply subst1 alpha2) in
+        tyenv := apply_env subst1 !tyenv @ [(name, apply subst1 alpha1)];
+        let subst2 = m_wrapped edef (apply subst1 alpha2) in
         subst2 @ subst1 (* Note: tyvar 중복체크 안해도 됨 *)
       end
       | FnCall(efunc, eparam) -> begin
         let alpha = new_variable () in
-        let subst1 = m_wrapped tyenv efunc (Function(alpha, ty)) in
-        let subst2 = m_wrapped (apply_env subst1 tyenv) eparam (apply subst1 alpha) in
+        let subst1 = m_wrapped efunc (Function(alpha, ty)) in
+        tyenv := apply_env subst1 !tyenv;
+        let subst2 = m_wrapped eparam (apply subst1 alpha) in
         subst2 @ subst1 (* Note: tyvar 중복체크 안해도 됨 *)
       end
-    and m_wrapped (tyenv: tyenv) (exp: expression) (ty: ty): substitution =
-      print_tyenv tyenv;
+    and m_wrapped (exp: expression) (ty: ty): substitution =
       match exp with
       | Term term -> begin
         (* Note: (List.length result) is always 1 *)
-        let result = m_algorithm tyenv exp ty in
-        let types = List.map (fun (_, ty) -> ty) result in
-        let rec ty_to_key (ty: ty): key =
-          match ty with
-          | Function(tleft, tright) -> Node(ty_to_key tleft, ty_to_key tright)
-          | _ -> Bar
-        in
-        keys := !keys @ List.map ty_to_key types;
+        let result = m_algorithm exp ty in
+        let ids, _ = List.split result in
+        names := !names @ ids;
         result
       end
-      | _ -> m_algorithm tyenv exp ty
+      | _ -> m_algorithm exp ty
     in
-    m_wrapped [] exp (new_variable ())
+    m_wrapped exp (new_variable ())
   in
   let exp = map_to_exp map in
-  let _ = inference exp in
-  dedup !keys
+  let subst = inference exp in
+  let names = List.map (fun id -> TyVar id) !names in
+  let rec ty_to_key (ty: ty): key =
+    match ty with
+    | T -> Bar
+    | Function(tleft, tright) -> Node(ty_to_key tleft, ty_to_key tright)
+    | TyVar name -> begin
+      if List.mem_assoc name subst then
+        ty_to_key (List.assoc name subst)
+      else
+        (* Note: Undefined variable은 Bar로 간주 *)
+        Bar
+    end
+  in
+  let keys = List.map ty_to_key names in
+  dedup keys
