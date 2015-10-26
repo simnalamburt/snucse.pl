@@ -67,7 +67,12 @@ let expect_str: map -> string -> unit =
   fun map expected -> begin
     let problem = map_to_str map in
     let actual = begin
-      try keylist_to_string (getReady map) with | IMPOSSIBLE -> "IMPOSSIBLE"
+      try
+        let actual = getReady map in
+        let actual = List.sort_uniq compare actual in
+        keylist_to_string actual
+      with
+      | IMPOSSIBLE -> "IMPOSSIBLE"
     end in
     test_results := !test_results @ [(!test_count, problem, expected, actual)];
     test_count := !test_count + 1
