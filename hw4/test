@@ -47,7 +47,7 @@ let expect map expected =
     let actual = sprintf "{%s}" concated in
 
 
-    if compare actual expected == 0 then
+    if actual = expected then
       printf "%s[%2d]%s %s%s%s\n" green !counter reset good expected reset
     else
       let format = format_of_string begin
