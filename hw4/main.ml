@@ -173,8 +173,16 @@ let getReady (map: map): key list =
         let alpha1 = new_variable () in
         let alpha2 = new_variable () in
         let subst1 = unify (Function(alpha1, alpha2)) ty in
-        (* TODO: 중복체크 *)
-        tyenv := apply_env subst1 !tyenv @ [(name, apply subst1 alpha1)];
+
+        (* Note: 교재에 없는 부분 *)
+        let _SGamma = apply_env subst1 !tyenv in
+        let _Salpha1 = apply subst1 alpha1 in
+        let hack = begin
+          if not (List.mem_assoc name _SGamma) then []
+          else unify _Salpha1 (List.assoc name _SGamma)
+        end in
+        let subst1 = subst1 @ hack in
+        tyenv := _SGamma @ [(name, _Salpha1)];
         let subst2 = m_wrapped edef (apply subst1 alpha2) in
         subst2 @ subst1 (* Note: tyvar 중복체크 안해도 됨 *)
       end
