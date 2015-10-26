@@ -44,6 +44,14 @@ let rec map_to_str (map: map): string =
   | Branch(mleft, mright) -> fmt "Branch (%s, %s)" (map_to_str mleft) (map_to_str mright)
   | Guide(name, mdef) -> fmt "Guide (%s, %s)" name (map_to_str mdef)
 
+let rec abbr_str (input: string): string =
+  let limit = 100 in
+  let len = String.length input in
+  if len <= limit then
+    input
+  else
+    String.sub input 0 (limit - 3) ^ "..."
+
 let rec wrap_string (input: string): string =
   let limit = 100 in
   let len = String.length input in
@@ -79,7 +87,7 @@ let print_results ((): unit) =
   let rst  = "\x1b[0m" in
   let per_ok (no, _, expected, actual) =
     if expected = actual then
-      Printf.printf "  %2d   %s✓%s   %s\n" no good rst expected
+      Printf.printf "  %2d   %s✓%s   %s\n" no good rst (abbr_str expected)
   in
   let per_error (no, problem, expected, actual) =
     if not (expected = actual) then begin
