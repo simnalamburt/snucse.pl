@@ -32,27 +32,35 @@ let keylist_to_string (keylist: key list): string =
   let stringlist = List.map key_to_string keylist in
   "{" ^ String.concat ", " stringlist ^ "}"
 
+let test_results = ref []
+
 let expect: map -> string -> unit =
-  let counter = ref 0 in
-  let good = "\x1b[38;5;083m" in
-  let bad  = "\x1b[38;5;166m" in
-  let gray = "\x1b[38;5;237m" in
-  let rst  = "\x1b[0m" in
+  let test_count = ref 0 in
   fun map expected -> begin
     let actual = begin
       try keylist_to_string (getReady map) with | IMPOSSIBLE -> "IMPOSSIBLE"
     end in
-    Printf.printf "  %2d   " !counter;
-    counter := !counter + 1;
+    test_results := !test_results @ [(!test_count, expected, actual)];
+    test_count := !test_count + 1
+  end
+
+let expect_fail (map: map) = expect map "IMPOSSIBLE"
+
+let print_results ((): unit) =
+  let good = "\x1b[38;5;083m" in
+  let bad  = "\x1b[38;5;166m" in
+  let gray = "\x1b[38;5;237m" in
+  let rst  = "\x1b[0m" in
+  let per_result ((no, expected, actual): int * string * string) =
+    Printf.printf "  %2d   " no;
     if expected = actual then
       Printf.printf "%s✓%s   %s\n" good rst expected
     else begin
       Printf.printf    "%s⚠%s   Expected: %s%s%s\n" bad gray rst expected gray;
       Printf.printf "              Given: %s%s\n\n" rst actual;
     end
-  end
-
-let expect_fail (map: map) = expect map "IMPOSSIBLE"
+  in
+  List.iter per_result !test_results
 ;;
 
 
@@ -401,3 +409,5 @@ expect
   "(-,(-,(((-,-),-),(-,-)))))))))), (-,(((-,-),-),(-,-))), (-,(((-,-),-),(-,(" ^
   "(-,-),-)))), (-,(((-,(-,-)),-),(-,(-,-)))), ((-,-),-), ((-,-),(-,(-,(-,(-," ^
   "-))))), ((-,(-,-)),-), (((-,-),-),(-,-)), (((-,-),-),(-,((-,-),-)))}");;
+
+print_results ()
