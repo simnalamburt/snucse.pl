@@ -149,8 +149,10 @@ let getReady (map: map): key list =
         if List.mem_assoc x !tyenv then
           let tright = List.assoc x !tyenv in
           unify ty tright
-        else
+        else begin
+          tyenv := (x, ty)::!tyenv;
           unify ty (TyVar x)
+        end
       end
       | FnDef(name, edef) -> begin
         let alpha1 = new_variable () in
