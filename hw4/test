@@ -96,11 +96,13 @@ let print_results ((): unit) =
   let good = "\x1b[38;5;083m" in
   let bad  = "\x1b[38;5;166m" in
   let gray = "\x1b[38;5;237m" in
+  let dark = "\x1b[38;5;233m" in
   let tint = "\x1b[38;5;192m" in
   let rst  = "\x1b[0m" in
-  let per_ok (no, _, expected, actual) =
+  let per_ok (no, problem, expected, actual) =
     if expected = actual then
-      Printf.printf "  %2d   %s✓%s   %s\n" no good rst (abbr_str expected)
+      let answer = fmt "%s  %s%s" expected dark (map_to_exp problem) in
+      Printf.printf "  %2d   %s✓%s   %s%s\n" no good rst (abbr_str answer) rst
   in
   let per_error (no, problem, expected, actual) =
     if not (expected = actual) then begin
