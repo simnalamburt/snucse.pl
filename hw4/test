@@ -112,6 +112,7 @@ let print_results ((): unit) =
   List.iter per_ok !test_results;
   List.iter per_error !test_results;
   Printf.printf "\nTest result: %d/%d (%g%%)\n\n" count_good count_all percentage;
+  exit (if count_good = count_all then 0 else 1)
 ;;
 
 
