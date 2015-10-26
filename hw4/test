@@ -54,20 +54,20 @@ let rec map_to_exp (map: map): string =
   | Guide(name, mdef) -> fmt "(λ%s.%s)" name (map_to_exp mdef)
 
 let rec abbr_str (input: string): string =
-  let limit = 100 in
+  let limit = 80 in
   let len = String.length input in
   if len <= limit then
     input
   else
     String.sub input 0 (limit - 3) ^ "..."
 
-let rec wrap_string (input: string): string =
+let rec wrap_str (input: string): string =
   let limit = 100 in
   let len = String.length input in
   if len <= limit then
     input
   else
-    String.sub input 0 limit ^ "\n                     " ^ wrap_string (String.sub input limit (len - limit))
+    String.sub input 0 limit ^ "\n                     " ^ wrap_str (String.sub input limit (len - limit))
 
 let test_results = ref []
 
@@ -106,11 +106,11 @@ let print_results ((): unit) =
     if not (expected = actual) then begin
       Printf.printf "\n";
       Printf.printf "  %2d   %s⚠%s" no bad gray;
-      Printf.printf         "    Problem: %s%s%s\n" rst  (wrap_string (map_to_str problem)) gray;
-      Printf.printf "  Lambda Expression: %s%s%s\n" tint (wrap_string (map_to_exp problem)) gray;
+      Printf.printf         "    Problem: %s%s%s\n" rst  (abbr_str (map_to_str problem)) gray;
+      Printf.printf "  Lambda Expression: %s%s%s\n" tint (wrap_str (map_to_exp problem)) gray;
       Printf.printf "\n";
-      Printf.printf "           Expected: %s%s%s\n" tint (wrap_string expected) gray;
-      Printf.printf "              Given: %s%s\n"   rst  (wrap_string actual);
+      Printf.printf "           Expected: %s%s%s\n" tint (wrap_str expected) gray;
+      Printf.printf "              Given: %s%s\n"   rst  (wrap_str actual);
       Printf.printf "\n";
     end
   in
