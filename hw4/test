@@ -37,12 +37,21 @@ let tr_to_str (tr: treasure): string =
   match tr with
   | StarBox -> "StarBox"
   | NameBox name -> fmt "NameBox \"%s\"" name
-
 let rec map_to_str (map: map): string =
   match map with
   | End tr -> fmt "End (%s)" (tr_to_str tr)
   | Branch(mleft, mright) -> fmt "Branch (%s, %s)" (map_to_str mleft) (map_to_str mright)
   | Guide(name, mdef) -> fmt "Guide (%s, %s)" name (map_to_str mdef)
+
+let tr_to_exp (tr: treasure): string =
+  match tr with
+  | StarBox -> "0"
+  | NameBox name -> name
+let rec map_to_exp (map: map): string =
+  match map with
+  | End tr -> fmt "%s" (tr_to_exp tr)
+  | Branch(mfun, mparam) -> fmt "(%s %s)" (map_to_exp mfun) (map_to_exp mparam)
+  | Guide(name, mdef) -> fmt "(λ%s.%s)" name (map_to_exp mdef)
 
 let rec abbr_str (input: string): string =
   let limit = 100 in
@@ -65,7 +74,6 @@ let test_results = ref []
 let expect_str: map -> string -> unit =
   let test_count = ref 1 in
   fun map expected -> begin
-    let problem = map_to_str map in
     let actual = begin
       try
         let actual = getReady map in
@@ -74,7 +82,7 @@ let expect_str: map -> string -> unit =
       with
       | IMPOSSIBLE -> "IMPOSSIBLE"
     end in
-    test_results := !test_results @ [(!test_count, problem, expected, actual)];
+    test_results := !test_results @ [(!test_count, map, expected, actual)];
     test_count := !test_count + 1
   end
 
@@ -98,7 +106,8 @@ let print_results ((): unit) =
     if not (expected = actual) then begin
       Printf.printf "\n";
       Printf.printf "  %2d   %s⚠%s" no bad gray;
-      Printf.printf         "    Problem: %s%s%s\n" rst  (wrap_string problem) gray;
+      Printf.printf         "    Problem: %s%s%s\n" rst  (wrap_string (map_to_str problem)) gray;
+      Printf.printf "  Lambda Expression: %s%s%s\n" tint (wrap_string (map_to_exp problem)) gray;
       Printf.printf "\n";
       Printf.printf "           Expected: %s%s%s\n" tint (wrap_string expected) gray;
       Printf.printf "              Given: %s%s\n"   rst  (wrap_string actual);
