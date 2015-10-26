@@ -66,6 +66,7 @@ let expect_str: map -> string -> unit =
   end
 
 let expect (map: map) (expected: key list) =
+  let expected = List.sort_uniq compare expected in
   expect_str map (keylist_to_string expected)
 
 let expect_fail (map: map) = expect_str map "IMPOSSIBLE"
