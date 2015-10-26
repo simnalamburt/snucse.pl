@@ -16,14 +16,19 @@ Programming Languages
 [bb15]: https://ropas.snu.ac.kr/phpbb/viewforum.php?f=37
 [bb14]: https://ropas.snu.ac.kr/phpbb/viewforum.php?f=34
 
-#### 테스트하기
+Testing
+--------
+자동화된 루비 스크립트로 전체 과제에 대한 테스트를 한번에 수행할 수 있다.
+또한 별도로 [**짱멋진 보물섬 자동채점기**](hw4)가 준비되어있어, 보물섬 과제를
+원만하게 수행할 수 있게해준다.
 ```sh
 gem install diffy
-./run
+./test
 ```
 ![](http://i.imgur.com/7uk7NG3.png)
 
-#### [제출하기][submit]
+[제출하기][submit]
+--------
 - [x] [Homework 1][hw1]
 - [x] [Homework 2][hw2]
 - [x] [Homework 3][hw3]
@@ -38,11 +43,6 @@ gem install diffy
 [hw4]: http://ropas.snu.ac.kr/~kwang/4190.310/15/hw4.pdf
 [hw5]: http://ropas.snu.ac.kr/~kwang/4190.310/15/hw5.pdf
 [hw6]: http://ropas.snu.ac.kr/~kwang/4190.310/15/hw6.pdf
-
-#### References
-* [LEE, Oukseh; YI, Kwangkeun. Proofs about a folklore let-polymorphic type
-  inference algorithm. ACM Transactions on Programming Languages and Systems
-  (TOPLAS), 1998, 20.4: 707-723.](http://ropas.snu.ac.kr/~kwang/paper/98-toplas-leyi.pdf)
 
 --------
 

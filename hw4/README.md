@@ -14,3 +14,10 @@ ocaml test
 디버깅할 수 있도록 해줍니다.
 
 ![](http://i.imgur.com/qhiOuiC.png)
+
+--------
+
+### References
+* [LEE, Oukseh; YI, Kwangkeun. Proofs about a folklore let-polymorphic type
+  inference algorithm. ACM Transactions on Programming Languages and Systems
+  (TOPLAS), 1998, 20.4: 707-723.](http://ropas.snu.ac.kr/~kwang/paper/98-toplas-leyi.pdf)
