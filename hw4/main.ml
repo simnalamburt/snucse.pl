@@ -82,6 +82,7 @@ let rec print_ty (ty: ty) =
 
 (* TODO: Remove debug codes *)
 let print_tyenv (tyenv: tyenv) =
+  print_string "TyEnv: ";
   if List.length tyenv = 0 then
     print_endline "[]"
   else begin
@@ -97,6 +98,7 @@ let print_tyenv (tyenv: tyenv) =
 
 (* TODO: Remove debug codes *)
 let print_subst (subst: substitution) =
+  print_string "Subst: ";
   if List.length subst = 0 then
     print_endline "[]"
   else begin
@@ -107,6 +109,17 @@ let print_subst (subst: substitution) =
       print_ty ty;
       print_string ", ";
     end) subst;
+    print_endline "\b\b]"
+  end
+
+(* TODO: Remove debug codes *)
+let print_names names =
+  print_string "Names: ";
+  if List.length names = 0 then
+    print_endline "[]"
+  else begin
+    print_string "[";
+    List.iter (Printf.printf "%s, ") names;
     print_endline "\b\b]"
   end
 
