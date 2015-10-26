@@ -164,8 +164,9 @@ let getReady (map: map): key list =
           unify ty tright
         else begin
           (* Note: 교재에 없는 부분 *)
-          tyenv := (x, ty)::!tyenv;
-          unify ty (TyVar x)
+          let alpha = new_variable () in
+          tyenv := !tyenv @ [(x, alpha)];
+          unify ty alpha
         end
       end
       | FnDef(name, edef) -> begin
