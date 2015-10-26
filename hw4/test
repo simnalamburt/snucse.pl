@@ -58,6 +58,7 @@ let print_results ((): unit) =
   let good = "\x1b[38;5;083m" in
   let bad  = "\x1b[38;5;166m" in
   let gray = "\x1b[38;5;237m" in
+  let tint = "\x1b[38;5;192m" in
   let rst  = "\x1b[0m" in
   let per_ok ((no, expected, actual): int * string * string) =
     if expected = actual then
@@ -66,7 +67,7 @@ let print_results ((): unit) =
   let per_error ((no, expected, actual): int * string * string) =
     if not (expected = actual) then begin
       Printf.printf "\n";
-      Printf.printf "  %2d   %s⚠%s   Expected: %s%s%s\n" no bad gray rst (wrap_string expected) gray;
+      Printf.printf "  %2d   %s⚠%s   Expected: %s%s%s\n" no bad gray tint (wrap_string expected) gray;
       Printf.printf "              Given: %s%s\n" rst (wrap_string actual)
     end
   in
