@@ -55,7 +55,7 @@ let rec wrap_string (input: string): string =
 let test_results = ref []
 
 let expect_str: map -> string -> unit =
-  let test_count = ref 0 in
+  let test_count = ref 1 in
   fun map expected -> begin
     let problem = map_to_str map in
     let actual = begin
@@ -64,6 +64,9 @@ let expect_str: map -> string -> unit =
     test_results := !test_results @ [(!test_count, problem, expected, actual)];
     test_count := !test_count + 1
   end
+
+let expect (map: map) (expected: key list) =
+  expect_str map (keylist_to_string expected)
 
 let expect_fail (map: map) = expect_str map "IMPOSSIBLE"
 
@@ -84,7 +87,8 @@ let print_results ((): unit) =
       Printf.printf         "    Problem: %s%s%s\n" rst  (wrap_string problem) gray;
       Printf.printf "\n";
       Printf.printf "           Expected: %s%s%s\n" tint (wrap_string expected) gray;
-      Printf.printf "              Given: %s%s\n"   rst  (wrap_string actual)
+      Printf.printf "              Given: %s%s\n"   rst  (wrap_string actual);
+      Printf.printf "\n";
     end
   in
   let count_good = List.fold_left (fun n (_, _, exp, act) -> n + (if exp = act then 1 else 0)) 0 !test_results in
@@ -195,6 +199,42 @@ let ex9 = Branch(Guide("x",(Guide("y",Guide("z",Guide ("w",Branch(Branch(End(Nam
 
 let ex10 = Guide("x",Guide("z",Guide("y", Branch(Branch(Branch(End(NameBox"x"),End(NameBox"y")),Branch(End(NameBox"z"),End(NameBox"y"))),Branch(Branch(End(NameBox"x"),End(NameBox"y")),Branch(End(NameBox"z"),End(NameBox"y")))))))
 ;;
+
+expect m1 ans1;;
+expect m2 ans2;;
+expect m3 ans3;;
+expect m4 ans4;;
+expect m5 ans5;;
+expect m6 ans6;;
+expect m7 ans7;;
+expect m8 ans8;;
+expect m9 ans9;;
+expect m10 ans10;;
+expect m11 ans11;;
+expect m12 ans12;;
+expect m13 ans13;;
+expect m14 ans14;;
+expect m15 ans15;;
+expect m16 ans16;;
+expect m17 ans17;;
+expect m18 ans18;;
+expect m19 ans19;;
+expect m20 ans20;;
+expect m21 ans21;;
+expect m22 ans22;;
+expect m23 ans23;;
+expect m24 ans24;;
+expect m25 ans25;;
+expect_fail ex1;;
+expect_fail ex2;;
+expect_fail ex3;;
+expect_fail ex4;;
+expect_fail ex5;;
+expect_fail ex6;;
+expect_fail ex7;;
+expect_fail ex8;;
+expect_fail ex9;;
+expect_fail ex10;;
 
 
 (*
