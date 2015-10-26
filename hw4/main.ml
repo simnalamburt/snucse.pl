@@ -40,7 +40,7 @@ type substitution = (tyvar * ty) list
 let rec apply (subst: substitution) (ty: ty): ty =
   match ty with
   | TyVar right when List.mem_assoc right subst -> List.assoc right subst
-  | Function(_, ret) -> apply subst ret
+  | Function(tparam, tret) -> Function(apply subst tparam, apply subst tret)
   | _ -> ty
 
 let apply_env (subst: substitution) (tyenv: tyenv): tyenv =
