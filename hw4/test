@@ -51,16 +51,24 @@ let print_results ((): unit) =
   let bad  = "\x1b[38;5;166m" in
   let gray = "\x1b[38;5;237m" in
   let rst  = "\x1b[0m" in
-  let per_result ((no, expected, actual): int * string * string) =
-    Printf.printf "  %2d   " no;
+  let per_ok ((no, expected, actual): int * string * string) =
     if expected = actual then
-      Printf.printf "%s✓%s   %s\n" good rst expected
-    else begin
-      Printf.printf    "%s⚠%s   Expected: %s%s%s\n" bad gray rst expected gray;
-      Printf.printf "              Given: %s%s\n\n" rst actual;
+      Printf.printf "  %2d   %s✓%s   %s\n" no good rst expected
+  in
+  let per_error ((no, expected, actual): int * string * string) =
+    if not (expected = actual) then begin
+      Printf.printf "\n";
+      Printf.printf "  %2d   %s⚠%s   Expected: %s%s%s\n" no bad gray rst expected gray;
+      Printf.printf "              Given: %s%s\n" rst actual
     end
   in
-  List.iter per_result !test_results
+  let count_good = List.fold_left (fun n (_, exp, act) -> n + (if exp = act then 1 else 0)) 0 !test_results in
+  let count_all = List.length !test_results in
+  let percentage = 100.0 *. float_of_int count_good /. float_of_int count_all in
+  Printf.printf "Test result: %d/%d (%g%%)\n\n" count_good count_all percentage;
+  List.iter per_ok !test_results;
+  List.iter per_error !test_results;
+  Printf.printf "\nTest result: %d/%d (%g%%)\n\n" count_good count_all percentage;
 ;;
 
 
