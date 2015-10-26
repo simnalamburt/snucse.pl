@@ -23,53 +23,36 @@
  *    ))
  *
  *)
-open Printf
-let reset = "\x1b[0m"
-let red   = "\x1b[31m"
-let green = "\x1b[32m"
-let brown = "\x1b[33m"
-let good  = "\x1b[38;5;045m"
-let gray  = "\x1b[37m"
-
 let keylist_to_string (keylist: key list): string =
   let rec key_to_string key =
     match key with
     | Bar -> "-"
-    | Node (left, right) -> sprintf "(%s,%s)" (key_to_string left) (key_to_string right)
+    | Node (left, right) -> "(" ^ key_to_string left ^ "," ^ key_to_string right ^")"
   in
   let stringlist = List.map key_to_string keylist in
   "{" ^ String.concat ", " stringlist ^ "}"
 
-let counter = ref 0
+let expect: map -> string -> unit =
+  let counter = ref 0 in
+  let good = "\x1b[38;5;083m" in
+  let bad  = "\x1b[38;5;166m" in
+  let gray = "\x1b[38;5;237m" in
+  let rst  = "\x1b[0m" in
+  fun map expected -> begin
+    let actual = begin
+      try keylist_to_string (getReady map) with | IMPOSSIBLE -> "IMPOSSIBLE"
+    end in
+    Printf.printf "  %2d   " !counter;
+    counter := !counter + 1;
+    if expected = actual then
+      Printf.printf "%s✓%s   %s\n" good rst expected
+    else begin
+      Printf.printf    "%s⚠%s   Expected: %s%s%s\n" bad gray rst expected gray;
+      Printf.printf "              Given: %s%s\n\n" rst actual;
+    end
+  end
 
-let expect map expected =
-  counter := !counter + 1;
-  try
-    let actual = keylist_to_string (getReady map) in
-
-    if actual = expected then
-      printf "%s[%2d]%s %s%s%s\n" green !counter reset good expected reset
-    else
-      let fmt = format_of_string begin
-        if String.length actual + String.length expected <= 80 then
-          "%s[%2d]%s %s%s%s != %s%s%s\n"
-        else
-          "\n%s[%2d]%s %s%s%s\n  != %s%s%s\n"
-      end in
-      printf fmt red   !counter reset
-                 gray  actual   reset
-                 brown expected reset
-  with
-  | IMPOSSIBLE -> printf "%s[%2d]%s Expected %s%s%s, but recieved IMPOSSIBLE\n"
-                        red !counter reset  brown expected reset
-
-let expect_fail map =
-  counter := !counter + 1;
-  try
-    let actual = keylist_to_string (getReady map) in
-    printf "%s[%2d]%s Expected %sIMPOSSIBLE%s, but recieved %s\n" red !counter reset brown reset actual
-  with
-  | IMPOSSIBLE -> printf "%s[%2d]%s %sIMPOSSIBLE%s\n" green !counter reset good reset
+let expect_fail (map: map) = expect map "IMPOSSIBLE"
 ;;
 
 
