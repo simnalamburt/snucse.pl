@@ -163,6 +163,7 @@ let getReady (map: map): key list =
           let tright = List.assoc x !tyenv in
           unify ty tright
         else begin
+          (* Note: 교재에 없는 부분 *)
           tyenv := (x, ty)::!tyenv;
           unify ty (TyVar x)
         end
@@ -171,6 +172,7 @@ let getReady (map: map): key list =
         let alpha1 = new_variable () in
         let alpha2 = new_variable () in
         let subst1 = unify (Function(alpha1, alpha2)) ty in
+        (* TODO: 중복체크 *)
         tyenv := apply_env subst1 !tyenv @ [(name, apply subst1 alpha1)];
         let subst2 = m_wrapped edef (apply subst1 alpha2) in
         subst2 @ subst1 (* Note: tyvar 중복체크 안해도 됨 *)
