@@ -32,7 +32,7 @@ gem install diffy
 - [x] [Homework 1][hw1]
 - [x] [Homework 2][hw2]
 - [x] [Homework 3][hw3]
-- [ ] [Homework 4][hw4]
+- [x] [Homework 4][hw4]
 - [ ] [Homework 5][hw5]
 - [ ] [Homework 6][hw6]
 
