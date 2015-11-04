@@ -10,6 +10,8 @@ make
 
 k.ml만 제출하면 됩니다.
 
+* [The K- Language](http://ropas.snu.ac.kr/~ta/4190.310/15/document/K_doc/k-.pdf)
+
 ### Pretty printer
 입력 프로그램을 간단히 화면에 출력시켜주는 pretty printer가 제공된 `pp.ml`
 파일에 포함되어 있습니다.
