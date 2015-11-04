@@ -153,5 +153,4 @@ puts 'OK'
 
 
 print 'Homework 4.2 ... '
-assert system 'cd hw4 && ./test 1>/dev/null'
-puts 'OK'
+assert system 'cd hw4 && ./test --simple'
