@@ -1,9 +1,9 @@
 *.cmo
 *.cmi
-hw3/lexer.ml
-hw3/parser.ml
-hw3/parser.mli
-hw3/run
+hw?/lexer.ml
+hw?/parser.ml
+hw?/parser.mli
+hw?/run
 
 tests/coin
 tests/tmp
