@@ -18,6 +18,13 @@ make
 * [테스트케이스](https://ropas.snu.ac.kr/phpbb/viewtopic.php?t=5129)
 * [K-- 스펙](http://ropas.snu.ac.kr/~ta/4190.310/15/document/K_doc/k--.pdf)
 
+### K- vs K--
+K-- 언어는 K- 에 비해 아래와 같은 차이점이 있습니다.
+
+1.  `for` statement가 있습니다.
+1.  K-의 함수 파라미터 숫자가 제한이 없는 반면, K--는 파라미터가 언제나 한개로 제한됩니다.
+2.  `Record`가 없습니다.
+
 ### 숙제 제출 관련
 1.  SM5 문제
 
