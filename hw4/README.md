@@ -4,8 +4,9 @@
 이쁘고 보기 쉬운 PL 4번과제 자동 채점기
 
 ```console
-curl https://raw.githubusercontent.com/simnalamburt/snucse.pl/master/hw4/test -O
-ocaml test
+./test
+./test 58
+./test --simple
 ```
 
 ![](http://i.imgur.com/xoDlOmE.png)
