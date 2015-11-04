@@ -13,6 +13,11 @@ make
 유닉스 머신에서는 Ctrl-D, 윈도우 환경에서는 Ctrl-Z를 누르시면
 프로그램이 실행됩니다.
 
+* [숙제 문서](http://ropas.snu.ac.kr/~kwang/4190.310/15/hw5.pdf)
+* [공지](https://ropas.snu.ac.kr/phpbb/viewtopic.php?t=5128)
+* [테스트케이스](https://ropas.snu.ac.kr/phpbb/viewtopic.php?t=5129)
+* [K-- 스펙](http://ropas.snu.ac.kr/~ta/4190.310/15/document/K_doc/k--.pdf)
+
 ### 숙제 제출 관련
 1.  SM5 문제
 
