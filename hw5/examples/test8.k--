@@ -1,0 +1,10 @@
+(* Public test case 8 : Recursive *)
+
+let proc fib (n) = 
+  if n < 1 then 0
+  else if n = 1 then 1
+  else fib(n-1) + fib(n-2)
+in
+write (fib(11))
+
+(* Output : prints out "89\n" *)

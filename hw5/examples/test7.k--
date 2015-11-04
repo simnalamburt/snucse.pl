@@ -1,0 +1,12 @@
+(* Public test case 7 : For loop *)
+
+let s := 0 in
+let i := 0 in
+let n := 0 in
+read n;
+for i := 1 to n do (
+  s := s + i
+);
+write s
+
+(* Output : reads in n and output the summation from 1 to n *)

@@ -1,0 +1,9 @@
+(* Public test case 6 : Scope *)
+
+let x := 1 in
+write(
+  (let x := 1 in (x := 5; x * 3)) +
+  x
+)
+
+(* Output : prints out "16\n" *)
