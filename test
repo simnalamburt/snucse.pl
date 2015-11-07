@@ -1,19 +1,14 @@
 #!/usr/bin/env ruby
 require 'diffy'
 
-Diffy::Diff.default_format = :color
-
-def assert result
-  if result; return; end
-
-  puts
-  puts 'Failed'
-  exit 1
-end
-
+#
+# Helpers
+#
+def assert actual; assert_eq actual, true end
 def assert_eq actual, expected
-  if actual == expected; return; end
+  if actual == expected; return end
 
+  Diffy::Diff.default_format = :color
   puts
   puts 'Failed'
   puts " \e[32mEXPECTED\e[0m  \e[31mACTUAL\e[0m"
@@ -26,7 +21,6 @@ end
 class Fixnum
   def digits
     return 1 if self == 0
-
     Math.log10(self.abs).to_i + 1
   end
 end
@@ -69,21 +63,20 @@ class TempMsg
 end
 
 
-puts  'Homework 1.*'
-print 'Homework 2.* ... '
-assert system 'ocaml tests/basic.ml'
-puts 'OK'
+#
+# Tests
+#
+class Test
+  @@tasks = []
 
+  def self.add(&proc)
+    @@tasks << Thread.new(&proc)
+  end
 
-print 'Homework 2.2 ... '
-assert system 'ocaml tests/hw2-ex2.ml'
-puts 'OK'
-
-
-print 'Homework 2.7 ... '
-assert_eq `ocaml tests/hw2-ex7.ml`, File.read('tests/hw2-ex7')
-puts 'OK'
-
+  def self.wait
+    @@tasks.each { |thr| thr.join }
+  end
+end
 
 def kminus dirname, ext = 'k-'
   `cd #{dirname} && make 2>/dev/null`
@@ -107,61 +100,91 @@ def kminus dirname, ext = 'k-'
   counter.clean
   puts 'OK (%d)' % counter.count
 end
-print 'Homework 3.1 ... '
-kminus 'hw3'
 
 
-print 'Homework 3.2 ... '
-
-tmp = TempMsg.new 'Compiling reference program'
-@exename = "tests/coin"
-system "g++ -std=c++0x -O3 tests/hw3-ex2.cc -o #{@exename}"
-tmp.clean
-
-tmp = TempMsg.new 'Testing '
-try = 120
-counter = Counter.new try
-def test num
-  assert_eq `echo #{num} | hw3/run hw3/examples/ex2.k-`, `#{@exename} #{num}`
+Test.add do
+  puts  'Homework 1.*'
+  print 'Homework 2.* ... '
+  assert system 'ocaml tests/basic.ml'
+  puts 'OK'
 end
 
-try -= 1
-counter.tick
-test 10000
-try.times do
+Test.add do
+  print 'Homework 2.2 ... '
+  assert system 'ocaml tests/hw2-ex2.ml'
+  puts 'OK'
+end
+
+Test.add do
+  print 'Homework 2.7 ... '
+  assert_eq `ocaml tests/hw2-ex7.ml`, File.read('tests/hw2-ex7')
+  puts 'OK'
+end
+
+Test.add do
+  print 'Homework 3.1 ... '
+  kminus 'hw3'
+end
+
+Test.add do
+  print 'Homework 3.2 ... '
+
+  tmp = TempMsg.new 'Compiling reference program'
+  @exename = "tests/coin"
+  system "g++ -std=c++0x -O3 tests/hw3-ex2.cc -o #{@exename}"
+  tmp.clean
+
+  tmp = TempMsg.new 'Testing '
+  try = 120
+  counter = Counter.new try
+  def test num
+    assert_eq `echo #{num} | hw3/run hw3/examples/ex2.k-`, `#{@exename} #{num}`
+  end
+
+  try -= 1
   counter.tick
-  test rand(1..10000)
+  test 10000
+  try.times do
+    counter.tick
+    test rand(1..10000)
+  end
+
+  tmp.clean
+  counter.clean
+  File.delete @exename
+
+  puts 'OK'
 end
 
-tmp.clean
-counter.clean
-File.delete @exename
+Test.add do
+  def test name
+    code = File.read('hw3/examples/ex3.k-')
+    test = File.read("tests/#{name}.k-")
 
-puts 'OK'
+    tmp = 'tests/tmp'
+    File.write(tmp, code + ';' + test)
+    actual = `hw3/run #{tmp}`
+    File.delete tmp
 
+    expected = File.read("tests/#{name}.out")
 
-print 'Homework 3.3 ... '
-def test name
-  code = File.read('hw3/examples/ex3.k-')
-  test = File.read("tests/#{name}.k-")
+    assert_eq actual, expected
+  end
 
-  tmp = 'tests/tmp'
-  File.write(tmp, code + ';' + test)
-  actual = `hw3/run #{tmp}`
-  File.delete tmp
-
-  expected = File.read("tests/#{name}.out")
-
-  assert_eq actual, expected
+  print 'Homework 3.3 ... '
+  test 'hw3-ex3'
+  test 'hw3-ex3-TA'
+  puts 'OK'
 end
-test 'hw3-ex3'
-test 'hw3-ex3-TA'
-puts 'OK'
 
+Test.add do
+  print 'Homework 4.2 ... '
+  assert system 'cd hw4 && ./test --simple'
+end
 
-print 'Homework 4.2 ... '
-assert system 'cd hw4 && ./test --simple'
+#Test.add do
+#  print 'Homework 5.1 ... '
+#  kminus 'hw5', 'k--'
+#end
 
-
-print 'Homework 5.1 ... '
-kminus 'hw5', 'k--'
+Test.wait
