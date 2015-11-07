@@ -25,7 +25,9 @@ end
 
 class Fixnum
   def digits
-    Math.log10(self).to_i + 1
+    return 1 if self == 0
+
+    Math.log10(self.abs).to_i + 1
   end
 end
 
@@ -51,6 +53,8 @@ class Counter
     @iter = @total
     @print_length = 0
   end
+
+  def count; return @iter end
 end
 
 class TempMsg
@@ -81,27 +85,30 @@ assert_eq `ocaml tests/hw2-ex7.ml`, File.read('tests/hw2-ex7')
 puts 'OK'
 
 
-print 'Homework 3.1 ... '
-`cd hw3 && make 2>/dev/null`
-glob = Dir.glob('hw3/examples/*.out')
-counter = Counter.new glob.count
-glob.each_with_index do |name, i|
-  code = File.basename(name, '.out')
+def kminus dirname, ext = 'k-'
+  `cd #{dirname} && make 2>/dev/null`
+  glob = Dir.glob("#{dirname}/examples/*.out")
+  counter = Counter.new glob.count
+  glob.each_with_index do |name, i|
+    code = File.basename(name, '.out')
 
-  input = File.join('hw3', 'examples', File.basename(name, '.out') + '.in')
-  actual = unless File.exist?(input)
-    `hw3/run hw3/examples/#{code}.k-`
-  else
-    `hw3/run hw3/examples/#{code}.k- < #{input}`
+    input = File.join(dirname, 'examples', File.basename(name, '.out') + '.in')
+    actual = unless File.exist?(input)
+      `#{dirname}/run #{dirname}/examples/#{code}.#{ext}`
+    else
+      `#{dirname}/run #{dirname}/examples/#{code}.#{ext} < #{input}`
+    end
+
+    expected = File.read(name)
+
+    assert_eq actual, expected
+    counter.tick
   end
-
-  expected = File.read(name)
-
-  assert_eq actual, expected
-  counter.tick
+  counter.clean
+  puts 'OK (%d)' % counter.count
 end
-counter.clean
-puts 'OK'
+print 'Homework 3.1 ... '
+kminus 'hw3'
 
 
 print 'Homework 3.2 ... '
@@ -154,3 +161,7 @@ puts 'OK'
 
 print 'Homework 4.2 ... '
 assert system 'cd hw4 && ./test --simple'
+
+
+print 'Homework 5.1 ... '
+kminus 'hw5', 'k--'
