@@ -9,6 +9,7 @@ def assert actual; assert_eq actual, true end
 def assert_eq actual, expected
   if actual == expected; return end
 
+  # TODO: no stdout
   Diffy::Diff.default_format = :color
   puts
   puts 'Failed'
@@ -26,6 +27,24 @@ class Fixnum
   end
 end
 
+class Curses::Window
+  def print(msg)
+    self << msg
+    self.refresh
+  end
+
+  def temp(msg)
+    self.print msg
+
+    clean = "\b"*msg.length + ' '*msg.length + "\b"*msg.length
+    TempMsg.new(self, clean)
+  end
+
+  def counter(count)
+    Counter.new(self, count)
+  end
+end
+
 class Counter
   def initialize win, total
     @win = win
@@ -37,32 +56,20 @@ class Counter
 
   def tick
     msg = @format % @iter
-    @win << "\b"*@print_length + msg
-    @win.refresh
+    @win.print "\b"*@print_length + msg
 
     @iter += 1
     @print_length = msg.length
   end
 
   def clean
-    @win << "\b"*@print_length + ' '*@print_length + "\b"*@print_length
-    @win.refresh
+    @win.print "\b"*@print_length + ' '*@print_length + "\b"*@print_length
 
     @iter = @total
     @print_length = 0
   end
 
   def count; return @iter end
-end
-
-class Curses::Window
-  def temp(msg)
-    self << msg
-    self.refresh
-
-    clean = "\b"*msg.length + ' '*msg.length + "\b"*msg.length
-    TempMsg.new(self, clean)
-  end
 end
 
 class TempMsg
@@ -72,8 +79,7 @@ class TempMsg
   end
 
   def clean
-    @win << @clean
-    @win.refresh
+    @win.print @clean
   end
 end
 
@@ -97,7 +103,7 @@ class Test
     @@tasks.each { |thr| thr.join }
 
     win = Curses::Window.new(1, 0, 0, 0)
-    win << 'Done!'
+    win.print 'Done!'
     win.getch
   end
 end
@@ -105,8 +111,8 @@ end
 def kminus win, dirname, ext = 'k-'
   `cd #{dirname} && make 2>/dev/null`
   glob = Dir.glob("#{dirname}/examples/*.out")
-  counter = Counter.new win, glob.count
-  glob.each_with_index do |name, i|
+  counter = win.counter glob.count
+  glob.each do |name|
     code = File.basename(name, '.out')
 
     input = File.join(dirname, 'examples', File.basename(name, '.out') + '.in')
@@ -122,54 +128,42 @@ def kminus win, dirname, ext = 'k-'
     counter.tick
   end
   counter.clean
-  win << 'OK (%d)' % counter.count
-  win.refresh
+  win.print 'OK (%d)' % counter.count
 end
 
 
-Curses.init_screen
-
 Test.add(2) do |win|
-  win << "Homework 1.*\n"
-  win << 'Homework 2.* ... '
-  win.refresh
+  win.print "Homework 1.*\nHomework 2.* ... "
 
   assert system 'ocaml tests/basic.ml'
 
-  win << 'OK'
-  win.refresh
+  win.print 'OK'
 end
 
 Test.add do |win|
-  win << 'Homework 2.2 ... '
-  win.refresh
+  win.print 'Homework 2.2 ... '
 
   assert system 'ocaml tests/hw2-ex2.ml'
 
-  win << 'OK'
-  win.refresh
+  win.print 'OK'
 end
 
 Test.add do |win|
-  win << 'Homework 2.7 ... '
-  win.refresh
+  win.print 'Homework 2.7 ... '
 
   assert_eq `ocaml tests/hw2-ex7.ml`, File.read('tests/hw2-ex7')
 
-  win << 'OK'
-  win.refresh
+  win.print 'OK'
 end
 
 Test.add do |win|
-  win << 'Homework 3.1 ... '
-  win.refresh
+  win.print 'Homework 3.1 ... '
 
   kminus win, 'hw3'
 end
 
 Test.add do |win|
-  win << 'Homework 3.2 ... '
-  win.refresh
+  win.print 'Homework 3.2 ... '
 
   tmp = win.temp 'Compiling reference program'
   @exename = "tests/coin"
@@ -178,7 +172,7 @@ Test.add do |win|
 
   tmp = win.temp 'Testing '
   try = 120
-  counter = Counter.new win, try
+  counter = win.counter try
   def test num
     assert_eq `echo #{num} | hw3/run hw3/examples/ex2.k-`, `#{@exename} #{num}`
   end
@@ -195,8 +189,7 @@ Test.add do |win|
   counter.clean
   File.delete @exename
 
-  win << 'OK'
-  win.refresh
+  win.print 'OK'
 end
 
 Test.add do |win|
@@ -214,30 +207,26 @@ Test.add do |win|
     assert_eq actual, expected
   end
 
-  win << 'Homework 3.3 ... '
-  win.refresh
+  win.print 'Homework 3.3 ... '
 
   test 'hw3-ex3'
   test 'hw3-ex3-TA'
 
-  win << 'OK'
-  win.refresh
+  win.print 'OK'
 end
 
 Test.add do |win|
-  win << 'Homework 4.2 ... '
-  win.refresh
+  win.print 'Homework 4.2 ... '
 
   msg = `cd hw4 && ./test --simple`
-
   assert $?.success?
 
-  win << msg
-  win.refresh
+  win.print msg
 end
 
 #Test.add do |win|
-#  win << 'Homework 5.1 ... '
+#  win.print 'Homework 5.1 ... '
+#
 #  kminus win, 'hw5', 'k--'
 #end
 
