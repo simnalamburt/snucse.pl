@@ -55,13 +55,20 @@ class Counter
   def count; return @iter end
 end
 
-class TempMsg
-  def initialize win, string
-    @win = win
-    @clean = "\b"*string.length + ' '*string.length + "\b"*string.length
+class Curses::Window
+  def temp(msg)
+    self << msg
+    self.refresh
 
-    @win << string
-    @win.refresh
+    clean = "\b"*msg.length + ' '*msg.length + "\b"*msg.length
+    TempMsg.new(self, clean)
+  end
+end
+
+class TempMsg
+  def initialize(win, clean)
+    @win = win
+    @clean = clean
   end
 
   def clean
@@ -164,12 +171,12 @@ Test.add do |win|
   win << 'Homework 3.2 ... '
   win.refresh
 
-  tmp = TempMsg.new win, 'Compiling reference program'
+  tmp = win.temp 'Compiling reference program'
   @exename = "tests/coin"
   system "g++ -std=c++0x -O3 tests/hw3-ex2.cc -o #{@exename}"
   tmp.clean
 
-  tmp = TempMsg.new win, 'Testing '
+  tmp = win.temp 'Testing '
   try = 120
   counter = Counter.new win, try
   def test num
