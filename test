@@ -1,5 +1,6 @@
 #!/usr/bin/env ruby
 require 'diffy'
+require 'curses'
 
 #
 # Helpers
@@ -26,7 +27,8 @@ class Fixnum
 end
 
 class Counter
-  def initialize total
+  def initialize win, total
+    @win = win
     @format = "%0#{(total - 1).digits}d/#{total}"
     @iter = 0
     @total = total
@@ -35,14 +37,16 @@ class Counter
 
   def tick
     msg = @format % @iter
-    print "\b"*@print_length + msg
+    @win << "\b"*@print_length + msg
+    @win.refresh
 
     @iter += 1
     @print_length = msg.length
   end
 
   def clean
-    print "\b"*@print_length + ' '*@print_length + "\b"*@print_length
+    @win << "\b"*@print_length + ' '*@print_length + "\b"*@print_length
+    @win.refresh
 
     @iter = @total
     @print_length = 0
@@ -52,13 +56,17 @@ class Counter
 end
 
 class TempMsg
-  def initialize string
-    print string
+  def initialize win, string
+    @win = win
     @clean = "\b"*string.length + ' '*string.length + "\b"*string.length
+
+    @win << string
+    @win.refresh
   end
 
   def clean
-    print @clean
+    @win << @clean
+    @win.refresh
   end
 end
 
@@ -68,20 +76,29 @@ end
 #
 class Test
   @@tasks = []
+  @@pos = 2
 
-  def self.add(&proc)
-    @@tasks << Thread.new(&proc)
+  def self.add
+    win = Curses::Window.new(1, 0, @@pos, 0)
+    @@tasks << Thread.new do
+      yield win
+    end
+    @@pos += 1
   end
 
   def self.wait
     @@tasks.each { |thr| thr.join }
+
+    win = Curses::Window.new(1, 0, 0, 0)
+    win << 'Done!'
+    win.getch
   end
 end
 
-def kminus dirname, ext = 'k-'
+def kminus win, dirname, ext = 'k-'
   `cd #{dirname} && make 2>/dev/null`
   glob = Dir.glob("#{dirname}/examples/*.out")
-  counter = Counter.new glob.count
+  counter = Counter.new win, glob.count
   glob.each_with_index do |name, i|
     code = File.basename(name, '.out')
 
@@ -98,45 +115,62 @@ def kminus dirname, ext = 'k-'
     counter.tick
   end
   counter.clean
-  puts 'OK (%d)' % counter.count
+  win << 'OK (%d)' % counter.count
+  win.refresh
 end
 
 
-Test.add do
-  puts  'Homework 1.*'
-  print 'Homework 2.* ... '
+Curses.init_screen
+
+Test.add do |win|
+  win << 'Homework 1.* 2.* ... '
+  win.refresh
+
   assert system 'ocaml tests/basic.ml'
-  puts 'OK'
+
+  win << 'OK'
+  win.refresh
 end
 
-Test.add do
-  print 'Homework 2.2 ... '
+Test.add do |win|
+  win << 'Homework 2.2 ... '
+  win.refresh
+
   assert system 'ocaml tests/hw2-ex2.ml'
-  puts 'OK'
+
+  win << 'OK'
+  win.refresh
 end
 
-Test.add do
-  print 'Homework 2.7 ... '
+Test.add do |win|
+  win << 'Homework 2.7 ... '
+  win.refresh
+
   assert_eq `ocaml tests/hw2-ex7.ml`, File.read('tests/hw2-ex7')
-  puts 'OK'
+
+  win << 'OK'
+  win.refresh
 end
 
-Test.add do
-  print 'Homework 3.1 ... '
-  kminus 'hw3'
+Test.add do |win|
+  win << 'Homework 3.1 ... '
+  win.refresh
+
+  kminus win, 'hw3'
 end
 
-Test.add do
-  print 'Homework 3.2 ... '
+Test.add do |win|
+  win << 'Homework 3.2 ... '
+  win.refresh
 
-  tmp = TempMsg.new 'Compiling reference program'
+  tmp = TempMsg.new win, 'Compiling reference program'
   @exename = "tests/coin"
   system "g++ -std=c++0x -O3 tests/hw3-ex2.cc -o #{@exename}"
   tmp.clean
 
-  tmp = TempMsg.new 'Testing '
+  tmp = TempMsg.new win, 'Testing '
   try = 120
-  counter = Counter.new try
+  counter = Counter.new win, try
   def test num
     assert_eq `echo #{num} | hw3/run hw3/examples/ex2.k-`, `#{@exename} #{num}`
   end
@@ -153,10 +187,11 @@ Test.add do
   counter.clean
   File.delete @exename
 
-  puts 'OK'
+  win << 'OK'
+  win.refresh
 end
 
-Test.add do
+Test.add do |win|
   def test name
     code = File.read('hw3/examples/ex3.k-')
     test = File.read("tests/#{name}.k-")
@@ -171,20 +206,31 @@ Test.add do
     assert_eq actual, expected
   end
 
-  print 'Homework 3.3 ... '
+  win << 'Homework 3.3 ... '
+  win.refresh
+
   test 'hw3-ex3'
   test 'hw3-ex3-TA'
-  puts 'OK'
+
+  win << 'OK'
+  win.refresh
 end
 
-Test.add do
-  print 'Homework 4.2 ... '
-  assert system 'cd hw4 && ./test --simple'
+Test.add do |win|
+  win << 'Homework 4.2 ... '
+  win.refresh
+
+  msg = `cd hw4 && ./test --simple`
+
+  assert $?.success?
+
+  win << msg
+  win.refresh
 end
 
-#Test.add do
-#  print 'Homework 5.1 ... '
-#  kminus 'hw5', 'k--'
+#Test.add do |win|
+#  win << 'Homework 5.1 ... '
+#  kminus win, 'hw5', 'k--'
 #end
 
 Test.wait
