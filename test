@@ -1,5 +1,6 @@
 #!/usr/bin/env ruby
 require 'curses'
+require 'parallel'
 
 GREEN = 1
 RED = 2
@@ -213,7 +214,7 @@ Test.add '3.2' do |win|
 
   win.print 'Testing '
   test 10000
-  (2..try).map { test rand(1..10000) }
+  Parallel.map(2..try, in_threads: 3) { test rand(1..10000) }
   win.clear
 
   File.delete @exename
