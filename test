@@ -149,8 +149,6 @@ class Test
     if $results.empty?
       win.print "    All Green!\n"
     else
-      require 'diffy'
-
       $results.each do |expected, actual|
         win << "Expected : '%s', Actual : '%s'\n" % [expected.chomp, actual.chomp]
       end
