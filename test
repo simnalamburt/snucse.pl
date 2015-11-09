@@ -54,16 +54,19 @@ class Curses::Window
     Counter.new(self, count)
   end
 
-  def check(bool, msg)
-    icon, col = bool ? ['✓', GREEN] : ['✗', RED]
-
-    maxy.times do
-      color(col) { self << icon }
-      self << msg + "\n"
-    end
-    refresh
+  def ok
+    color(GREEN) { print "✓\n" * maxy }
   end
-  def ok(msg = ''); check(true, msg) end
+
+  def result(succeeded, total)
+    succeeded = succeeded.to_i
+    total = total.to_i
+
+    icon, col = succeeded == total ? ['✓', GREEN] : ['✗', RED]
+    color(col) { self << icon }
+
+    print ' (%d/%d, %g%%)' % [succeeded, total, succeeded * 100.0 / total]
+  end
 end
 
 class Counter
@@ -188,7 +191,7 @@ def kminus win, dirname, ext = 'k-'
   end
   counter.clean
 
-  win.check result, " (#{succeeded}/#{counter.count})"
+  win.result succeeded, counter.count
 end
 
 
@@ -264,10 +267,10 @@ Test.add '3.3' do |win|
 end
 
 Test.add '4.2' do |win|
-  msg = `cd hw4 && ./test --simple`
+  succeeded, total = `cd hw4 && ./test --simple`.chomp.split('/')
   assert $?.success?
 
-  win.print msg
+  win.result succeeded, total
 end
 
 Test.add '5.1' do |win|
