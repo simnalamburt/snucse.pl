@@ -43,13 +43,6 @@ class Curses::Window
     color_set 0
   end
 
-  def temp(msg)
-    print msg
-
-    clean = "\b"*msg.length + ' '*msg.length + "\b"*msg.length
-    TempMsg.new(self, clean)
-  end
-
   def counter(count)
     Counter.new(self, count)
   end
@@ -94,17 +87,6 @@ class Counter
   end
 
   def count; return @iter end
-end
-
-class TempMsg
-  def initialize(win, clean)
-    @win = win
-    @clean = clean
-  end
-
-  def clean
-    @win.print @clean
-  end
 end
 
 
@@ -174,9 +156,9 @@ def kminus win, dirname, ext = 'k-'
 
     input = File.join(dirname, 'examples', File.basename(name, '.out') + '.in')
     actual = unless File.exist?(input)
-      `#{dirname}/run #{dirname}/examples/#{code}.#{ext}`
+      `#{dirname}/run #{dirname}/examples/#{code}.#{ext} 2>/dev/null`
     else
-      `#{dirname}/run #{dirname}/examples/#{code}.#{ext} < #{input}`
+      `#{dirname}/run #{dirname}/examples/#{code}.#{ext} < #{input} 2>/dev/null`
     end
 
     expected = File.read(name)
@@ -216,28 +198,24 @@ Test.add '3.1' do |win|
 end
 
 Test.add '3.2' do |win|
-  tmp = win.temp 'Compiling reference program'
   @exename = "tests/coin"
-  system "g++ -std=c++0x -O3 tests/hw3-ex2.cc -o #{@exename}"
-  tmp.clean
 
-  tmp = win.temp 'Testing '
+  win.print 'Compiling...'
+  system "g++ -std=c++0x -O3 tests/hw3-ex2.cc -o #{@exename}"
+  win.clear
+
   try = 120
-  counter = win.counter try
+  @counter = win.counter try
   def test num
+    @counter.tick
     assert_eq `echo #{num} | hw3/run hw3/examples/ex2.k-`, `#{@exename} #{num}`
   end
 
-  try -= 1
-  counter.tick
+  win.print 'Testing '
   test 10000
-  try.times do
-    counter.tick
-    test rand(1..10000)
-  end
+  (2..try).map { test rand(1..10000) }
+  win.clear
 
-  tmp.clean
-  counter.clean
   File.delete @exename
 
   win.ok
