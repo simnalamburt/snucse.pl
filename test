@@ -136,7 +136,7 @@ class Test
       end
     end
 
-    win.print "\n    Press 'q' to exit\n"
+    win.print "\n    Press 'q' to exit "
 
     loop do
       break if win.getch == 'q'
