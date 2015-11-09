@@ -21,11 +21,11 @@ Testing
 자동화된 루비 스크립트로 전체 과제에 대한 테스트를 한번에 수행할 수 있다.
 또한 별도로 [**짱멋진 보물섬 자동채점기**](hw4)가 준비되어있어, 보물섬 과제를
 원만하게 수행할 수 있게해준다.
-```sh
-gem install diffy
+```console
+gem install curses parallel
 ./test
 ```
-![](http://i.imgur.com/7uk7NG3.png)
+![](http://i.imgur.com/DmbNvZj.gif)
 
 [제출하기][submit]
 --------
