@@ -1,38 +1,71 @@
 #!/usr/bin/env ruby
-require 'diffy'
+require 'curses'
+require 'parallel'
 
-Diffy::Diff.default_format = :color
+GREEN = 1
+RED = 2
+$results = []
 
-def assert result
-  if result; return; end
+Curses::noecho
+Curses::init_screen
+Curses::start_color
+Curses::init_pair(GREEN, 83, Curses::COLOR_BLACK)
+Curses::init_pair(RED, 166, Curses::COLOR_BLACK)
 
-  puts
-  puts 'Failed'
-  exit 1
-end
 
+
+#
+# Helpers
+#
+def assert actual; assert_eq actual, true end
 def assert_eq actual, expected
-  if actual == expected; return; end
+  return true if expected == actual
 
-  puts
-  puts 'Failed'
-  puts " \e[32mEXPECTED\e[0m  \e[31mACTUAL\e[0m"
-  puts '-'*40
-  puts
-  puts Diffy::Diff.new actual, expected
-  exit 1
+  $results << [ expected, actual ]
+  false
 end
 
 class Fixnum
   def digits
     return 1 if self == 0
+    Math.log10(abs).to_i + 1
+  end
+end
 
-    Math.log10(self.abs).to_i + 1
+class Curses::Window
+  def print(msg)
+    self << msg
+    refresh
+  end
+
+  def color(col)
+    color_set col
+    yield
+    color_set 0
+  end
+
+  def counter(count)
+    Counter.new(self, count)
+  end
+
+  def ok
+    color(GREEN) { print "✓\n" * maxy }
+  end
+
+  def result(succeeded, total)
+    succeeded = succeeded.to_i
+    total = total.to_i
+
+    icon, col = succeeded == total ? ['✓', GREEN] : ['✗', RED]
+    color(col) { self << icon }
+
+    print ' (%d/%d, %g%%)' % [succeeded, total, succeeded * 100.0 / total]
   end
 end
 
 class Counter
-  def initialize total
+  def initialize win, total
+    @win = win
     @format = "%0#{(total - 1).digits}d/#{total}"
     @iter = 0
     @total = total
@@ -41,14 +74,14 @@ class Counter
 
   def tick
     msg = @format % @iter
-    print "\b"*@print_length + msg
+    @win.print "\b"*@print_length + msg
 
     @iter += 1
     @print_length = msg.length
   end
 
   def clean
-    print "\b"*@print_length + ' '*@print_length + "\b"*@print_length
+    @win.print "\b"*@print_length + ' '*@print_length + "\b"*@print_length
 
     @iter = @total
     @print_length = 0
@@ -57,111 +90,168 @@ class Counter
   def count; return @iter end
 end
 
-class TempMsg
-  def initialize string
-    print string
-    @clean = "\b"*string.length + ' '*string.length + "\b"*string.length
+
+#
+# Tests
+#
+class Test
+  @@tasks = []
+  @@pos = 3
+
+  head = Curses::Window.new(2, 0, 1, 3)
+  head.print <<-HEAD
+  Homework │ Status
+───────────┼─────────
+  HEAD
+
+  def self.add(*params)
+    height = params.length
+
+    left = Curses::Window.new(height, 6, @@pos, 10)
+    left << params.map { |x| x + ' |' } .join("\n")
+    left.refresh
+
+    win = Curses::Window.new(height, 0, @@pos, 16)
+    @@tasks << Thread.new do
+      yield win
+    end
+    @@pos += height
   end
 
-  def clean
-    print @clean
+  def self.wait
+    @@tasks.each { |thr| thr.join }
+
+    line = Curses::Window.new(0, 2, 0, 43)
+    line << "|\n" * line.maxy
+    line.refresh
+
+    win = Curses::Window.new(0, 0, 1, 45)
+    win.keypad true
+    win.scrollok true
+
+    if $results.empty?
+      win.print "    All Green!\n"
+    else
+      $results.each do |expected, actual|
+        win << "Expected : '%s', Actual : '%s'\n" % [expected.chomp, actual.chomp]
+      end
+    end
+
+    win.print "\n    Press 'q' to exit "
+
+    loop do
+      break if win.getch == 'q'
+    end
   end
 end
 
+def kminus win, dirname, ext = 'k-'
+  result = true
+  succeeded = 0
 
-puts  'Homework 1.*'
-print 'Homework 2.* ... '
-assert system 'ocaml tests/basic.ml'
-puts 'OK'
-
-
-print 'Homework 2.2 ... '
-assert system 'ocaml tests/hw2-ex2.ml'
-puts 'OK'
-
-
-print 'Homework 2.7 ... '
-assert_eq `ocaml tests/hw2-ex7.ml`, File.read('tests/hw2-ex7')
-puts 'OK'
-
-
-def kminus dirname, ext = 'k-'
   `cd #{dirname} && make 2>/dev/null`
   glob = Dir.glob("#{dirname}/examples/*.out")
-  counter = Counter.new glob.count
-  glob.each_with_index do |name, i|
+  counter = win.counter glob.count
+  glob.each do |name|
     code = File.basename(name, '.out')
 
     input = File.join(dirname, 'examples', File.basename(name, '.out') + '.in')
     actual = unless File.exist?(input)
-      `#{dirname}/run #{dirname}/examples/#{code}.#{ext}`
+      `#{dirname}/run #{dirname}/examples/#{code}.#{ext} 2>/dev/null`
     else
-      `#{dirname}/run #{dirname}/examples/#{code}.#{ext} < #{input}`
+      `#{dirname}/run #{dirname}/examples/#{code}.#{ext} < #{input} 2>/dev/null`
     end
 
     expected = File.read(name)
 
-    assert_eq actual, expected
+    res = assert_eq actual, expected
     counter.tick
+
+    succeeded += 1 if res
+    result &&= res
   end
   counter.clean
-  puts 'OK (%d)' % counter.count
-end
-print 'Homework 3.1 ... '
-kminus 'hw3'
 
-
-print 'Homework 3.2 ... '
-
-tmp = TempMsg.new 'Compiling reference program'
-@exename = "tests/coin"
-system "g++ -std=c++0x -O3 tests/hw3-ex2.cc -o #{@exename}"
-tmp.clean
-
-tmp = TempMsg.new 'Testing '
-try = 120
-counter = Counter.new try
-def test num
-  assert_eq `echo #{num} | hw3/run hw3/examples/ex2.k-`, `#{@exename} #{num}`
+  win.result succeeded, counter.count
 end
 
-try -= 1
-counter.tick
-test 10000
-try.times do
-  counter.tick
-  test rand(1..10000)
+
+Test.add '1.*', '2.*' do |win|
+  assert system 'ocaml tests/basic.ml'
+
+  win.ok
 end
 
-tmp.clean
-counter.clean
-File.delete @exename
+Test.add '2.2' do |win|
+  assert system 'ocaml tests/hw2-ex2.ml'
 
-puts 'OK'
-
-
-print 'Homework 3.3 ... '
-def test name
-  code = File.read('hw3/examples/ex3.k-')
-  test = File.read("tests/#{name}.k-")
-
-  tmp = 'tests/tmp'
-  File.write(tmp, code + ';' + test)
-  actual = `hw3/run #{tmp}`
-  File.delete tmp
-
-  expected = File.read("tests/#{name}.out")
-
-  assert_eq actual, expected
+  win.ok
 end
-test 'hw3-ex3'
-test 'hw3-ex3-TA'
-puts 'OK'
 
+Test.add '2.7' do |win|
+  assert_eq `ocaml tests/hw2-ex7.ml`, File.read('tests/hw2-ex7')
 
-print 'Homework 4.2 ... '
-assert system 'cd hw4 && ./test --simple'
+  win.ok
+end
 
+Test.add '3.1' do |win|
+  kminus win, 'hw3'
+end
 
-print 'Homework 5.1 ... '
-kminus 'hw5', 'k--'
+Test.add '3.2' do |win|
+  @exename = "tests/coin"
+
+  win.print 'Compiling...'
+  system "g++ -std=c++0x -O3 tests/hw3-ex2.cc -o #{@exename}"
+  win.clear
+
+  try = 120
+  @counter = win.counter try
+  def test num
+    @counter.tick
+    assert_eq `echo #{num} | hw3/run hw3/examples/ex2.k-`, `#{@exename} #{num}`
+  end
+
+  win.print 'Testing '
+  test 10000
+  Parallel.map(2..try, in_threads: 3) { test rand(1..10000) }
+  win.clear
+
+  File.delete @exename
+
+  win.ok
+end
+
+Test.add '3.3' do |win|
+  def test name
+    code = File.read('hw3/examples/ex3.k-')
+    test = File.read("tests/#{name}.k-")
+
+    tmp = 'tests/tmp'
+    File.write(tmp, code + ';' + test)
+    actual = `hw3/run #{tmp}`
+    File.delete tmp
+
+    expected = File.read("tests/#{name}.out")
+
+    assert_eq actual, expected
+  end
+
+  test 'hw3-ex3'
+  test 'hw3-ex3-TA'
+
+  win.ok
+end
+
+Test.add '4.2' do |win|
+  succeeded, total = `cd hw4 && ./test --simple`.chomp.split('/')
+  assert $?.success?
+
+  win.result succeeded, total
+end
+
+Test.add '5.1' do |win|
+  kminus win, 'hw5', 'k--'
+end
+
+Test.wait
