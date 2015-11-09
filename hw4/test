@@ -130,11 +130,11 @@ let print_results ((): unit) =
   in
   let count_good = List.fold_left (fun n (_, _, exp, act) -> n + (if exp = act then 1 else 0)) 0 !test_results in
   let count_all = List.length !test_results in
-  let percentage = 100.0 *. float_of_int count_good /. float_of_int count_all in
-  let result = Printf.sprintf "%d/%d (%g%%)" count_good count_all percentage in
+  let result = Printf.sprintf "%d/%d" count_good count_all in
 
   if verbose then
-    let result = Printf.sprintf "Test result: %s\n" result in
+    let percentage = 100.0 *. float_of_int count_good /. float_of_int count_all in
+    let result = Printf.sprintf "Test result: %s (%g%%)\n" result percentage in
     print_endline result;
     List.iter per_ok !test_results;
     List.iter per_error !test_results;
