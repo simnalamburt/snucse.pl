@@ -95,6 +95,8 @@ class Test
   @@tasks = []
   @@pos = 3
 
+  Curses.noecho
+
   head = Curses::Window.new(2, 0, 1, 3)
   head.print <<-HEAD
   Homework │ Status
@@ -122,9 +124,12 @@ class Test
     win.print <<-TAIL
 ───────────┴─────────
 
-    Done!
+    Press 'q' to exit
     TAIL
-    win.getch
+
+    loop do
+      break if win.getch == 'q'
+    end
   end
 end
 
