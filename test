@@ -1,14 +1,14 @@
 #!/usr/bin/env ruby
-require 'diffy'
 require 'curses'
 
+OK = 1
+$results = []
 
 Curses::noecho
 Curses::init_screen
 Curses::start_color
+Curses::init_pair(OK, 83, Curses::COLOR_BLACK)
 
-OK = 1
-Curses.init_pair(OK, 83, Curses::COLOR_BLACK)
 
 
 #
@@ -18,15 +18,7 @@ def assert actual; assert_eq actual, true end
 def assert_eq actual, expected
   if actual == expected; return end
 
-  # TODO: no stdout
-  Diffy::Diff.default_format = :color
-  puts
-  puts 'Failed'
-  puts " \e[32mEXPECTED\e[0m  \e[31mACTUAL\e[0m"
-  puts '-'*40
-  puts
-  puts Diffy::Diff.new actual, expected
-  exit 1
+  $results << [ expected, actual ]
 end
 
 class Fixnum
@@ -137,12 +129,25 @@ class Test
   def self.wait
     @@tasks.each { |thr| thr.join }
 
-    win = Curses::Window.new(3, 0, @@pos, 3)
-    win.print <<-TAIL
-───────────┴─────────
+    line = Curses::Window.new(0, 2, 0, 43)
+    line << "|\n" * line.maxy
+    line.refresh
 
-    Press 'q' to exit
-    TAIL
+    win = Curses::Window.new(0, 0, 1, 45)
+    win.keypad true
+    win.scrollok true
+
+    if $results.empty?
+      win.print "    All Green!\n"
+    else
+      require 'diffy'
+
+      $results.each do |expected, actual|
+        win << "Expected : '%s', Actual : '%s'\n" % [expected.chomp, actual.chomp]
+      end
+    end
+
+    win.print "\n    Press 'q' to exit\n"
 
     loop do
       break if win.getch == 'q'
@@ -252,10 +257,8 @@ Test.add '4.2' do |win|
   win.print msg
 end
 
-#Test.add do |win|
-#  win.print 'Homework 5.1 ... '
-#
-#  kminus win, 'hw5', 'k--'
-#end
+Test.add '5.1' do |win|
+  kminus win, 'hw5', 'k--'
+end
 
 Test.wait
