@@ -43,6 +43,10 @@ class Curses::Window
   def counter(count)
     Counter.new(self, count)
   end
+
+  def ok(msg = '')
+    self.print (["✓" + msg] * self.maxy).join("\n")
+  end
 end
 
 class Counter
@@ -89,10 +93,22 @@ end
 #
 class Test
   @@tasks = []
-  @@pos = 2
+  @@pos = 3
 
-  def self.add(height = 1)
-    win = Curses::Window.new(height, 0, @@pos, 0)
+  head = Curses::Window.new(2, 0, 1, 3)
+  head.print <<-HEAD
+  Homework │ Status
+───────────┼─────────
+  HEAD
+
+  def self.add(*params)
+    height = params.length
+
+    left = Curses::Window.new(height, 6, @@pos, 10)
+    left << params.map { |x| x + ' |' } .join("\n")
+    left.refresh
+
+    win = Curses::Window.new(height, 0, @@pos, 16)
     @@tasks << Thread.new do
       yield win
     end
@@ -102,8 +118,12 @@ class Test
   def self.wait
     @@tasks.each { |thr| thr.join }
 
-    win = Curses::Window.new(1, 0, 0, 0)
-    win.print 'Done!'
+    win = Curses::Window.new(3, 0, @@pos, 3)
+    win.print <<-TAIL
+───────────┴─────────
+
+    Done!
+    TAIL
     win.getch
   end
 end
@@ -128,43 +148,33 @@ def kminus win, dirname, ext = 'k-'
     counter.tick
   end
   counter.clean
-  win.print 'OK (%d)' % counter.count
+  win.ok " (#{counter.count})"
 end
 
 
-Test.add(2) do |win|
-  win.print "Homework 1.*\nHomework 2.* ... "
-
+Test.add '1.*', '2.*' do |win|
   assert system 'ocaml tests/basic.ml'
 
-  win.print 'OK'
+  win.ok
 end
 
-Test.add do |win|
-  win.print 'Homework 2.2 ... '
-
+Test.add '2.2' do |win|
   assert system 'ocaml tests/hw2-ex2.ml'
 
-  win.print 'OK'
+  win.ok
 end
 
-Test.add do |win|
-  win.print 'Homework 2.7 ... '
-
+Test.add '2.7' do |win|
   assert_eq `ocaml tests/hw2-ex7.ml`, File.read('tests/hw2-ex7')
 
-  win.print 'OK'
+  win.ok
 end
 
-Test.add do |win|
-  win.print 'Homework 3.1 ... '
-
+Test.add '3.1' do |win|
   kminus win, 'hw3'
 end
 
-Test.add do |win|
-  win.print 'Homework 3.2 ... '
-
+Test.add '3.2' do |win|
   tmp = win.temp 'Compiling reference program'
   @exename = "tests/coin"
   system "g++ -std=c++0x -O3 tests/hw3-ex2.cc -o #{@exename}"
@@ -189,10 +199,10 @@ Test.add do |win|
   counter.clean
   File.delete @exename
 
-  win.print 'OK'
+  win.ok
 end
 
-Test.add do |win|
+Test.add '3.3' do |win|
   def test name
     code = File.read('hw3/examples/ex3.k-')
     test = File.read("tests/#{name}.k-")
@@ -207,17 +217,13 @@ Test.add do |win|
     assert_eq actual, expected
   end
 
-  win.print 'Homework 3.3 ... '
-
   test 'hw3-ex3'
   test 'hw3-ex3-TA'
 
-  win.print 'OK'
+  win.ok
 end
 
-Test.add do |win|
-  win.print 'Homework 4.2 ... '
-
+Test.add '4.2' do |win|
   msg = `cd hw4 && ./test --simple`
   assert $?.success?
 
