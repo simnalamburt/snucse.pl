@@ -1,13 +1,15 @@
 #!/usr/bin/env ruby
 require 'curses'
 
-OK = 1
+GREEN = 1
+RED = 2
 $results = []
 
 Curses::noecho
 Curses::init_screen
 Curses::start_color
-Curses::init_pair(OK, 83, Curses::COLOR_BLACK)
+Curses::init_pair(GREEN, 83, Curses::COLOR_BLACK)
+Curses::init_pair(RED, 166, Curses::COLOR_BLACK)
 
 
 
@@ -16,9 +18,10 @@ Curses::init_pair(OK, 83, Curses::COLOR_BLACK)
 #
 def assert actual; assert_eq actual, true end
 def assert_eq actual, expected
-  if actual == expected; return end
+  return true if expected == actual
 
   $results << [ expected, actual ]
+  false
 end
 
 class Fixnum
@@ -51,13 +54,16 @@ class Curses::Window
     Counter.new(self, count)
   end
 
-  def ok(msg = '')
+  def check(bool, msg)
+    icon, col = bool ? ['✓', GREEN] : ['✗', RED]
+
     maxy.times do
-      color(OK) { self << '✓' }
+      color(col) { self << icon }
       self << msg + "\n"
     end
     refresh
   end
+  def ok(msg = ''); check(true, msg) end
 end
 
 class Counter
@@ -156,6 +162,9 @@ class Test
 end
 
 def kminus win, dirname, ext = 'k-'
+  result = true
+  succeeded = 0
+
   `cd #{dirname} && make 2>/dev/null`
   glob = Dir.glob("#{dirname}/examples/*.out")
   counter = win.counter glob.count
@@ -171,11 +180,15 @@ def kminus win, dirname, ext = 'k-'
 
     expected = File.read(name)
 
-    assert_eq actual, expected
+    res = assert_eq actual, expected
     counter.tick
+
+    succeeded += 1 if res
+    result &&= res
   end
   counter.clean
-  win.ok " (#{counter.count})"
+
+  win.check result, " (#{succeeded}/#{counter.count})"
 end
 
 
