@@ -19,11 +19,17 @@ Curses::init_pair(RED, 166, Curses::COLOR_BLACK)
 #
 # Helpers
 #
-def assert actual; assert_eq actual, true end
+def assert actual
+  return true if actual
+
+  $results << 'Assertion failed'
+  false
+end
+
 def assert_eq actual, expected
   return true if expected == actual
 
-  $results << [ expected, actual ]
+  $results << 'Expected : "%s", Actual : "%s"' % [expected.chomp, actual.chomp]
   false
 end
 
@@ -132,14 +138,12 @@ class Test
     win.scrollok true
 
     if $results.empty?
-      win.print "    All Green!\n"
+      win << '    All Green!'
     else
-      $results.each do |expected, actual|
-        win << "Expected : '%s', Actual : '%s'\n" % [expected.chomp, actual.chomp]
-      end
+      win << $results.join("\n")
     end
 
-    win.print "\n    Press 'q' to exit "
+    win.print "\n\n    Press 'q' to exit "
 
     loop do
       break if win.getch == 'q'
