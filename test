@@ -198,9 +198,13 @@ end
 
 Test.add '3.1' do |win|
   kminus win, 'hw3'
+
+  # TODO: Dependency
+  Test.add '3.2', &method(:_3_2)
+  Test.add '3.3', &method(:_3_3)
 end
 
-Test.add '3.2' do |win|
+def _3_2(win)
   @exename = "tests/hw3-ex2/main"
 
   win.print 'Compiling...'
@@ -222,7 +226,7 @@ Test.add '3.2' do |win|
   win.ok
 end
 
-Test.add '3.3' do |win|
+def _3_3(win)
   def test name
     code = File.read('hw3/examples/ex3.k-')
     test = File.read("tests/#{name}.k-")
