@@ -201,10 +201,10 @@ Test.add '3.1' do |win|
 end
 
 Test.add '3.2' do |win|
-  @exename = "tests/coin"
+  @exename = "tests/hw3-ex2/main"
 
   win.print 'Compiling...'
-  system "g++ -std=c++0x -O3 tests/hw3-ex2.cc -o #{@exename}"
+  system "cd tests/hw3-ex2 && make"
   win.clear
 
   try = 120
@@ -218,8 +218,6 @@ Test.add '3.2' do |win|
   test 10000
   Parallel.map(2..try, in_threads: 3) { test rand(1..10000) }
   win.clear
-
-  File.delete @exename
 
   win.ok
 end

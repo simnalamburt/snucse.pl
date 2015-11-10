@@ -5,5 +5,5 @@ hw?/parser.ml
 hw?/parser.mli
 hw?/run
 
-tests/coin
+tests/hw3-ex2/main
 tests/tmp
