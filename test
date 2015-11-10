@@ -64,7 +64,7 @@ class Curses::Window
     succeeded = succeeded.to_i
     total = total.to_i
 
-    icon, col = succeeded == total ? ['✓', GREEN] : ['✗', RED]
+    icon, col = succeeded == total && total != 0 ? ['✓', GREEN] : ['✗', RED]
     color(col) { self << icon }
 
     print ' (%d/%d, %g%%)' % [succeeded, total, succeeded * 100.0 / total]
