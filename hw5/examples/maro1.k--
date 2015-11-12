@@ -1,0 +1,2 @@
+let proc f(x) = (x := 10000; 1) in
+write (2+f(1))

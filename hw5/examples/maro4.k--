@@ -1,0 +1,9 @@
+let n := 15 in
+let proc f(h) =
+  let n := h in
+  (for h := 1 to h/10 do
+    (for h := 0 to 10/h do h := n - h); write(h := n)); h * 2
+in
+let proc h(n) =
+  (write f<n>; if n = 1 then write 0 else if (n/2)*2 = n then h(n/2) else h((3*n)+1)) in
+h (n)
