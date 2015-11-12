@@ -105,7 +105,8 @@ module Translator = struct
       (* TODO: 재귀호출이 잘 되는가? *)
       [Sm5.PUSH (Sm5.Id name)] @ (* 함수 Push *)
       [Sm5.PUSH (Sm5.Id param); Sm5.LOAD] @ (* Value Push *)
-      [Sm5.PUSH (Sm5.Id param)] (* Location Push *)
+      [Sm5.PUSH (Sm5.Id param)] @ (* Location Push *)
+      [Sm5.CALL] (* CALL *)
     end
     | K.READ x -> [Sm5.GET; Sm5.PUSH (Sm5.Id x); Sm5.STORE; Sm5.PUSH (Sm5.Id x); Sm5.LOAD]
     | K.WRITE exp -> begin
