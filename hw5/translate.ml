@@ -13,6 +13,7 @@ module Translator = struct
       | K.WHILE (econd, ebody) -> failwith "WHILE Unimplemented"
       | K.FOR (econd, efrom, eto, ebody) -> failwith "FOR Unimplemented"
       | K.CALLV (name, eparam) -> begin
+        (* TODO: 재귀호출이 잘 되는가? *)
         let tempname = "β" in
         K.LETV (tempname, eparam, K.CALLR(name, tempname))
       end
