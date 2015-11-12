@@ -158,7 +158,7 @@ struct
   let lookup_record x r =
     try List.assoc x r with Not_found -> raise (Error ("Unfound field : " ^ x))
 
-  let load l m =
+  let load (l: loc) (m: memory): value =
     try List.assoc l m with
     Not_found -> raise (Error ("Uninitialized location : %s" ^ (loc_to_str l)))
 
@@ -173,18 +173,46 @@ struct
 
   let reachable_locs : (loc list) ref = ref []
 
-  (* TODO : complete this function.
-   * Implement the GC algorithm introduced in class material.
-   *)
-  let malloc_with_gc s m e c k =
+  let malloc_with_gc (s: stack) (m: memory) (e: environment) (c: command) (k: continuation) =
     if List.length m < mem_limit then
       let _ = loc_id := !loc_id + 1 in
       ((!loc_id, 0), m)
     else
       let _ = reachable_locs := [] in
-      (* TODO : Add the code that marks the reachable locations.
-       * let _ = ...
-       *)
+      (* 해당 value에 물려있는 loc들을 찾는 함수 *)
+      let rec sweep_value (value: value) =
+        match value with
+        | L subloc -> mark subloc
+        | R record -> begin
+          let _, locs = List.split record in
+          List.iter mark locs
+        end
+        | _ -> () (* Do nothing *)
+      (* 해당 loc을 마크하고, 관련된 loc을 찾는 함수 *)
+      and mark (loc: loc) =
+        (* 1. 일단 마크를 한다 *)
+        reachable_locs := !reachable_locs @ [loc];
+        (* 2. 이 loc에 연결된 다른 loc을 조사한다 *)
+        sweep_value (load loc m)
+      in
+      let rec emark ((_, evalue): string * evalue) =
+        match evalue with
+        | Loc loc -> mark loc
+        | Proc (_, _, env) -> List.iter emark env
+      in
+      let rec smark (svalue: svalue) =
+        match svalue with
+        | V value -> sweep_value value
+        | P (_, _, env) -> List.iter emark env
+        | M entry -> emark entry
+      in
+      let rec kmark ((_, env): command * environment) =
+        List.iter emark env
+      in
+      (* stack, env, continuation 세곳에서 GC를 시작한다 *)
+      List.iter smark s;
+      List.iter emark e;
+      List.iter kmark k;
       let new_m = List.filter (fun (l, _) -> List.mem l !reachable_locs) m in
       if List.length new_m < mem_limit then
         let _ = loc_id := !loc_id + 1 in
