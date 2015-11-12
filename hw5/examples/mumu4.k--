@@ -1,0 +1,14 @@
+(* Public test case f *)
+
+let proc f(n) =
+  if n = 0 then 1
+  else n * f(n-1) in
+let n := 4 in
+let m := 2 in
+for m := 1 to n do
+(
+  if (for p := m to 0 do write (f<p>)) = unit
+  then write (f<n>)
+  else write 0
+);
+write (f<m>)

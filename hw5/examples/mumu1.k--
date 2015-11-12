@@ -1,0 +1,12 @@
+(* Public test case 1 : while loop *)
+
+let x := 1 in
+let y := 0 in
+while (x < 11) do
+(
+  y := y + x;
+  x := x + 1
+);
+write x + y
+
+(* Output : prints out "66\n" *)

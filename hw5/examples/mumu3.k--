@@ -1,0 +1,8 @@
+(* Public test case e *)
+
+let x :=
+(let y := 0 in
+ let i := 0 in
+ for i:= 1 to 5 do
+ y := y + i) in
+if x = unit then (write 1) else (write 2)

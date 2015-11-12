@@ -1,0 +1,10 @@
+(* Public test case 9 : For loop *)
+
+let i := 0 in
+for i := 1 to 5 do (
+  write i;
+  i := i + 2;
+  write i
+)
+
+(* Output : 1\n3\n2\n4\3\n5\n4\n6\n5\n7\n *)
