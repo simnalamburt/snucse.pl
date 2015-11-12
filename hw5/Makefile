@@ -36,5 +36,11 @@ lexer.cmo: lexer.ml
 lexer.ml: lexer.mll parser.cmo
 	ocamllex lexer.mll
 
+gctest: lexer.cmo parser.cmo sm5.cmo k.cmo translate.cmo pp.cmo gctest.cmo
+	ocamlc -o gctest lexer.cmo pp.cmo parser.cmo sm5.cmo translate.cmo k.cmo gctest.cmo
+
+gctest.cmo : translate.cmo gctest.ml
+	ocamlc -c gctest.ml
+
 clean:
 	rm -f *.cmx *.cmi parser.mli parser.ml lexer.ml run *.o *.cmo
