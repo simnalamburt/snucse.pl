@@ -7,7 +7,8 @@
 open K
 open Sm5
 module Translator = struct
-  let rec trans : K.program -> Sm5.command = function
+  let rec trans (input: K.program): Sm5.command =
+    match input with
     | K.NUM i -> [Sm5.PUSH (Sm5.Val (Sm5.Z i))]
     | K.TRUE -> [Sm5.PUSH (Sm5.Val (Sm5.B true))]
     | K.FALSE -> [Sm5.PUSH (Sm5.Val (Sm5.B false))]
