@@ -37,8 +37,11 @@ module Translator = struct
       trans e2 @ [Sm5.UNBIND; Sm5.POP]
     end
 
-    | K.LETF (name, param, ebody, eafter)
-    -> failwith "Unimplemented"
+    | K.LETF (name, param, ebody, eafter) -> begin
+      [Sm5.PUSH (Sm5.Fn (param, trans ebody)); Sm5.BIND name] @
+      trans eafter @ [Sm5.UNBIND; Sm5.POP]
+    end
+
     | K.CALLV (name, eparam)
     -> failwith "Unimplemented"
     | K.CALLR (name, param)
