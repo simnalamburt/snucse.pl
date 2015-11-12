@@ -8,9 +8,32 @@ open K
 open Sm5
 module Translator = struct
   let rec trans (input: K.program): Sm5.command =
-    let desugar (input: K.program): K.program =
+    let rec desugar (input: K.program): K.program =
       match input with
-      | K.WHILE (econd, ebody) -> failwith "WHILE Unimplemented"
+      | K.WHILE (econd, ebody) -> begin
+        (*
+         * while(econd) { ebody; }
+         *   // is same with
+         * function f() {
+         *   if (econd) {
+         *     ebody;
+         *     f()
+         *   }
+         * };
+         * f()
+         *)
+        let tempname = "λ" in
+        K.LETF (
+          tempname, "γ",
+            K.IF (econd,
+              K.SEQ (
+                ebody,
+                desugar (K.CALLV (tempname, K.UNIT))
+              ),
+            K.UNIT),
+          desugar (K.CALLV (tempname, K.UNIT))
+        )
+      end
       | K.FOR (econd, efrom, eto, ebody) -> failwith "FOR Unimplemented"
       | K.CALLV (name, eparam) -> begin
         (* TODO: 재귀호출이 잘 되는가? *)
