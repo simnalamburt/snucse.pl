@@ -8,7 +8,17 @@ open K
 open Sm5
 module Translator = struct
   let rec trans (input: K.program): Sm5.command =
-    match input with
+    let desugar (input: K.program): K.program =
+      match input with
+      | K.WHILE (econd, ebody) -> failwith "WHILE Unimplemented"
+      | K.FOR (econd, efrom, eto, ebody) -> failwith "FOR Unimplemented"
+      | K.CALLV (name, eparam) -> begin
+        let tempname = "β" in
+        K.LETV (tempname, eparam, K.CALLR(name, tempname))
+      end
+      | _ -> input
+    in
+    match (desugar input) with
     | K.NUM i -> [Sm5.PUSH (Sm5.Val (Sm5.Z i))]
     | K.TRUE -> [Sm5.PUSH (Sm5.Val (Sm5.B true))]
     | K.FALSE -> [Sm5.PUSH (Sm5.Val (Sm5.B false))]
@@ -27,12 +37,6 @@ module Translator = struct
     end
     | K.SEQ (ebefore, eafter) -> trans ebefore @ [Sm5.POP] @ trans eafter
     | K.IF (econd, ethen, eelse) -> trans econd @ [Sm5.JTR (trans ethen, trans eelse)]
-
-    | K.WHILE (econd, ebody)
-    -> failwith "WHILE Unimplemented"
-    | K.FOR (econd, efrom, eto, ebody)
-    -> failwith "FOR Unimplemented"
-
     | K.LETV (x, e1, e2) -> begin
       trans e1 @ [Sm5.MALLOC; Sm5.BIND x; Sm5.PUSH (Sm5.Id x); Sm5.STORE] @
       trans e2 @ [Sm5.UNBIND; Sm5.POP]
@@ -41,10 +45,6 @@ module Translator = struct
       [Sm5.PUSH (Sm5.Fn (param, trans ebody)); Sm5.BIND name] @
       trans eafter @ [Sm5.UNBIND; Sm5.POP]
     end
-
-    | K.CALLV (name, eparam)
-    -> failwith "CALLV unimplemented"
-
     | K.CALLR (name, param) -> begin
       (* TODO: 재귀호출이 잘 되는가? *)
       [Sm5.PUSH (Sm5.Id name)] @ (* 함수 Push *)
@@ -60,4 +60,5 @@ module Translator = struct
       [Sm5.PUSH (Sm5.Id tempname); Sm5.LOAD] @ (* 스택 맨 위에 값 저장 *)
       [Sm5.UNBIND; Sm5.POP] (* 임시변수 해제 *)
     end
+    | K.WHILE _ | K.FOR _ | K.CALLV _ -> [] (* Unreachable! *)
 end
