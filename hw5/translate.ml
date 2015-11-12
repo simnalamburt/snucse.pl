@@ -44,31 +44,51 @@ module Translator = struct
          *
          * // ... is same with ...
          *
-         * function f(i) {
-         *   int temp = i;
-         *   if (eto < i) {
-         *     ()
-         *   } else {
-         *     ebody;
-         *     f(temp + 1);
-         *   }
-         * };
-         * f(efrom)
+         * int from = efrom;
+         * int to = eto;
+         * if (to < from) {
+         *   ()
+         * } else {
+         *   i = to;
+         *   function f(i) {
+         *     int temp = i;
+         *     if (to < i) {
+         *       ()
+         *     } else {
+         *       ebody;
+         *       f(temp + 1);
+         *     }
+         *   };
+         *   f(from)
+         * }
          *)
-        let tempname = "λfor" in
-        let tempvar = "α" in
-        K.LETF (
-          tempname, i,
-          K.LETV (tempvar, K.VAR i,
-            K.IF (K.LESS(eto, K.VAR i),
-              K.UNIT,
-              K.SEQ (
-                ebody,
-                desugar (K.CALLV (tempname, K.ADD (K.VAR tempvar, K.NUM 1)))
+        let vfrom = "αfrom" in
+        let vto = "αto" in
+        let vtemp = "αtemp" in
+        let fname = "λfor" in
+
+        K.LETV (vfrom, efrom,
+        K.LETV (vto, eto,
+        K.IF (K.LESS (K.VAR vto, K.VAR vfrom),
+          K.UNIT,
+          K.SEQ (
+          K.ASSIGN (i, K.VAR vto),
+          K.LETF (
+            fname, i,
+            K.LETV (vtemp, K.VAR i,
+              K.IF (K.LESS(K.VAR vto, K.VAR i),
+                K.UNIT,
+                K.SEQ (
+                  ebody,
+                  desugar (K.CALLV (fname, K.ADD (K.VAR vtemp, K.NUM 1)))
+                )
               )
-            )
-          ),
-          desugar (K.CALLV (tempname, efrom))
+            ),
+            desugar (K.CALLV (fname, efrom))
+          )
+          )
+        )
+        )
         )
       end
       | K.CALLV (name, eparam) -> begin
