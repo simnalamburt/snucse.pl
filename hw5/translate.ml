@@ -45,25 +45,29 @@ module Translator = struct
          * // ... is same with ...
          *
          * function f(i) {
+         *   int temp = i;
          *   if (eto < i) {
-         *     return;
+         *     ()
          *   } else {
          *     ebody;
-         *     f(i + 1);
+         *     f(temp + 1);
          *   }
          * };
          * f(efrom)
          *)
         let tempname = "λfor" in
+        let tempvar = "α" in
         K.LETF (
           tempname, i,
+          K.LETV (tempvar, K.VAR i,
             K.IF (K.LESS(eto, K.VAR i),
               K.UNIT,
               K.SEQ (
                 ebody,
-                desugar (K.CALLV (tempname, K.ADD (K.VAR i, K.NUM 1)))
+                desugar (K.CALLV (tempname, K.ADD (K.VAR tempvar, K.NUM 1)))
               )
-            ),
+            )
+          ),
           desugar (K.CALLV (tempname, efrom))
         )
       end
