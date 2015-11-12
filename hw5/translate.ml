@@ -68,7 +68,6 @@ module Translator = struct
         )
       end
       | K.CALLV (name, eparam) -> begin
-        (* TODO: 재귀호출이 잘 되는가? *)
         let tempname = "β" in
         K.LETV (tempname, eparam, K.CALLR(name, tempname))
       end
@@ -98,11 +97,11 @@ module Translator = struct
       trans e2 @ [Sm5.UNBIND; Sm5.POP]
     end
     | K.LETF (name, param, ebody, eafter) -> begin
-      [Sm5.PUSH (Sm5.Fn (param, trans ebody)); Sm5.BIND name] @
+      [Sm5.PUSH (Sm5.Fn (param, [Sm5.BIND name] @ trans ebody)); Sm5.BIND name] @
       trans eafter @ [Sm5.UNBIND; Sm5.POP]
     end
     | K.CALLR (name, param) -> begin
-      (* TODO: 재귀호출이 잘 되는가? *)
+      [Sm5.PUSH (Sm5.Id name)] @ (* 함수 스택 맨 위에 푸쉬 *)
       [Sm5.PUSH (Sm5.Id name)] @ (* 함수 Push *)
       [Sm5.PUSH (Sm5.Id param); Sm5.LOAD] @ (* Value Push *)
       [Sm5.PUSH (Sm5.Id param)] @ (* Location Push *)
