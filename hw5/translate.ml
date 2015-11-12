@@ -13,7 +13,9 @@ module Translator = struct
       | K.WHILE (econd, ebody) -> begin
         (*
          * while(econd) { ebody; }
-         *   // is same with
+         *
+         * // ... is same with ...
+         *
          * function f() {
          *   if (econd) {
          *     ebody;
@@ -22,7 +24,7 @@ module Translator = struct
          * };
          * f()
          *)
-        let tempname = "λ" in
+        let tempname = "λwhile" in
         K.LETF (
           tempname, "γ",
             K.IF (econd,
@@ -34,7 +36,37 @@ module Translator = struct
           desugar (K.CALLV (tempname, K.UNIT))
         )
       end
-      | K.FOR (econd, efrom, eto, ebody) -> failwith "FOR Unimplemented"
+      | K.FOR (i, efrom, eto, ebody) -> begin
+        (*
+         * for i in efrom..eto {
+         *   ebody
+         * }
+         *
+         * // ... is same with ...
+         *
+         * function f(i) {
+         *   if (eto < i) {
+         *     return;
+         *   } else {
+         *     ebody;
+         *     f(i + 1);
+         *   }
+         * };
+         * f(efrom)
+         *)
+        let tempname = "λfor" in
+        K.LETF (
+          tempname, i,
+            K.IF (K.LESS(eto, K.VAR i),
+              K.UNIT,
+              K.SEQ (
+                ebody,
+                desugar (K.CALLV (tempname, K.ADD (K.VAR i, K.NUM 1)))
+              )
+            ),
+          desugar (K.CALLV (tempname, efrom))
+        )
+      end
       | K.CALLV (name, eparam) -> begin
         (* TODO: 재귀호출이 잘 되는가? *)
         let tempname = "β" in
