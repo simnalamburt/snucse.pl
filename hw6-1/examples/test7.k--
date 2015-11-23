@@ -1,0 +1,14 @@
+(* Public test case 7 : Function inside function *)
+
+let x := 0 in
+
+let proc f (a) =
+  ( let proc g (b) = 5 * b in
+    read x;
+    a := g (x)
+  )
+in
+let a := 1 in
+(f<a>; write a)
+
+(* Output : reads in n and prints out 5n *)

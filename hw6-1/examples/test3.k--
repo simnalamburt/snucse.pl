@@ -1,0 +1,7 @@
+(* Public test case 3 : Recursive *)
+
+let proc f (x) = 
+  if (x < 1) then 0 else (x + f (x-1)) in
+write (f (10))
+
+(* Output : prints out "55\n" *)

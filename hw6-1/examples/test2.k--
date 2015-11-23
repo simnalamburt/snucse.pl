@@ -1,0 +1,13 @@
+(* Public test case 2 : call by reference *)
+
+let x := 0 in
+
+let proc f (a) =
+  ( read x;
+    a := 2 * x
+  )
+in
+let a := 1 in
+(f<a>; write a)
+
+(* Output : reads in n and prints out 2n *)

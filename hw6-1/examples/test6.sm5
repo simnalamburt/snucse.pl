@@ -1,0 +1,53 @@
+[push (n,
+  [bind fib;
+  push n;
+  load;
+  push 1;
+  less;
+  jtr (
+    [push 0],
+    [push n;
+    load;
+    push 1;
+    eq;
+    jtr (
+      [push 1],
+      [push fib;
+      push fib;
+      push n;
+      load;
+      push 1;
+      sub;
+      malloc;
+      call;
+      push fib;
+      push fib;
+      push n;
+      load;
+      push 2;
+      sub;
+      malloc;
+      call;
+      add])]);
+  unbind;
+  pop]
+);
+bind fib;
+malloc;
+bind #write_var;
+push fib;
+push fib;
+push 11;
+malloc;
+call;
+push #write_var;
+store;
+push #write_var;
+load;
+put;
+push #write_var;
+load;
+unbind;
+pop;
+unbind;
+pop]
