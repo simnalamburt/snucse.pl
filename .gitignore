@@ -3,7 +3,7 @@
 hw?/lexer.ml
 hw?/parser.ml
 hw?/parser.mli
-hw?/run
+hw*/run
 hw5/gctest
 
 tests/hw3-ex2/main
