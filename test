@@ -266,4 +266,8 @@ Test.add '5.2' do |win|
   win.ok assert_eq actual, expected
 end
 
+Test.add '6.1' do |win|
+  kminus win, 'hw6-1', 'sm5'
+end
+
 Test.wait
