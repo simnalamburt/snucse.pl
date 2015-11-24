@@ -36,19 +36,18 @@ let rec alpha_conv exp subs =
   | Fst e -> Fst (alpha_conv e subs)
   | Snd e -> Snd (alpha_conv e subs)
 
-(* TODO : Complete this function *)
 let rec conv (exp: mexp): mexp =
   let k = new_name () in
   match exp with
-  (* Constant expressions *)
-  | Num n -> Fn (k, (* TODO *) Num 1 )
-  | Var x -> Fn (k, (* TODO *) Num 1 )
-  | Fn (x, e) -> Fn (k, (* TODO *) Num 1 )
-  | Rec (f, x, e) -> Fn (k, (* TODO *) Num 1 )
+  | Num _
+  | Var _ -> Fn (k, App (Var k, exp))
+  | Fn (x, e) -> Fn (k, App (Var k, Fn (x, conv e)))
+  | Rec (f, x, e) -> Fn (k, App (Var k, Rec (f, x, conv e)))
   (* Non constant expressions *)
   | App (e1, e2) -> Fn (k, (* TODO *) Num 1 )
   | Ifz (e1, e2, e3) -> Fn (k, (* TODO *) Num 1 )
   | Add (e1, e2) -> begin
+    (* _e1 + e2_ = λk.(_e1_ λv1.(_e2_ λv2.(k (v1 + v2)))) *)
     let v1 = new_name () in
     let v2 = new_name () in
     Fn (k,
@@ -57,15 +56,48 @@ let rec conv (exp: mexp): mexp =
           App (conv e2,
             Fn (v2,
               App (Var k, Add (Var v1, Var v2))
-              )
             )
           )
         )
       )
+    )
   end
-  | Pair (e1, e2) -> Fn (k, (* TODO *) Num 1 )
-  | Fst e ->  Fn (k, (* TODO *) Num 1 )
-  | Snd e ->  Fn (k, (* TODO *) Num 1 )
+  | Pair (e1, e2) -> begin
+    (* _(e1, e2)_ = λk.(_e1_ λv1.(_e2_ λv2.(k (v1, v2)))) *)
+    let v1 = new_name () in
+    let v2 = new_name () in
+    Fn (k,
+      App (conv e1,
+        Fn (v1,
+          App (conv e2,
+            Fn (v2,
+              App (Var k, Pair (Var v1, Var v2))
+            )
+          )
+        )
+      )
+    )
+  end
+  | Fst epair -> begin
+    let var = new_name () in
+    Fn (k,
+      App (conv epair,
+        Fn (var,
+          App (Var k, Fst (Var var))
+        )
+      )
+    )
+  end
+  | Snd epair -> begin
+    let var = new_name () in
+    Fn (k,
+      App (conv epair,
+        Fn (var,
+          App (Var k, Snd (Var var))
+        )
+      )
+    )
+  end
 
 let cps exp = conv (alpha_conv exp [])
 
