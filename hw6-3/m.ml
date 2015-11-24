@@ -100,9 +100,9 @@ struct
    * load M l                M(l)
    *)
   let (@+) f (x, v) = (fun y -> if y = x then v else f y)
-  let store (l, m) p = (l, m @+ p)
-  let load (_, m) l = m l
-  let malloc (l, m) = (l, (l+1, m))
+  let store ((l, m): memory) (p: loc * value): memory = (l, m @+ p)
+  let load ((_, m): memory) (l: loc): value = m l
+  let malloc ((l, m): memory) = (l, (l+1, m))
 
   (* auxiliary functions *)
   let getInt = function
@@ -117,7 +117,7 @@ struct
     | (Bool b) -> b
     | _ -> raise (TypeError "not a bool")
 
-  let getLoc = function
+  let getLoc: value -> loc = function
     | (Loc l) -> l
     | _ -> raise (TypeError "not a loc")
 
@@ -129,13 +129,20 @@ struct
     | (Closure c) -> c
     | _ -> raise (TypeError "not a function")
 
-  let op2fn =
-    function ADD -> (fun (v1,v2) -> Int (getInt v1 + getInt v2))
-    | SUB -> (fun (v1,v2) -> Int (getInt v1 - getInt v2))
-    | AND -> (fun (v1,v2) -> Bool (getBool v1 && getBool v2))
-    | OR ->  (fun (v1,v2) -> Bool (getBool v1 || getBool v2))
-    | EQ -> (* TODO : implement this *)
-      failwith "Unimplemented"
+  let op2fn (operator: bop) ((v1, v2): value * value): value =
+    match operator with
+    | ADD -> Int (getInt v1 + getInt v2)
+    | SUB -> Int (getInt v1 - getInt v2)
+    | AND -> Bool (getBool v1 && getBool v2)
+    | OR -> Bool (getBool v1 || getBool v2)
+    | EQ -> begin
+      match v1, v2 with
+      | Int left, Int right       -> Bool (left = right)
+      | String left, String right -> Bool (left = right)
+      | Bool left, Bool right     -> Bool (left = right)
+      | Loc left, Loc right       -> Bool (left = right)
+      | _ -> raise (TypeError "ㅇㅅㅇ")
+    end
 
   let rec printValue =
     function
@@ -144,21 +151,24 @@ struct
     | String s -> print_endline s
     | _ -> raise (TypeError "WRITE operand is not int/bool/string")
 
-  let rec eval env mem exp =
+  let rec eval (env: env) (mem: memory) (exp: exp): (value * memory) =
     match exp with
     | CONST (S s) -> (String s, mem)
     | CONST (N n) -> (Int n, mem)
     | CONST (B b) -> (Bool b, mem)
     | VAR x -> (env x, mem)
     | FN (x, e) -> (Closure (Fun (x, e), env), mem)
-    | APP (e1, e2) ->
+    | APP (e1, e2) -> begin
       let (v1, m') = eval env mem e1 in
       let (v2, m'') = eval env m' e2 in
       let (c, env') = getClosure v1 in
-      (match c with
+      match c with
       | Fun (x, e) -> eval (env' @+ (x, v2)) m'' e
-      | RecFun (f, x, e) ->  (* TODO : implement this *)
-        failwith "Unimplemented")
+      | RecFun (f, x, e) -> begin
+        (* TODO: RecApp *)
+        failwith "Unimplemented"
+      end
+    end
     | IF (e1, e2, e3) ->
       let (v1, m') = eval env mem e1 in
       eval env m' (if getBool v1 then e2 else e3)
@@ -183,15 +193,45 @@ struct
     | SND e ->
       let (v, m') = eval env mem e in
       (snd (getPair v), m')
-    (* TODO : complete the rest of interpreter *)
-    | _ -> failwith "Unimplemented"
+    | LET (REC (ifun, iarg, ebody), exp) -> begin
+      (* TODO: LetRec *)
+      failwith "Unimplemented"
+    end
+    | LET (VAL (iname, evalue), exp) -> begin
+      let value, mem = eval env mem evalue in
+      let env = env @+ (iname, value) in
+      eval env mem exp
+    end
+    | MALLOC exp -> begin
+      let value, mem = eval env mem exp in
+      let loc, mem = malloc mem in
+      let mem = store mem (loc, value) in
+      (Loc loc, mem)
+    end
+    | ASSIGN (eleft, eright) -> begin
+      let ret, mem = eval env mem exp in
+      let location = getLoc ret in
+      let value, mem = eval env mem exp in
+      let mem = store mem (location, value) in
+      (value, mem)
+    end
+    | BANG exp -> begin
+      let ret, mem = eval env mem exp in
+      let location = getLoc ret in
+      let value = load mem location in
+      (value, mem)
+    end
+    | SEQ (ebefore, eafter) -> begin
+      let _, mem = eval env mem ebefore in
+      eval env mem eafter
+    end
 
   let emptyEnv = (fun x -> raise (RunError ("unbound id: " ^ x)))
 
   let emptyMem =
     (0, fun l -> raise (RunError ("uninitialized loc: " ^ string_of_int l)))
 
-  let run exp = ignore (eval emptyEnv emptyMem exp)
+  let run (exp: exp) = ignore (eval emptyEnv emptyMem exp)
 
 end
 
