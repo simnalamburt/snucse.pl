@@ -37,8 +37,12 @@ let trans (input: Sm5.command): Sonata.command =
   and trans_command (input: Sm5.command): Sonata.command =
     match input with
     | [] -> []
+    | Sm5.CALL :: [] -> [Sonata.CALL]
     | Sm5.CALL :: tail -> begin
       (*
+       * Sm5.CALL 뒤에 추가적인 호출이 들어갈경우, Return Address 보존이
+       * 필요하다.
+       *
        * 스택 구조
        *
        *     loc :: value :: proc :: S
