@@ -48,7 +48,7 @@ let trans (input: Sm5.command): Sonata.command =
       (* 1.  스택에 있는 CALL의 파라미터 3개를 뽑아서 어딘가에 저장한다. 이때
        *     loc과 proc은 tmp에 저장하고, value는 dummy에 저장한다. *)
       let tmp: string = "α" in
-      let unused: string = "ω" in
+      let unused: string = "∅" in
       [Sonata.BIND tmp] @
       [Sonata.PUSH (Sonata.Id dummy); Sonata.STORE] @
       [Sonata.BIND tmp] @
