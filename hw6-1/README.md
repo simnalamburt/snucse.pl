@@ -4,6 +4,7 @@ Rozetta
 
 - [숙제문서](http://ropas.snu.ac.kr/~kwang/4190.310/15/hw6.pdf)
 - [공지](https://ropas.snu.ac.kr/phpbb/viewtopic.php?t=5157&sid=dab9401469898e5efa942d4f30c29f00)
+- [SM5 스펙](http://ropas.snu.ac.kr/~kwang/4190.310/15/hw5.pdf)
 
 `sm5.ml`에는 sm5언어와 실행기, `sonata.ml`에는 sonata 언어와 실행기가 정의되어
 있습니다. 아래와 같이 실행하면, 주어진 sm5 프로그램을 여러분이 작성하신
