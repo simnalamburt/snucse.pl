@@ -1,29 +1,29 @@
 (*
- * SNU 4190.310 Programming Languages 
- * SM5 Interface .mli 
+ * SNU 4190.310 Programming Languages
+ * SM5 Interface .mli
  * Jaeseung Choi (jschoi@ropas.snu.ac.kr)
  *)
 
 type record
-type loc 
+type loc
 type value = Z of int | B of bool | L of loc | Unit | R of record
-type cmd = 
-  | PUSH of obj 
-  | POP 
-  | STORE 
-  | LOAD 
+type cmd =
+  | PUSH of obj
+  | POP
+  | STORE
+  | LOAD
   | JTR of command * command
-  | MALLOC 
-  | BOX of int 
-  | UNBOX of string 
-  | BIND of string 
+  | MALLOC
+  | BOX of int
+  | UNBOX of string
+  | BIND of string
   | UNBIND
-  | GET 
-  | PUT 
-  | CALL 
-  | ADD 
-  | SUB 
-  | MUL 
+  | GET
+  | PUT
+  | CALL
+  | ADD
+  | SUB
+  | MUL
   | DIV
   | EQ
   | LESS

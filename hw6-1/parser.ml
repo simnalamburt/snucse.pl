@@ -1,6 +1,6 @@
 (*
- * SNU 4190.310 Programming Languages 
- * SM5 Parser 
+ * SNU 4190.310 Programming Languages
+ * SM5 Parser
  * Jaeseung Choi (jschoi@ropas.snu.ac.kr)
  *)
 
@@ -13,57 +13,57 @@ let buf = Buffer.create 256
 
 let rec tokenize input_str accum_tokens =
   if input_str = "" then accum_tokens else
-    let idx = 
+    let idx =
       try search_forward (regexp "[][ \t\n(),;]") input_str 0 with
-      Not_found -> 
+      Not_found ->
         let error_msg = Printf.sprintf "delim token unfound :\n%s" input_str in
         failwith ("Parsing error : " ^ error_msg)
     in
-    let token, rest_str = 
+    let token, rest_str =
       if idx = 0 then
         (string_before input_str 1, string_after input_str 1)
       else
         (string_before input_str idx, string_after input_str idx)
     in
-    let accum_tokens = 
+    let accum_tokens =
       match token with
       | " " | "\t" | "\n" -> accum_tokens
       | _ -> token :: accum_tokens
     in
     tokenize rest_str accum_tokens
 
-let consume token token_list = 
+let consume token token_list =
   match token_list with
-  | head_t :: tail_tokens -> 
-    if head_t = token then tail_tokens else 
+  | head_t :: tail_tokens ->
+    if head_t = token then tail_tokens else
       let fail_msg = Printf.sprintf "%s expected instead of %s" token head_t in
       failwith ("Token not match : " ^ fail_msg)
   | [] -> failwith "Unexpected end of program"
 
-let parse_obj token = 
+let parse_obj token =
   match token with
   | "true" -> Sm5.Val (Sm5.B true)
   | "false" -> Sm5.Val (Sm5.B false)
   | "unit" -> Sm5.Val Sm5.Unit
-  | _ -> 
-    try Sm5.Val (Sm5.Z (int_of_string token)) with 
+  | _ ->
+    try Sm5.Val (Sm5.Z (int_of_string token)) with
     Failure _ -> Sm5.Id token
 
-let rec parse_cmd token_list = 
+let rec parse_cmd token_list =
   match token_list with
   | "pop" :: tail_token -> (Sm5.POP, tail_token)
   | "store" :: tail_token -> (Sm5.STORE, tail_token)
-  | "load" :: tail_token -> (Sm5.LOAD, tail_token) 
+  | "load" :: tail_token -> (Sm5.LOAD, tail_token)
   | "malloc" :: tail_token -> (Sm5.MALLOC, tail_token)
-  | "box" :: n_str :: tail_token -> 
-    let n = 
-      try int_of_string n_str with 
-      Failure _ -> failwith "Non-integer after box command" 
+  | "box" :: n_str :: tail_token ->
+    let n =
+      try int_of_string n_str with
+      Failure _ -> failwith "Non-integer after box command"
     in
     (Sm5.BOX n, tail_token)
-  | "unbox" :: id :: tail_token -> 
+  | "unbox" :: id :: tail_token ->
     (Sm5.UNBOX id, tail_token)
-  | "bind" :: id :: tail_token -> 
+  | "bind" :: id :: tail_token ->
     (Sm5.BIND id, tail_token)
   | "unbind" :: tail_token -> (Sm5.UNBIND, tail_token)
   | "get" :: tail_token -> (Sm5.GET, tail_token)
@@ -88,17 +88,17 @@ let rec parse_cmd token_list =
     (Sm5.PUSH (Sm5.Fn (arg_id, fun_comm)), tail_token)
   | "push" :: token :: tail_token ->
     (Sm5.PUSH (parse_obj token), tail_token)
-  | _ -> 
+  | _ ->
     let _ = List.iter print_endline token_list in
     failwith "parsing error : unexpected token sequence"
 
-and parse_command_helper accum_command token_list = 
+and parse_command_helper accum_command token_list =
   match token_list with
   | "]" :: tail_token -> (accum_command, tail_token)
-  | "[" :: tail_token | ";" :: tail_token -> 
+  | "[" :: tail_token | ";" :: tail_token ->
     let (cmd, tail_token) = parse_cmd tail_token in
     parse_command_helper (accum_command @ [cmd]) tail_token
-  | _ -> 
+  | _ ->
     let _ = List.iter print_endline token_list in
     failwith "parsing error : unexpected token btw. cmds"
 

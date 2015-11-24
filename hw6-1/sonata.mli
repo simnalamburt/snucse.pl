@@ -1,5 +1,5 @@
 (*
- * SNU 4190.310 Programming Languages 
+ * SNU 4190.310 Programming Languages
  * Sonata Interface .mli
  * Jaeseung Choi (jschoi@ropas.snu.ac.kr)
  *)
@@ -9,21 +9,21 @@ type loc
 type value = Z of int | B of bool | L of loc | Unit | R of record
 type cmd =
   | PUSH of obj
-  | POP 
-  | STORE 
-  | LOAD 
+  | POP
+  | STORE
+  | LOAD
   | JTR of command * command
-  | MALLOC 
-  | BOX of int 
-  | UNBOX of string 
-  | BIND of string 
+  | MALLOC
+  | BOX of int
+  | UNBOX of string
+  | BIND of string
   | UNBIND
-  | GET 
-  | PUT 
-  | CALL 
-  | ADD 
-  | SUB 
-  | MUL 
+  | GET
+  | PUT
+  | CALL
+  | ADD
+  | SUB
+  | MUL
   | DIV
   | EQ
   | LESS

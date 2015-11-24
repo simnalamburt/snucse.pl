@@ -1,5 +1,5 @@
 (*
- * SNU 4190.310 Programming Languages 
+ * SNU 4190.310 Programming Languages
  * Sonata Implementation
  * Jaeseung Choi (jschoi@ropas.snu.ac.kr)
  *)
@@ -7,26 +7,26 @@
 type loc = int * int
 type record = (string * loc) list
 type value = Z of int | B of bool | L of loc | Unit | R of record
-type cmd = 
-  | PUSH of obj 
-  | POP 
-  | STORE 
-  | LOAD 
+type cmd =
+  | PUSH of obj
+  | POP
+  | STORE
+  | LOAD
   | JTR of command * command
-  | MALLOC 
-  | BOX of int 
-  | UNBOX of string 
-  | BIND of string 
+  | MALLOC
+  | BOX of int
+  | UNBOX of string
+  | BIND of string
   | UNBIND
-  | GET 
-  | PUT 
-  | CALL 
-  | ADD 
-  | SUB 
-  | MUL 
-  | DIV 
-  | EQ 
-  | LESS 
+  | GET
+  | PUT
+  | CALL
+  | ADD
+  | SUB
+  | MUL
+  | DIV
+  | EQ
+  | LESS
   | NOT
 and obj = Val of value | Id of string | Fn of string * command
 and command = cmd list
@@ -43,25 +43,25 @@ exception Error of string
 
 let debug_mode = ref false
 
-let loc_to_str (base, offset) = 
+let loc_to_str (base, offset) =
   Printf.sprintf "<%d, %d>" base offset
 
-let val_to_str = function 
+let val_to_str = function
   | Z i -> string_of_int i
   | B b -> string_of_bool b
-  | R pair_list -> 
+  | R pair_list ->
     let pair_to_str (s, l) = Printf.sprintf "(%s, %s)" s (loc_to_str l) in
     "{" ^  (String.concat ", " (List.map pair_to_str pair_list)) ^ "}"
   | Unit -> "unit"
   | L l -> loc_to_str l
 
-let rec cmd_to_str indent cmd = 
+let rec cmd_to_str indent cmd =
   match cmd with
   | PUSH obj -> Printf.sprintf "push %s" (obj_to_str indent obj)
   | POP -> "pop"
   | STORE -> "store"
   | LOAD -> "load"
-  | JTR (c1, c2) -> 
+  | JTR (c1, c2) ->
     let c1_str = (command_to_str ("  " ^ indent) c1) in
     let c2_str = (command_to_str ("  " ^ indent) c2) in
     Printf.sprintf "jtr (\n%s,\n%s)" c1_str c2_str
@@ -80,16 +80,16 @@ let rec cmd_to_str indent cmd =
   | EQ -> "eq"
   | LESS -> "less"
   | NOT -> "not"
-and obj_to_str indent obj = 
+and obj_to_str indent obj =
   match obj with
   | Val v -> val_to_str v
   | Id x -> x
-  | Fn (f, comm) -> 
+  | Fn (f, comm) ->
     let new_indent = "  " ^ indent in
     let comm_str = command_to_str new_indent comm in
     Printf.sprintf "(%s,\n%s\n%s)" f comm_str new_indent
-and command_to_str indent comm = 
-  indent ^ "[" ^ 
+and command_to_str indent comm =
+  indent ^ "[" ^
   (String.concat (";\n" ^ indent) (List.map (cmd_to_str indent) comm)) ^ "]"
 
 let rec proc_to_str indent (x, comm, env) =
@@ -102,10 +102,10 @@ and evalue_to_str indent ev =
   | Loc l -> loc_to_str l
   | Proc p -> proc_to_str indent p
 and env_to_str indent env =
-  let entry_to_str (x, ev) = 
+  let entry_to_str (x, ev) =
     Printf.sprintf "%s : %s" x (evalue_to_str indent ev)
   in
-  indent ^ "[" ^ 
+  indent ^ "[" ^
   (String.concat (";\n" ^ indent) (List.map entry_to_str env)) ^ "]"
 
 let sval_to_str = function
@@ -139,7 +139,7 @@ let store l sv m =
 
 let loc_id = ref 0
 
-let malloc () = 
+let malloc () =
   let _ = loc_id := !loc_id + 1 in
   (!loc_id, 0)
 
@@ -153,7 +153,7 @@ let is_equal v1 v2 =
   match v1, v2 with
   | Z z1, Z z2 -> z1 = z2
   | B b1, B b2 -> b1 = b2
-  | R r1, R r2 -> 
+  | R r1, R r2 ->
     List.sort Pervasives.compare r1 = List.sort Pervasives.compare r2
   | Unit, Unit -> true
   | L (base1, z1), L (base2, z2) ->
@@ -170,15 +170,15 @@ let rec step = function
   | (w :: s, m, e, POP :: c) -> (s, m, e, c)
   | (V (L l) :: sv :: s, m, e, STORE :: c) -> (s, store l sv m, e, c)
   | (V (L l) :: s, m, e, LOAD :: c) -> (load l m :: s, m, e, c)
-  | (V (B b)::s, m, e, JTR (c1,c2) :: c) -> 
+  | (V (B b)::s, m, e, JTR (c1,c2) :: c) ->
     (s, m, e, (if b then c1 @ c else (c2 @ c)))
   | (s, m, e, MALLOC :: c) -> (V (L (malloc ())) :: s, m, e, c)
   | (s, m, e, BOX z :: c) ->
-    if z <= 0 then 
-      raise (Error "Box(n): non-positive n") 
-    else 
+    if z <= 0 then
+      raise (Error "Box(n): non-positive n")
+    else
       (box_stack s z [], m, e, c)
-  | (V (R r) :: s, m, e, UNBOX x :: c) -> 
+  | (V (R r) :: s, m, e, UNBOX x :: c) ->
     (V (L (lookup_record x r)) :: s, m, e, c)
   | (V (L l) :: s, m, e, BIND x :: c) -> (s, m, (x, Loc l) :: e, c)
   | (P p :: s, m, e, BIND x :: c) -> (s, m, (x, Proc p) :: e, c)
@@ -186,40 +186,40 @@ let rec step = function
   | (V (L l) :: sv :: P (x, c', e') :: s, m, e, CALL :: c) ->
     (s, store l sv m, (x, Loc l) :: e', c')
   | (s, m, e, GET :: c) -> (V (Z (read_int())) :: s, m, e, c)
-  | (V (Z z) :: s, m, e, PUT :: c) -> 
+  | (V (Z z) :: s, m, e, PUT :: c) ->
     let _ = print_endline (string_of_int z) in
     (s, m, e, c)
   | (V (Z z2) :: V (Z z1) :: s, m, e, ADD :: c) ->
     (V (Z (z1 + z2))::s, m, e, c)
   | (V (Z z) :: V (L (base, offset)) :: s, m, e, ADD :: c)
-  | (V (L (base, offset)) :: V (Z z) :: s, m, e, ADD :: c) -> 
+  | (V (L (base, offset)) :: V (Z z) :: s, m, e, ADD :: c) ->
     if offset + z >= 0 then
-      (V (L (base, offset + z)) :: s, m, e, c) 
-    else 
+      (V (L (base, offset + z)) :: s, m, e, c)
+    else
       raise (Error "Negative loc offset spawned")
   | (V (Z z2) :: V (Z z1) :: s, m, e, SUB :: c) ->
     (V (Z (z1 - z2)) :: s, m, e, c)
-  | (V (Z z) :: V (L (base, offset)) :: s, m, e, SUB :: c) -> 
+  | (V (Z z) :: V (L (base, offset)) :: s, m, e, SUB :: c) ->
     if offset - z >= 0 then
-      (V (L (base, offset - z)) :: s, m, e, c) 
-    else  
+      (V (L (base, offset - z)) :: s, m, e, c)
+    else
       raise (Error "Negative loc offset spanwed")
-  | (V (Z z2) :: V (Z z1) :: s, m, e, MUL :: c) -> 
+  | (V (Z z2) :: V (Z z1) :: s, m, e, MUL :: c) ->
     (V (Z (z1 * z2)) :: s, m, e, c)
-  | (V (Z z2) :: V (Z z1) :: s, m, e, DIV :: c) -> 
+  | (V (Z z2) :: V (Z z1) :: s, m, e, DIV :: c) ->
     (V (Z (z1 / z2)) :: s, m, e, c)
-  | (V v2 :: V v1 :: s, m, e, EQ :: c) -> 
+  | (V v2 :: V v1 :: s, m, e, EQ :: c) ->
     (V (B (is_equal v1 v2)) :: s, m, e, c)
-  | (V (Z z2) :: V (Z z1) :: s, m, e, LESS :: c) -> 
+  | (V (Z z2) :: V (Z z1) :: s, m, e, LESS :: c) ->
     (V (B (z1 < z2)) :: s, m, e, c)
   | (V (B b) :: s, m, e, NOT :: c) -> (V (B (not b)) :: s, m, e, c)
   | s, m, e, c ->
     raise (Error "Invalid machine state")
 
-let rec run_helper (s, m, e, c) = 
+let rec run_helper (s, m, e, c) =
   match c with
   | [] -> ()
-  | _ -> 
+  | _ ->
     let _ = if !debug_mode then
       let _ = print_endline "====== Machine state ======" in
       let _ = print_newline() in
@@ -238,4 +238,4 @@ let rec run_helper (s, m, e, c) =
     in
     run_helper (step (s, m, e, c))
 
-let run c = run_helper ([], [], [], c) 
+let run c = run_helper ([], [], [], c)
