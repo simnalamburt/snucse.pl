@@ -194,8 +194,10 @@ struct
       let (v, m') = eval env mem e in
       (snd (getPair v), m')
     | LET (REC (ifun, iarg, ebody), exp) -> begin
-      (* TODO: LetRec *)
-      failwith "Unimplemented"
+      let func = RecFun (ifun, iarg, ebody) in
+      let closure = Closure (func, env) in
+      let env = env @+ (ifun, closure) in
+      eval env mem exp
     end
     | LET (VAL (iname, evalue), exp) -> begin
       let value, mem = eval env mem evalue in
