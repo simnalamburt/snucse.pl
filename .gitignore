@@ -1,8 +1,8 @@
 *.cmo
 *.cmi
-hw?/lexer.ml
-hw?/parser.ml
-hw?/parser.mli
+hw*/lexer.ml
+hw*/parser.ml
+hw*/parser.mli
 hw*/run
 hw5/gctest
 
