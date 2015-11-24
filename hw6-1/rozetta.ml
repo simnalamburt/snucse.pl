@@ -27,7 +27,7 @@ let trans (input: Sm5.command): Sonata.command =
          *     이름에 Sonata.BIND 한다. *)
         Sonata.BIND return;
         ] @ trans_command cbody @ [
-        Sonata.PUSH (Sonata.Id return);
+        Sonata.PUSH (Sonata.Id return); Sonata.UNBIND; Sonata.POP;
         Sonata.PUSH (Sonata.Val Sonata.Unit);
         Sonata.PUSH (Sonata.Id dummy);
         Sonata.CALL;
