@@ -209,9 +209,9 @@ struct
       (Loc loc, mem)
     end
     | ASSIGN (eleft, eright) -> begin
-      let ret, mem = eval env mem exp in
+      let ret, mem = eval env mem eleft in
       let location = getLoc ret in
-      let value, mem = eval env mem exp in
+      let value, mem = eval env mem eright in
       let mem = store mem (location, value) in
       (value, mem)
     end
