@@ -43,8 +43,21 @@ let rec conv (exp: mexp): mexp =
   | Var _ -> Fn (k, App (Var k, exp))
   | Fn (x, e) -> Fn (k, App (Var k, Fn (x, conv e)))
   | Rec (f, x, e) -> Fn (k, App (Var k, Rec (f, x, conv e)))
-  (* Non constant expressions *)
-  | App (e1, e2) -> Fn (k, (* TODO *) Num 1 )
+  | App (efunc, eparam) -> begin
+    let vparam = new_name () in
+    let vfunc = new_name () in
+    Fn (k,
+      App (conv efunc,
+        Fn (vfunc,
+          App (conv eparam,
+            Fn (vparam,
+              App (App (Var vfunc, Var vparam), Var k)
+            )
+          )
+        )
+      )
+    )
+  end
   | Ifz (e1, e2, e3) -> Fn (k, (* TODO *) Num 1 )
   | Add (e1, e2) -> begin
     (* _e1 + e2_ = λk.(_e1_ λv1.(_e2_ λv2.(k (v1 + v2)))) *)
