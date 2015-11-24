@@ -20,18 +20,24 @@ let trans (input: Sm5.command): Sonata.command =
     | Sm5.Val v -> Sonata.Val (trans_value v)
     | Sm5.Id id -> Sonata.Id id
     | Sm5.Fn (arg, cbody) -> begin
-      (* cbody 뒤에, 스택에 있는 Return Address를 Sonata.CALL 하는 코드 삽입 *)
-      let return: string = "γ" in (* Return Address가 Sonata.BIND될 이름 *)
-      let cbody = [
-        (* 1.  Sonata.CALL 직전, 미리 깔아줬던 Return Address 프로시저를 임의의
-         *     이름에 Sonata.BIND 한다. *)
-        Sonata.BIND return;
-        ] @ trans_command cbody @ [
-        Sonata.PUSH (Sonata.Id return); Sonata.UNBIND; Sonata.POP;
-        Sonata.PUSH (Sonata.Val Sonata.Unit);
-        Sonata.PUSH (Sonata.Id dummy);
-        Sonata.CALL;
-      ] in
+      (*
+       * cbody의 앞에는 스택에 있는 Return Address 프로시저를 'γ' 라는 변수에
+       * Sonata.BIND 하는 코드를 삽입한다.
+       *
+       * cbody의 뒤에는 'γ' 에 저장했던 Return Address 프로시저를 다시 불러내어
+       * 호출하는 코드를 합입한다.
+       *)
+      let return: string = "γ" in
+      let cbody = begin
+        [ Sonata.BIND return; ] @
+        trans_command begin
+          cbody @
+          [Sm5.PUSH (Sm5.Id return); Sm5.UNBIND; Sm5.POP] @
+          [Sm5.PUSH (Sm5.Val Sm5.Unit)] @
+          [Sm5.PUSH (Sm5.Id dummy)] @
+          [Sm5.CALL]
+        end
+      end in
       Sonata.Fn (arg, cbody)
     end
   and trans_command (input: Sm5.command): Sonata.command =
