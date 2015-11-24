@@ -70,6 +70,11 @@ let trans (input: Sm5.command): Sonata.command =
       [Sonata.PUSH (Sonata.Id tmp); Sonata.UNBIND; Sonata.POP] @
       [Sonata.CALL]
     end
+    | Sm5.JTR (cleft, cright) :: tail -> begin
+      let cleft = cleft @ tail in
+      let cright = cright @ tail in
+      [Sonata.JTR (trans_command cleft, trans_command cright)]
+    end
     | cmd :: tail -> begin
       let head = match cmd with
       | Sm5.PUSH obj  -> Sonata.PUSH (trans_obj obj)
@@ -90,7 +95,7 @@ let trans (input: Sm5.command): Sonata.command =
       | Sm5.EQ        -> Sonata.EQ
       | Sm5.LESS      -> Sonata.LESS
       | Sm5.NOT       -> Sonata.NOT
-      | Sm5.JTR (a,b) -> Sonata.JTR (trans_command a, trans_command b)
+      | Sm5.JTR (a,b) -> Sonata.JTR (trans_command a, trans_command b) (* Unreachable!! *)
       | Sm5.CALL      -> Sonata.CALL (* Unreachable!! *)
       in
       head :: trans_command tail
