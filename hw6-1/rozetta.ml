@@ -47,6 +47,4 @@ let rec trans_cmd (input: Sm5.cmd): Sonata.command =
     failwith "TODO : fill in here"
   end
 and trans (input: Sm5.command): Sonata.command =
-  match input with
-  | [] -> []
-  | first::rest -> trans_cmd first @ trans rest
+  List.fold_left (fun ret cmd -> ret @ trans_cmd cmd) [] input
