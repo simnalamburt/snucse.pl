@@ -58,7 +58,32 @@ let rec conv (exp: mexp): mexp =
       )
     )
   end
-  | Ifz (e1, e2, e3) -> Fn (k, (* TODO *) Num 1 )
+  | Ifz (econd, ethen, eelse) -> begin
+    let cps_then =
+      let vthen = new_name () in
+      App (conv ethen,
+        Fn (vthen,
+          App (Var k, Var vthen)
+        )
+      )
+    in
+    let cps_else =
+      let velse = new_name () in
+      App (conv eelse,
+        Fn (velse,
+          App (Var k, Var velse)
+        )
+      )
+    in
+    let vcond = new_name () in
+    Fn (k,
+      App (conv econd,
+        Fn (vcond,
+          Ifz (Var vcond, cps_then, cps_else)
+        )
+      )
+    )
+  end
   | Add (e1, e2) -> begin
     (* _e1 + e2_ = λk.(_e1_ λv1.(_e2_ λv2.(k (v1 + v2)))) *)
     let v1 = new_name () in
