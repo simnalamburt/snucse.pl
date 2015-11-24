@@ -158,15 +158,19 @@ struct
     | CONST (B b) -> (Bool b, mem)
     | VAR x -> (env x, mem)
     | FN (x, e) -> (Closure (Fun (x, e), env), mem)
-    | APP (e1, e2) -> begin
-      let (v1, m') = eval env mem e1 in
-      let (v2, m'') = eval env m' e2 in
-      let (c, env') = getClosure v1 in
-      match c with
-      | Fun (x, e) -> eval (env' @+ (x, v2)) m'' e
-      | RecFun (f, x, e) -> begin
-        (* TODO: RecApp *)
-        failwith "Unimplemented"
+    | APP (efunc, eparam) -> begin
+      let vfunc, mem = eval env mem efunc in
+      let vparam, mem = eval env mem eparam in
+      let closure, env = getClosure vfunc in
+      match closure with
+      | Fun (iarg, ebody) -> begin
+        let env = env @+ (iarg, vparam) in
+        eval env mem ebody
+      end
+      | RecFun (ifun, iarg, ebody) -> begin
+        let env = env @+ (iarg, vparam) in
+        let env = env @+ (ifun, vfunc) in
+        eval env mem ebody
       end
     end
     | IF (e1, e2, e3) ->
