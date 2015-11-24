@@ -1,10 +1,10 @@
 /*
- * SNU 4190.310 Programming Languages 
+ * SNU 4190.310 Programming Languages
  *
  * Parser for M
  */
 
-%{ 
+%{
 exception EmptyBinding
 let rec desugarLet =
   function ([], e) -> raise EmptyBinding
@@ -22,22 +22,22 @@ let whichSel = function (e, 1) -> M.M.FST e
 %token <string> ID
 %token <string> STRING
 
-%left SEMICOLON         
-%right FN RARROW LET 
+%left SEMICOLON
+%right FN RARROW LET
 %right WRITE
-%right COLONEQ         
+%right COLONEQ
 %nonassoc IF THEN ELSE
-%left EQUAL 
+%left EQUAL
 %left PLUS MINUS OR
 %left AND
 %right BANG MALLOC
-%left DOT 
+%left DOT
 %nonassoc TRUE FALSE NUM ID STRING READ LP
 
 %start program
 %type <M.M.exp> program
 %type <M.M.exp> expr
-%type <M.M.decl> decl         
+%type <M.M.decl> decl
 
 %%
 program: expr EOF   {$1}
@@ -67,7 +67,7 @@ aexpr: LP expr RP {$2}
     | MALLOC expr {M.M.MALLOC ($2)}
     | BANG expr {M.M.BANG ($2)}
     | LP expr COMMA expr RP {M.M.PAIR ($2,$4)}
-    ;        
+    ;
 decls: decl {[$1]}
     | decls decl {$1 @ [$2]}
     ;
