@@ -35,7 +35,9 @@ gem install curses parallel
 - [x] [Homework 3][hw3]
 - [x] [Homework 4][hw4]
 - [x] [Homework 5][hw5]
-- [ ] [Homework 6][hw6]
+- [x] [Homework 6][hw6]
+- [ ] [Homework 7][hw7]
+- [ ] [Homework 8][hw8]
 
 [submit]: http://ropas.snu.ac.kr/~ta/4190.310/15/submit/index.pl
 [hw1]: http://ropas.snu.ac.kr/~kwang/4190.310/15/hw1.pdf
@@ -44,6 +46,8 @@ gem install curses parallel
 [hw4]: http://ropas.snu.ac.kr/~kwang/4190.310/15/hw4.pdf
 [hw5]: http://ropas.snu.ac.kr/~kwang/4190.310/15/hw5.pdf
 [hw6]: http://ropas.snu.ac.kr/~kwang/4190.310/15/hw6.pdf
+[hw7]: http://ropas.snu.ac.kr/~kwang/4190.310/15/hw7.pdf
+[hw8]: http://ropas.snu.ac.kr/~kwang/4190.310/15/hw8.pdf
 
 --------
 
