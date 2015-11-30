@@ -6,6 +6,8 @@ Exception is Sugar
 * [공지](https://ropas.snu.ac.kr/phpbb/viewtopic.php?t=5175&sid=c727509cfbdaa56c78773f36d08a0570)
 * [Control-flow constructs; Scope](http://www.seas.harvard.edu/courses/cs152/2010sp/lectures/lec12.pdf)
 
+![](http://i.imgur.com/1aYwl8Z.png)
+
 ### 컴파일 및 실행 방법
 `xexp.ml`에는 xexp 언어와 그 실행기가 정의되어 있습니다. `desugar.ml` 파일에는
 주어진 프로그램에서 설탕 문법구조(syntactic sugar)인 `raise`와 `handle`을 녹여
