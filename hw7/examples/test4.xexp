@@ -1,0 +1,5 @@
+(* Public testcase 4 : Two subexpressions both raising exceptions. *)
+
+((if (raise 10) = (raise 20) then 1 else 2) handle 20 65) handle 10 55
+
+(* Output : 55 *)

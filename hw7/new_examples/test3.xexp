@@ -1,0 +1,28 @@
+(* Public testcase 3 : Pair simulation : unhandled exception *)
+
+
+let pair = 
+  (fn x => 
+    (fn y => 
+      (fn i => 
+        if i = 1 then 
+          x 
+        else if i = 2 then
+          y
+        else
+          raise 0
+      )
+    )
+  ) 
+in
+let fst = (fn p => p 1) in
+let snd = (fn p => p 2) in
+let third = (fn p => p 3) in (* Error *)
+let f = 
+  (fn p => 
+    (third (snd (fst p))) handle 1 10
+  ) 
+in
+f (pair (pair 1 (pair 2 3)) 4)
+
+(* Output : Unhandled exception #0 *)

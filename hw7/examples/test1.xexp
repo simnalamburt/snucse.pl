@@ -1,0 +1,5 @@
+(* Public testcase 1 : Simple Raise/Handle with If, Equal *)
+
+((if 8 = 9 then 50 else raise 77) handle 99 100) handle 77 200
+
+(* Output : 200 *)

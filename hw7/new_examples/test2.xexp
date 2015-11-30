@@ -1,0 +1,8 @@
+(* Public testcase 2 : Raise in a function  *)
+
+let throw = fn n => raise n in
+let f = (fn thr => (fn x => if x = 0 then (thr 1) else x)) in
+let g = (fn x => (f throw x) handle 0 20) in
+(g 0) handle 1 10
+
+(* Output : 10 *)

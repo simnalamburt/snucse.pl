@@ -1,0 +1,8 @@
+(* Public testcase 10 : Environment must be preserved *)
+
+let fail = fn x => fn n => raise n in
+let f = fn a => fail a 10 in
+let g = fn x => fn y => (f y) handle 10 x in
+(g 85 75)
+
+(* Output : 85 *)

@@ -1,0 +1,13 @@
+(* Public testcase8 : Environment must be preserved *)
+
+(fn x => 
+  (fn y => 
+    (if y = 0 then 
+      1
+    else
+      (fn x => raise 7) 65
+    ) handle 7 x
+  ) 75
+) 85
+
+(* Output : 85 *)

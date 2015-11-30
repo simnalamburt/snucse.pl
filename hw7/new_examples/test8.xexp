@@ -1,0 +1,9 @@
+(* Public testcase 8 : Exception handler that raises exception *)
+
+let fail = fn n => (fn i => i) (raise n) in
+let f = (fn a => (fail a) handle 10 (fail 0)) in
+let g = (fn b => (fail b) handle 20 (fail 1)) in
+let h = (fn x => (f x) handle 0 (g 20)) in
+(h 10) handle 2 33
+
+(* Output : Unhandled Exception #1 *)

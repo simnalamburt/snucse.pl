@@ -1,0 +1,7 @@
+(* Public testcase 6 : If exception raises, program must abort
+ * and jump out, without falling into type error.
+ *)
+
+(if (raise 3) = (fn x => x) then y else (2 = 3) = 4) handle 3 10
+
+(* Output : 10 *)

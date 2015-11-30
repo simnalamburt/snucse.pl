@@ -1,0 +1,8 @@
+(* Public testcase 5 : Raise clause subexpression that raises exception *)
+
+let f = (fn x => raise x) in
+let g = (fn x => if (f 10) = 20 then x else 0) in
+let h = (fn x => (if x = 3 then raise (g 1) else 10) handle 10 30) in
+h 3
+
+(* Output : 30 *)

@@ -1,0 +1,9 @@
+(* Public testcase 9 : If exception rises, following type error must not occur *)
+
+let fail = fn n => raise n in
+let f = fn x =>
+  if (fail x) = 20 then (1 = 2) = 3 else y
+in
+(f 10) handle 10 20
+
+(* Output : 20 *)

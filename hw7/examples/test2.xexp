@@ -1,0 +1,5 @@
+(* Public testcase 2 : Simple Raise/Handle with Fn/App *)
+
+((fn f => f 0) (fn x => if x = 0 then raise 10 else x)) handle 10 100
+
+(* Output : 100 *)

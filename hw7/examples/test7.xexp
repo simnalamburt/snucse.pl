@@ -1,0 +1,20 @@
+(* Public testcase 7 : Toy with 'raise' function *)
+
+(
+  (
+    (
+      (fn error => 
+        (fn x => 
+          if x = 1 then
+            error 1
+          else if x = 2 then
+            error 2
+          else
+            error 3
+        ) 5
+      ) (fn x => raise x)
+    ) handle 1 11
+  ) handle 2 22
+) handle 3 33
+
+(* Output : 33 *)
