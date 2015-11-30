@@ -1,5 +1,5 @@
 (*
- * SNU 4190.310 Programming Languages 
+ * SNU 4190.310 Programming Languages
  * Homework "Exceptions are sugar" Skeleton
  * Jaeseung Choi (jschoi@ropas.snu.ac.kr)
  *)

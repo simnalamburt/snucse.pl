@@ -1,5 +1,5 @@
 /*
- * SNU 4190.310 Programming Languages 
+ * SNU 4190.310 Programming Languages
  *
  * Parser of xexp for Homework "Exceptions are sugar"
  */
@@ -11,9 +11,9 @@
 %token <string> ID
 
 
-%right FN RARROW let 
-%left NUM 
-%nonassoc IF THEN ELSE 
+%right FN RARROW let
+%left NUM
+%nonassoc IF THEN ELSE
 %left EQ ID
 %nonassoc LP
 %left APP
@@ -25,7 +25,7 @@
 %%
 program: expr EOF {$1}
     ;
-expr: 
+expr:
   | LP expr RP {$2}
   | NUM {Xexp.Num $1}
   | MINUS NUM {Xexp.Num (- $2)}

@@ -1,5 +1,5 @@
 (*
- * SNU 4190.310 Programming Languages 
+ * SNU 4190.310 Programming Languages
  *
  * Lexer of xexp for Homework "Exceptions are sugar"
  *)
@@ -25,7 +25,7 @@
            | s -> if ('~' = String.get s 0) then
                    - (int_of_string(String.sub s 1 ((String.length s)-1)))
                    else int_of_string s
-} 
+}
 
 let blank = [' ' '\t' '\r' '\n']+
 let id = ['a'-'z' 'A'-'Z'](['a'-'z' 'A'-'Z' '\'' '0'-'9' '_'])*
@@ -49,7 +49,7 @@ parse blank { start lexbuf }
     | ")" { verbose ")"; RP}
     | "=" { verbose "="; EQ}
     | "-" { verbose "-"; MINUS}
-    | _ {raise (Lex_err("illical token "^(Lexing.lexeme lexbuf)))} 
+    | _ {raise (Lex_err("illical token "^(Lexing.lexeme lexbuf)))}
 
 and comment = parse
      "(*" {comment_depth := !comment_depth+1; comment lexbuf}

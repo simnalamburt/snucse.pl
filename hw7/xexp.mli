@@ -1,10 +1,10 @@
 (*
- * SNU 4190.310 Programming Languages 
+ * SNU 4190.310 Programming Languages
  * Xexp Language Definition and Interpreter
  * Jaeseung Choi (jschoi@ropas.snu.ac.kr)
  *)
 
-type xexp = 
+type xexp =
   | Num of int
   | Var of string
   | Fn of string * xexp
@@ -20,7 +20,7 @@ type value =
   | B of bool
   | C of closure
 
-type result = 
+type result =
   | Val of value  (* Value *)
   | Exn of int    (* Exception *)
 
