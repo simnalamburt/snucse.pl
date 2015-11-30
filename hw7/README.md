@@ -2,6 +2,9 @@ Exception is Sugar
 ========
 `desugar.ml` 파일에 있는 `removeExn` 함수를 완성하시고 그 파일만 제출해 주세요.
 
+* [숙제 문서](http://ropas.snu.ac.kr/~kwang/4190.310/15/hw7.pdf)
+* [공지](https://ropas.snu.ac.kr/phpbb/viewtopic.php?t=5175&sid=c727509cfbdaa56c78773f36d08a0570)
+
 ### 컴파일 및 실행 방법
 `xexp.ml`에는 xexp 언어와 그 실행기가 정의되어 있습니다. `desugar.ml` 파일에는
 주어진 프로그램에서 설탕 문법구조(syntactic sugar)인 `raise`와 `handle`을 녹여
