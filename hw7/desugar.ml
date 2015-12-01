@@ -5,5 +5,10 @@
  *)
 open Xexp
 
+let count = ref 0
+let variable () =
+  count := !count + 1;
+  "α" ^ string_of_int !count
+
 let removeExn (input: xexp): xexp =
   input
