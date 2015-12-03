@@ -61,7 +61,7 @@ let rec cps (input: xexp): xexp =
       end)) (Var h)
     end
     | Handle (etry, typ, ehandler) -> begin
-      let Fn (x, ehandlerbody) = cps ehandler in
+      let x = variable () in
       biapp (cps etry) (Var k) (Fn (x, begin
         (*
         h' = x -> {
@@ -75,7 +75,7 @@ let rec cps (input: xexp): xexp =
         *)
         If (Equal (Var x, Num typ), begin
           (* then *)
-          biapp (cps ehandlerbody) (Var k) (Var h)
+          biapp (cps ehandler) (Var k) (Var h)
         end, begin
           (* else *)
           App (Var h, Var x)
