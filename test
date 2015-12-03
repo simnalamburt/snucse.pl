@@ -268,13 +268,18 @@ Test.add '6.1' do |win|
   kminus win, 'hw6-1', 'sm5'
 end
 
+# TODO: 줄안맞음
 Test.add '7  ' do |win|
   `cd hw7 && make 2>/dev/null`
   results = Dir['hw7/examples/*.xexp'].map do |name|
     lines = `hw7/run #{name} 2>/dev/null`.split("\n")
     result = lines.include? "[Valid] Exception sugar removed successfully"
 
-    (assert result, 'Exception sugar is not removed') && (assert_eq lines[1], lines[4])
+    if lines[1].match /^Unhandled Exception #/
+      lines[1] = '201511'
+    end
+
+    (assert result, 'Exception sugar is not removed') && (assert_eq lines[4], lines[1])
   end
 
   win.results results
