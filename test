@@ -61,6 +61,10 @@ class Curses::Window
     color(col) { print msg * maxy }
   end
 
+  def results(array)
+    self.result array.count(true), array.count
+  end
+
   def result(succeeded, total)
     succeeded = succeeded.to_i
     total = total.to_i
@@ -153,13 +157,10 @@ class Test
 end
 
 def kminus win, dirname, ext = 'k-'
-  result = true
-  succeeded = 0
-
   `cd #{dirname} && make 2>/dev/null`
-  glob = Dir.glob("#{dirname}/examples/*.out")
-  counter = win.counter glob.count
-  glob.each do |name|
+  tests = Dir["#{dirname}/examples/*.out"]
+  counter = win.counter tests.count
+  results = tests.map do |name|
     code = File.basename(name, '.out')
 
     input = File.join(dirname, 'examples', File.basename(name, '.out') + '.in')
@@ -171,15 +172,12 @@ def kminus win, dirname, ext = 'k-'
 
     expected = File.read(name)
 
-    res = assert_eq actual, expected
     counter.tick
-
-    succeeded += 1 if res
-    result &&= res
+    res = assert_eq actual, expected
   end
   counter.clean
 
-  win.result succeeded, counter.count
+  win.results results
 end
 
 
@@ -268,6 +266,18 @@ end
 
 Test.add '6.1' do |win|
   kminus win, 'hw6-1', 'sm5'
+end
+
+Test.add '7  ' do |win|
+  `cd hw7 && make 2>/dev/null`
+  results = Dir['hw7/examples/*.xexp'].map do |name|
+    lines = `hw7/run #{name} 2>/dev/null`.split("\n")
+    result = lines.include? "[Valid] Exception sugar removed successfully"
+
+    (assert result, 'Exception sugar is not removed') && (assert_eq lines[1], lines[4])
+  end
+
+  win.results results
 end
 
 Test.wait
