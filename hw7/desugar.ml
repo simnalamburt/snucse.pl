@@ -60,8 +60,29 @@ let rec cps (input: xexp): xexp =
         end)) (Var h)
       end)) (Var h)
     end
-    (* TODO *)
-    | _ -> input
+    | Handle (etry, typ, ehandler) -> begin
+      let Fn (x, ehandlerbody) = cps ehandler in
+      biapp (cps etry) (Var k) (Fn (x, begin
+        (*
+        h' = x -> {
+          // body
+          if x == typ
+            (cps ehandlerbody) k h
+          else
+            h x
+          end
+        };
+        *)
+        If (Equal (Var x, Num typ), begin
+          (* then *)
+          biapp (cps ehandlerbody) (Var k) (Var h)
+        end, begin
+          (* else *)
+          App (Var h, Var x)
+        end)
+      end))
+    end
+    | Raise (eexception) -> biapp (cps eexception) (Var h) (Var h)
   end))
 
 let removeExn (input: xexp): xexp =
@@ -69,5 +90,8 @@ let removeExn (input: xexp): xexp =
     let param = variable () in
     Fn (param, Var param)
   end in
-  let handler = Num 201511 in
+  let handler = begin
+    let param = variable () in
+    Fn (param, Num 201511)
+  end in
   App (App (cps input, id), handler)
