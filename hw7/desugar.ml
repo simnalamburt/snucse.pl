@@ -10,5 +10,18 @@ let variable () =
   count := !count + 1;
   "α" ^ string_of_int !count
 
+let rec cps (input: xexp): xexp =
+  (* TODO *)
+  let k = variable () in
+  let h = variable () in
+  Fn (k, Fn (h, begin
+    input
+  end))
+
 let removeExn (input: xexp): xexp =
-  input
+  let id = begin
+    let param = variable () in
+    Fn (param, Var param)
+  end in
+  let handler = Num 201511 in
+  App (App (cps input, id), handler)
