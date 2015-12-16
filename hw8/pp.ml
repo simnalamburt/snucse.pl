@@ -1,7 +1,7 @@
 (*
- * SNU 4190.310 Programming Languages 
+ * SNU 4190.310 Programming Languages
  *
- * M pretty printer 
+ * M pretty printer
  *)
 
 open M.M
@@ -15,10 +15,10 @@ struct
   let ps = print_string
   let nl = print_newline
   let indent i =
-    let rec it = function 
+    let rec it = function
       | 0 -> ()
       |  n -> ps " "; it (n-1)
-    in  
+    in
     nl (); it i
 
   let rec pp n =
@@ -59,21 +59,21 @@ struct
     | PAIR (e1, e2) -> ps "("; pp n e1; ps ", "; pp n e2; ps ")"
     | FST e -> pp n e; ps ".1"
     | SND e -> pp n e; ps ".2"
-    | BOP (op, e1, e2) -> 
-      let op_str = 
-        (match op with 
-        | ADD -> "+" 
-        | SUB -> "-" 
+    | BOP (op, e1, e2) ->
+      let op_str =
+        (match op with
+        | ADD -> "+"
+        | SUB -> "-"
         | EQ -> "="
-        | AND -> "and" 
+        | AND -> "and"
         | OR -> "or")
       in
       ps "("; pp n e1; ps (" " ^ op_str ^ " "); pp n e2; ps ")"
-  and printDecl n = function 
+  and printDecl n = function
     | VAL (x, e) -> ps "val "; ps (x ^ " = "); pp (n+1) e
     | REC (f, x, e) -> ps ("rec " ^ f ^ "(" ^ x ^ ") = "); pp (n+1) e
-  
-  let rec pp_type ty = 
+
+  let rec pp_type ty =
     match ty with
     | TyInt -> ps "int"
     | TyBool -> ps "bool"

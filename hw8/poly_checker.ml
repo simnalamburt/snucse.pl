@@ -8,7 +8,7 @@ open M
 
 type var = string
 
-type typ = 
+type typ =
   | TInt
   | TBool
   | TString
@@ -19,23 +19,23 @@ type typ =
   (* Modify, or add more if needed *)
 
 type typ_scheme =
-  | SimpleTyp of typ 
+  | SimpleTyp of typ
   | GenTyp of (var list * typ)
 
 type typ_env = (M.id * typ_scheme) list
 
-let count = ref 0 
+let count = ref 0
 
-let new_var () = 
+let new_var () =
   let _ = count := !count +1 in
   "x_" ^ (string_of_int !count)
 
 (* Definitions related to free type variable *)
 
-let union_ftv ftv_1 ftv_2 = 
+let union_ftv ftv_1 ftv_2 =
   let ftv_1' = List.filter (fun v -> not (List.mem v ftv_2)) ftv_1 in
   ftv_1' @ ftv_2
-  
+
 let sub_ftv ftv_1 ftv_2 =
   List.filter (fun v -> not (List.mem v ftv_2)) ftv_1
 
@@ -48,12 +48,12 @@ let rec ftv_of_typ : typ -> var list = function
 
 let ftv_of_scheme : typ_scheme -> var list = function
   | SimpleTyp t -> ftv_of_typ t
-  | GenTyp (alphas, t) -> sub_ftv (ftv_of_typ t) alphas 
+  | GenTyp (alphas, t) -> sub_ftv (ftv_of_typ t) alphas
 
 let ftv_of_env : typ_env -> var list = fun tyenv ->
-  List.fold_left 
+  List.fold_left
     (fun acc_ftv (id, tyscm) -> union_ftv acc_ftv (ftv_of_scheme tyscm))
-    [] tyenv 
+    [] tyenv
 
 (* Generalize given type into a type scheme *)
 let generalize : typ_env -> typ -> typ_scheme = fun tyenv t ->
@@ -72,7 +72,7 @@ type subst = typ -> typ
 let empty_subst : subst = fun t -> t
 
 let make_subst : var -> typ -> subst = fun x t ->
-  let rec subs t' = 
+  let rec subs t' =
     match t' with
     | TVar x' -> if (x = x') then t else t'
     | TPair (t1, t2) -> TPair (subs t1, subs t2)

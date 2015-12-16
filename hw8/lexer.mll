@@ -1,5 +1,5 @@
 (*
- * SNU 4190.310 Programming Languages 
+ * SNU 4190.310 Programming Languages
  *
  * Lexer for M
  *)
@@ -29,12 +29,12 @@
                     ("malloc", MALLOC);
                     ("val", VAL)
                   ]
-     
+
      let s2int = function "" -> raise (Lex_err("illegal number token", get_ln()))
        		   | s -> if ('~' = String.get s 0) then
                    - (int_of_string(String.sub s 1 ((String.length s)-1)))
                    else int_of_string s
-} 
+}
 
 let blank = [' ' '\t']+
 let id = ['a'-'z' 'A'-'Z'](['a'-'z' 'A'-'Z' '\'' '0'-'9' '_'])*
@@ -50,7 +50,7 @@ rule start =
             in try Hashtbl.find keyword_tbl id
                with _ -> ID id
             }
-     | charstring { STRING(Lexing.lexeme lexbuf) }         
+     | charstring { STRING(Lexing.lexeme lexbuf) }
      | eof { verbose "eof"; EOF}
      | "(*" { comment_depth :=1;
               comment lexbuf;
@@ -66,7 +66,7 @@ rule start =
      | ")" { verbose ")"; RP}
      | "." { verbose "."; DOT}
      | "," { verbose ","; COMMA}
-     | _ {raise (Lex_err("illical token "^(Lexing.lexeme lexbuf), get_ln()))} 
+     | _ {raise (Lex_err("illical token "^(Lexing.lexeme lexbuf), get_ln()))}
 
 and comment = parse
      "(*" {comment_depth := !comment_depth+1; comment lexbuf}
