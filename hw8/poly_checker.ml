@@ -113,7 +113,7 @@ let rec unify (left: typ) (right: typ): subst =
     let inner = occurs query in
     match ty with
     | TInt | TBool | TString -> false
-    | TPair (left, right) | TFun (left, right) -> (inner left) || (inner right)
+    | TPair (left, right) | TFun (left, right) -> inner left || inner right
     | TLoc value -> inner value
     | TVar name -> query = name
   in
@@ -129,6 +129,31 @@ let rec unify (left: typ) (right: typ): subst =
   end
   | TLoc linner, TLoc rinner -> unify linner rinner
   | _ -> raise (M.TypeError "Type Mismatch")
+
+let rec expansive (input: M.exp): bool =
+  match input with
+  | M.CONST _
+  | M.VAR _
+  | M.FN _
+  | M.READ
+  -> false
+  | M.MALLOC _
+  | M.APP _
+  -> true
+  | M.WRITE einner
+  | M.BANG einner
+  | M.FST einner
+  | M.SND einner
+  -> expansive einner
+  | M.LET (M.REC (_, _, e1), e2)
+  | M.LET (M.VAL (_, e1), e2)
+  | M.BOP (_, e1, e2)
+  | M.ASSIGN (e1, e2)
+  | M.SEQ  (e1, e2)
+  | M.PAIR (e1, e2)
+  -> expansive e1 || expansive e2
+  | M.IF (econd, ethen, eelse)
+  -> expansive econd || expansive ethen || expansive eelse
 
 let rec convert_typ (input: typ): M.typ =
   match input with
