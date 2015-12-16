@@ -29,7 +29,7 @@ let new_var: unit -> string = begin
   let counter = ref (-1) in
   (fun () -> begin
     counter := !counter + 1;
-    "α" ^ (string_of_int !counter)
+    "β" ^ (string_of_int !counter)
   end)
 end
 
