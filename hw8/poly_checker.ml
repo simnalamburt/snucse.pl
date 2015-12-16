@@ -105,7 +105,22 @@ let subst_scheme (subs: subst) (tyscm: typ_scheme): typ_scheme =
 let subst_env (subs: subst) (tyenv: typ_env): typ_env =
   List.map (fun (x, tyscm) -> (x, subst_scheme subs tyscm)) tyenv
 
+(*
+ * Type checking
+ *)
+let rec convert_typ (input: typ): M.typ =
+  match input with
+  | TInt -> M.TyInt
+  | TBool -> M.TyBool
+  | TString -> M.TyString
+  | TPair (tleft, tright) -> M.TyPair (convert_typ tleft, convert_typ tright)
+  | TLoc tinner -> M.TyLoc (convert_typ tinner)
+  | TFun _ | TVar _ -> raise (M.TypeError "Wrong Input")
 
-(* TODO : Implement this function *)
-let check : M.exp -> M.typ =
-  raise (M.TypeError "Type Checker Unimplemented")
+let check (input: M.exp): M.typ =
+  let rec check (env: typ_env) (input: M.exp): subst * typ =
+    (* TODO *)
+    raise (M.TypeError "Type Checker Unimplemented")
+  in
+  let subst, result = check [] input in
+  convert_typ (subst result)
