@@ -5,7 +5,7 @@ M Type Checker
 * [숙제 문서](http://ropas.snu.ac.kr/~kwang/4190.310/15/hw8.pdf)
 * [The M Language](http://ropas.snu.ac.kr/~kwang/4190.310/14/M.pdf)
 * [공지](https://ropas.snu.ac.kr/phpbb/viewtopic.php?t=5199)
-* [Unification 참고자료](http://ropas.snu.ac.kr/~kwang/4190.310/08/5-1poly-type.pdf)
+* [Unification 참고자료](http://ropas.snu.ac.kr/~dreameye/PL/slide/PL12.pdf)
 * [Let polymorphism 참고자료](http://ropas.snu.ac.kr/~kwang/4190.310/08/5-1poly-type.pdf)
 
 ### 핵심 요약
