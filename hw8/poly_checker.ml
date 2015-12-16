@@ -108,6 +108,28 @@ let subst_env (subs: subst) (tyenv: typ_env): typ_env =
 (*
  * Type checking
  *)
+let rec unify (left: typ) (right: typ): subst =
+  let rec occurs (query: var) (ty: typ): bool =
+    let inner = occurs query in
+    match ty with
+    | TInt | TBool | TString -> false
+    | TPair (left, right) | TFun (left, right) -> (inner left) || (inner right)
+    | TLoc value -> inner value
+    | TVar name -> query = name
+  in
+  match left, right with
+  | left, right when left = right -> empty_subst
+  | TVar alpha, ty
+  | ty, TVar alpha when not (occurs alpha ty) -> make_subst alpha ty
+  | TPair(lparam, lbody), TPair(rparam, rbody)
+  | TFun(lparam, lbody), TFun(rparam, rbody) -> begin
+    let subst1 = unify lparam rparam in
+    let subst2 = unify (subst1 lbody) (subst1 rbody) in
+    subst2 @@ subst1
+  end
+  | TLoc linner, TLoc rinner -> unify linner rinner
+  | _ -> raise (M.TypeError "Type Mismatch")
+
 let rec convert_typ (input: typ): M.typ =
   match input with
   | TInt -> M.TyInt
