@@ -141,8 +141,27 @@ let rec convert_typ (input: typ): M.typ =
 
 let check (input: M.exp): M.typ =
   let rec check (env: typ_env) (input: M.exp): subst * typ =
+    match input with
+    | M.CONST M.S _ -> empty_subst, TString
+    | M.CONST M.N _ -> empty_subst, TInt
+    | M.CONST M.B _ -> empty_subst, TBool
+    (*
     (* TODO *)
-    raise (M.TypeError "Type Checker Unimplemented")
+    | M.FN of id * exp
+    | M.APP of exp * exp
+    | M.LET of decl * exp
+    | M.IF of exp * exp * exp
+    | M.BOP of bop * exp * exp
+    | M.READ
+    | M.WRITE of exp
+    | M.MALLOC of exp          (*   malloc e *)
+    | M.ASSIGN of exp * exp    (*   e := e   *)
+    | M.BANG of exp            (*   !e       *)
+    | M.SEQ of exp * exp       (*   e ; e    *)
+    | M.PAIR of exp * exp      (*   (e, e)   *)
+    | M.FST of exp            (*   e.1      *)
+    | M.SND of exp            (*   e.2      *)
+    *)
   in
   let subst, result = check [] input in
   convert_typ (subst result)
