@@ -209,7 +209,7 @@ let check (input: M.exp): M.typ =
     | M.VAR name -> begin
       let tyscheme =
         try List.assoc name env with
-        | Not_found -> raise (M.TypeError "Undefined Variable")
+        | Not_found -> raise (M.TypeError ("Undefined Variable \x1b[33m" ^ name ^ "\x1b[0m"))
       in
       let typ = match tyscheme with
       | SimpleTyp typ -> typ
@@ -256,11 +256,14 @@ let check (input: M.exp): M.typ =
     | M.LET (M.REC (fname, pname, ebody), erest) -> begin
       let beta = TVar (new_var ()) in
 
-      let subst1 = m ([fname, SimpleTyp expected] @ env) ebody beta in
+      let subst1 = begin
+        let env = [fname, SimpleTyp beta] @ env in
+        m env (M.FN (pname, ebody)) beta
+      end in
       let beta, env, expected = subst1 beta, subst_env subst1 env, subst1 expected in
 
       let subst2 = begin
-        let env = [pname, generalize env beta] @ env in
+        let env = [fname, generalize env beta] @ env in
         m env erest expected
       end in
       subst2 @@ subst1
