@@ -195,9 +195,17 @@ let check (input: M.exp): M.typ =
       let subst3 = unify (subst2 ty1) (TFun (ty2, beta)) in
       subst3 @@ subst2 @@ subst1, subst3 beta
     end
+    | M.LET (M.VAL (name, edecl), erest) -> begin
+      let subst1, ty1 = w env edecl in
+      let subst2, ty2 = begin
+        let env = subst_env subst1 env in
+        let tyscheme = if expansive edecl then SimpleTyp ty1 else generalize env ty1 in
+        w ([name, tyscheme] @ env) erest
+      end in
+      subst2 @@ subst1, ty2
+    end
     (*
     (* TODO *)
-    | M.LET of decl * exp
     | M.IF of exp * exp * exp
     | M.BOP of bop * exp * exp
     | M.READ
