@@ -165,49 +165,100 @@ let rec convert_typ (input: typ): M.typ =
   | TFun _ | TVar _ -> raise (M.TypeError "Wrong Input")
 
 let check (input: M.exp): M.typ =
-  let rec w (env: typ_env) (input: M.exp): subst * typ =
+  let rec m (env: typ_env) (input: M.exp) (expected: typ): subst =
     match input with
-    | M.CONST M.S _ -> empty_subst, TString
-    | M.CONST M.N _ -> empty_subst, TInt
-    | M.CONST M.B _ -> empty_subst, TBool
+    | M.CONST M.S _ -> unify expected TString
+    | M.CONST M.N _ -> unify expected TInt
+    | M.CONST M.B _ -> unify expected TBool
     | M.VAR name -> begin
-      if List.mem_assoc name env then
-        (* TODO: 정리 *)
-        let tyscheme = List.assoc name env in
-        match tyscheme with
-        | SimpleTyp typ -> empty_subst, typ
-        | GenTyp (alphas, typ) -> begin
-          let GenTyp (_, typ) = subst_scheme empty_subst tyscheme in
-          empty_subst, typ
-        end
-      else
-        raise (M.TypeError "Undefined Variable")
+      let tyscheme =
+        try List.assoc name env with
+        | Not_found -> raise (M.TypeError "Undefined Variable")
+      in
+      let typ = match tyscheme with
+      | SimpleTyp typ -> typ
+      | GenTyp (alphas, typ) -> begin
+        let GenTyp (_, typ) = subst_scheme empty_subst tyscheme in
+        typ
+      end in
+      unify expected typ
     end
     | M.FN (name, ebody) -> begin
-      let beta = TVar (new_var ()) in
-      let subst1, ty1 = w ([name, SimpleTyp beta] @ env) ebody in
-      subst1, subst1 (TFun (beta, ty1))
+      let vparam, vret = TVar (new_var ()), TVar (new_var ()) in
+
+      let subst1 = unify expected (TFun (vparam, vret)) in
+      let env = subst_env subst1 env in
+
+      let subst2 = m ([name, SimpleTyp (subst1 vparam)] @ env) ebody (subst1 vret) in
+      subst2 @@ subst1
     end
     | M.APP (efunc, eparam) -> begin
       let beta = TVar (new_var ()) in
-      let subst1, ty1 = w env efunc in
-      let subst2, ty2 = w (subst_env subst1 env) eparam in
-      let subst3 = unify (subst2 ty1) (TFun (ty2, beta)) in
-      subst3 @@ subst2 @@ subst1, subst3 beta
+
+      let subst1 = m env efunc (TFun (beta, expected)) in
+      let beta, env, expected = subst1 beta, subst_env subst1 env, subst1 expected in
+
+      let subst2 = m env eparam beta in
+      subst2 @@ subst1
     end
-    | M.LET (M.VAL (name, edecl), erest) -> begin
-      let subst1, ty1 = w env edecl in
-      let subst2, ty2 = begin
-        let env = subst_env subst1 env in
-        let tyscheme = if expansive edecl then SimpleTyp ty1 else generalize env ty1 in
-        w ([name, tyscheme] @ env) erest
+    | M.LET (M.VAL (name, edef), erest) -> begin
+      let beta = TVar (new_var ()) in
+
+      let subst1 = m env edef beta in
+      let beta, env, expected = subst1 beta, subst_env subst1 env, subst1 expected in
+
+      let subst2 = begin
+        let tyscheme =
+          if expansive edef then SimpleTyp beta
+          else generalize env beta
+        in
+        m ([name, tyscheme] @ env) erest expected
       end in
-      subst2 @@ subst1, ty2
+      subst2 @@ subst1
+    end
+    | M.LET (M.REC (fname, pname, ebody), erest) -> begin
+      let beta = TVar (new_var ()) in
+
+      let subst1 = m ([fname, SimpleTyp expected] @ env) ebody beta in
+      let beta, env, expected = subst1 beta, subst_env subst1 env, subst1 expected in
+
+      let subst2 = begin
+        let env = [pname, generalize env beta] @ env in
+        m env erest expected
+      end in
+      subst2 @@ subst1
+    end
+    | M.IF (econd, ethen, eelse) -> begin
+      let subst1 = m env econd TBool in
+      let env, expected = subst_env subst1 env, subst1 expected in
+
+      let subst2 = m env ethen expected in
+      let env, expected = subst_env subst2 env, subst2 expected in
+
+      let subst3 = m env eelse expected in
+      subst3 @@ subst2 @@ subst1
+    end
+    | M.BOP (op, eleft, eright) -> begin
+      let binary (ty: typ) =
+        let subst1 = unify expected ty in
+        let env = subst_env subst1 env in
+
+        let subst2 = m env eleft ty in
+        let env = subst_env subst2 env in
+
+        let subst3 = m env eright ty in
+        subst3 @@ subst2 @@ subst1
+      in
+      match op with
+      | M.ADD | M.SUB -> binary TInt
+      | M.AND | M.OR  -> binary TBool
+      | M.EQ -> begin
+        (* TODO *)
+        raise (M.TypeError "Undefined Variable")
+      end
     end
     (*
     (* TODO *)
-    | M.IF of exp * exp * exp
-    | M.BOP of bop * exp * exp
     | M.READ
     | M.WRITE of exp
     | M.MALLOC of exp          (*   malloc e *)
@@ -219,5 +270,6 @@ let check (input: M.exp): M.typ =
     | M.SND of exp            (*   e.2      *)
     *)
   in
-  let subst, result = w [] input in
-  convert_typ (subst result)
+  let entire = TVar (new_var ()) in
+  let subst = m [] input entire in
+  convert_typ (subst entire)
