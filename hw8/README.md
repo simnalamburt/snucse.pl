@@ -14,7 +14,7 @@ M Type Checker
 
 ![](http://i.imgur.com/Hc7tIVS.png)
 
-![](http://i.imgur.com/tYnxglM.png)
+![](http://i.imgur.com/vM9AqgX.png)
 
 ![](http://i.imgur.com/D3xscYa.png)
 
