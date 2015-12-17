@@ -285,4 +285,17 @@ Test.add '7  ' do |win|
   win.results results
 end
 
+Test.add '8  ' do |win|
+  `cd hw8 && make 2>/dev/null`
+  results = Dir['hw8/examples/*.m'].map do |name|
+    expected = File.read(name + '.out').chomp
+    actual = `hw8/run #{name} 2>/dev/null`.chomp
+    if /^Type Checking Failed:/ === actual then actual = 'Type Checking Failed' end
+
+    assert_eq actual, expected
+  end
+
+  win.results results
+end
+
 Test.wait
