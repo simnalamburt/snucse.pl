@@ -253,22 +253,61 @@ let check (input: M.exp): M.typ =
       | M.ADD | M.SUB -> binary TInt
       | M.AND | M.OR  -> binary TBool
       | M.EQ -> begin
-        (* TODO *)
-        raise (M.TypeError "Undefined Variable")
+        (* TODO: Implement *)
+        empty_subst
       end
     end
-    (*
-    (* TODO *)
-    | M.READ
-    | M.WRITE of exp
-    | M.MALLOC of exp          (*   malloc e *)
-    | M.ASSIGN of exp * exp    (*   e := e   *)
-    | M.BANG of exp            (*   !e       *)
-    | M.SEQ of exp * exp       (*   e ; e    *)
-    | M.PAIR of exp * exp      (*   (e, e)   *)
-    | M.FST of exp            (*   e.1      *)
-    | M.SND of exp            (*   e.2      *)
-    *)
+    | M.READ -> unify expected TInt
+    | M.WRITE value -> begin
+      (* TODO: Implement *)
+      empty_subst
+    end
+    | M.MALLOC einner -> begin
+      let beta = TVar (new_var ()) in
+
+      let subst1 = m env einner beta in
+      let beta, env, expected = subst1 beta, subst_env subst1 env, subst1 expected in
+
+      let subst2 = unify expected (TLoc beta) in
+      subst2 @@ subst1
+    end
+    | M.ASSIGN (eloc, evalue) -> begin
+      let subst1 = m env eloc (TLoc expected) in
+      let env, expected = subst_env subst1 env, subst1 expected in
+
+      let subst2 = m env evalue expected in
+      subst2 @@ subst1
+    end
+    | M.BANG eloc -> m env eloc (TLoc expected)
+    | M.SEQ (ebefore, eafter) -> begin
+      let subst1 = begin
+        let beta = TVar (new_var ()) in
+        m env ebefore beta
+      end in
+      let env, expected = subst_env subst1 env, subst1 expected in
+
+      let subst2 = m env eafter expected in
+      subst2 @@ subst1
+    end
+    | M.PAIR (efirst, esecond) -> begin
+      let vfirst, vsecond = TVar (new_var ()), TVar (new_var ()) in
+      let subst1 = unify expected (TPair (vfirst, vsecond)) in
+      let vfirst, vsecond, env = subst1 vfirst, subst1 vsecond, subst_env subst1 env in
+
+      let subst2 = m env efirst vfirst in
+      let vsecond, env = subst2 vsecond, subst_env subst2 env in
+
+      let subst3 = m env esecond vsecond in
+      subst3 @@ subst2 @@ subst1
+    end
+    | M.FST epair -> begin
+      let beta = TVar (new_var ()) in
+      m env epair (TPair (expected, beta))
+    end
+    | M.SND epair -> begin
+      let beta = TVar (new_var ()) in
+      m env epair (TPair (beta, expected))
+    end
   in
   let entire = TVar (new_var ()) in
   let subst = m [] input entire in
