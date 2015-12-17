@@ -19,6 +19,8 @@ type typ =
   | TLoc of typ
   | TFun of typ * typ
   | TVar of var
+  | TComparableVar of var
+  | TPrintableVar of var
 type typ_scheme =
   | SimpleTyp of typ
   | GenTyp of (var list * typ)
@@ -50,7 +52,7 @@ let generalize (tyenv: typ_env) (t: typ): typ_scheme =
     | TPair (t1, t2) -> union_ftv (ftv_of_typ t1) (ftv_of_typ t2)
     | TLoc t -> ftv_of_typ t
     | TFun (t1, t2) ->  union_ftv (ftv_of_typ t1) (ftv_of_typ t2)
-    | TVar v -> [v]
+    | TVar v | TComparableVar v | TPrintableVar v -> [v]
   in
   let ftv_of_scheme : typ_scheme -> var list = function
     | SimpleTyp t -> ftv_of_typ t
@@ -74,15 +76,29 @@ let generalize (tyenv: typ_env) (t: typ): typ_scheme =
  *)
 let empty_subst: subst = fun t -> t
 
-let make_subst (x: var) (t: typ): subst =
-  let rec subs t' =
-    match t' with
-    | TVar x' -> if (x = x') then t else t'
-    | TPair (t1, t2) -> TPair (subs t1, subs t2)
-    | TLoc t'' -> TLoc (subs t'')
-    | TFun (t1, t2) -> TFun (subs t1, subs t2)
-    | TInt | TBool | TString -> t'
-  in subs
+let make_subst (query: var) (toutput: typ): subst =
+  let rec subst (tinput: typ): typ =
+    match tinput with
+    | TInt | TBool | TString -> tinput
+    | TPair (tleft, tright) -> TPair (subst tleft, subst tright)
+    | TLoc tinner -> TLoc (subst tinner)
+    | TFun (tfunc, tparam) -> TFun (subst tfunc, subst tparam)
+    | TVar name | TComparableVar name | TPrintableVar name when not (query = name) -> tinput
+    (* Precondition: query = name *)
+    | TVar name -> toutput
+    | TComparableVar name -> begin
+      match toutput with
+      | TVar x -> TComparableVar x
+      | _ -> toutput
+    end
+    | TPrintableVar name -> begin
+      match toutput with
+      | TVar x -> TPrintableVar x
+      | TComparableVar x -> TPrintableVar x
+      | _ -> toutput
+    end
+  in
+  subst
 
 (* substitution composition *)
 let (@@) (sleft: subst) (sright: subst): subst =
@@ -115,12 +131,32 @@ let rec unify (left: typ) (right: typ): subst =
     | TInt | TBool | TString -> false
     | TPair (left, right) | TFun (left, right) -> inner left || inner right
     | TLoc value -> inner value
-    | TVar name -> query = name
+    | TVar name | TComparableVar name | TPrintableVar name -> query = name
   in
   match left, right with
   | left, right when left = right -> empty_subst
+
   | TVar alpha, ty
   | ty, TVar alpha when not (occurs alpha ty) -> make_subst alpha ty
+
+  | TComparableVar alpha, ty
+  | ty, TComparableVar alpha when not (occurs alpha ty) -> begin
+    match ty with
+    | TInt | TBool | TString | TLoc _ | TComparableVar _ | TPrintableVar _ ->
+      make_subst alpha ty
+    | TPair _ | TFun _ | TVar _ ->
+      raise (M.TypeError "Tried to compare uncomparable types")
+  end
+
+  | TPrintableVar alpha, ty
+  | ty, TPrintableVar alpha when not (occurs alpha ty) -> begin
+    match ty with
+    | TInt | TBool | TString | TPrintableVar _ ->
+      make_subst alpha ty
+    | TPair _ | TLoc _ | TFun _ | TVar _ | TComparableVar _ ->
+      raise (M.TypeError "Tried to print unprintable types")
+  end
+
   | TPair(lparam, lbody), TPair(rparam, rbody)
   | TFun(lparam, lbody), TFun(rparam, rbody) -> begin
     let subst1 = unify lparam rparam in
@@ -162,7 +198,7 @@ let rec convert_typ (input: typ): M.typ =
   | TString -> M.TyString
   | TPair (tleft, tright) -> M.TyPair (convert_typ tleft, convert_typ tright)
   | TLoc tinner -> M.TyLoc (convert_typ tinner)
-  | TFun _ | TVar _ -> raise (M.TypeError "Wrong Input")
+  | TFun _ | TVar _ | TComparableVar _ | TPrintableVar _ -> raise (M.TypeError "Wrong Input")
 
 let check (input: M.exp): M.typ =
   let rec m (env: typ_env) (input: M.exp) (expected: typ): subst =
@@ -178,6 +214,7 @@ let check (input: M.exp): M.typ =
       let typ = match tyscheme with
       | SimpleTyp typ -> typ
       | GenTyp (alphas, typ) -> begin
+        (* TODO: 정리 *)
         let GenTyp (_, typ) = subst_scheme empty_subst tyscheme in
         typ
       end in
@@ -239,28 +276,30 @@ let check (input: M.exp): M.typ =
       subst3 @@ subst2 @@ subst1
     end
     | M.BOP (op, eleft, eright) -> begin
-      let binary (ty: typ) =
-        let subst1 = unify expected ty in
-        let env = subst_env subst1 env in
+      let binary (toperand: typ) (tret: typ) =
+        let subst1 = unify expected tret in
+        let toperand, env = subst1 toperand, subst_env subst1 env in
 
-        let subst2 = m env eleft ty in
-        let env = subst_env subst2 env in
+        let subst2 = m env eleft toperand in
+        let toperand, env = subst2 toperand, subst_env subst2 env in
 
-        let subst3 = m env eright ty in
+        let subst3 = m env eright toperand in
         subst3 @@ subst2 @@ subst1
       in
       match op with
-      | M.ADD | M.SUB -> binary TInt
-      | M.AND | M.OR  -> binary TBool
+      | M.ADD | M.SUB -> binary TInt  TInt
+      | M.AND | M.OR  -> binary TBool TBool
       | M.EQ -> begin
-        (* TODO: Implement *)
-        empty_subst
+        binary (TComparableVar (new_var ())) TBool
       end
     end
     | M.READ -> unify expected TInt
-    | M.WRITE value -> begin
-      (* TODO: Implement *)
-      empty_subst
+    | M.WRITE evalue -> begin
+      let subst1 = unify expected (TPrintableVar (new_var ())) in
+      let expected, env = subst1 expected, subst_env subst1 env in
+
+      let subst2 = m env evalue expected in
+      subst2 @@ subst1
     end
     | M.MALLOC einner -> begin
       let beta = TVar (new_var ()) in
