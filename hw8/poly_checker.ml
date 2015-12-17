@@ -165,15 +165,38 @@ let rec convert_typ (input: typ): M.typ =
   | TFun _ | TVar _ -> raise (M.TypeError "Wrong Input")
 
 let check (input: M.exp): M.typ =
-  let rec check (env: typ_env) (input: M.exp): subst * typ =
+  let rec w (env: typ_env) (input: M.exp): subst * typ =
     match input with
     | M.CONST M.S _ -> empty_subst, TString
     | M.CONST M.N _ -> empty_subst, TInt
     | M.CONST M.B _ -> empty_subst, TBool
+    | M.VAR name -> begin
+      if List.mem_assoc name env then
+        (* TODO: 정리 *)
+        let tyscheme = List.assoc name env in
+        match tyscheme with
+        | SimpleTyp typ -> empty_subst, typ
+        | GenTyp (alphas, typ) -> begin
+          let GenTyp (_, typ) = subst_scheme empty_subst tyscheme in
+          empty_subst, typ
+        end
+      else
+        raise (M.TypeError "Undefined Variable")
+    end
+    | M.FN (name, ebody) -> begin
+      let beta = TVar (new_var ()) in
+      let subst1, ty1 = w ([name, SimpleTyp beta] @ env) ebody in
+      subst1, subst1 (TFun (beta, ty1))
+    end
+    | M.APP (efunc, eparam) -> begin
+      let beta = TVar (new_var ()) in
+      let subst1, ty1 = w env efunc in
+      let subst2, ty2 = w (subst_env subst1 env) eparam in
+      let subst3 = unify (subst2 ty1) (TFun (ty2, beta)) in
+      subst3 @@ subst2 @@ subst1, subst3 beta
+    end
     (*
     (* TODO *)
-    | M.FN of id * exp
-    | M.APP of exp * exp
     | M.LET of decl * exp
     | M.IF of exp * exp * exp
     | M.BOP of bop * exp * exp
@@ -188,5 +211,5 @@ let check (input: M.exp): M.typ =
     | M.SND of exp            (*   e.2      *)
     *)
   in
-  let subst, result = check [] input in
+  let subst, result = w [] input in
   convert_typ (subst result)
