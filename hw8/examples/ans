@@ -1,0 +1,52 @@
+(int, bool)
+Type Checking Failed
+int
+Type Checking Failed
+(string, bool)
+Type Checking Failed
+((int, int), (bool, bool))
+Type Checking Failed
+int
+Type Checking Failed
+(int, string)
+Type Checking Failed
+(int, bool)
+Type Checking Failed
+(bool, (bool, bool))
+Type Checking Failed
+((int, string), (bool, loc (int)))
+Type Checking Failed
+(bool, string)
+Type Checking Failed
+(bool, bool)
+Type Checking Failed
+string
+Type Checking Failed
+(int, (string, bool))
+Type Checking Failed
+(bool, bool)
+Type Checking Failed
+(bool, bool)
+Type Checking Failed
+(bool, string)
+Type Checking Failed
+string
+Type Checking Failed
+bool
+Type Checking Failed
+bool
+Type Checking Failed
+int
+Type Checking Failed
+int
+bool
+string
+bool
+string
+(int, int)
+bool
+Type Checking Failed
+bool
+bool
+Type Checking Failed
+Type Checking Failed

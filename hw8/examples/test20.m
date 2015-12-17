@@ -16,4 +16,4 @@ in
   end
 end
     
-(* Result : type erro *)
+(* Result : type error *)
