@@ -26,10 +26,10 @@ def assert(actual, msg = 'Assertion failed')
   false
 end
 
-def assert_eq actual, expected
+def assert_eq msg, actual, expected
   return true if expected == actual
 
-  $results << 'Expected : "%s", Actual : "%s"' % [expected.chomp, actual.chomp]
+  $results << '%s, Expected : "%s", Actual : "%s"' % [msg, expected.chomp, actual.chomp]
   false
 end
 
@@ -173,7 +173,7 @@ def kminus win, dirname, ext = 'k-'
     expected = File.read(name)
 
     counter.tick
-    res = assert_eq actual, expected
+    res = assert_eq name, actual, expected
   end
   counter.clean
 
@@ -193,7 +193,7 @@ Test.add '2.7' do |win|
   expected = File.read('tests/hw2-ex7')
   actual = `ocaml tests/hw2-ex7.ml`
 
-  win.ok assert_eq actual, expected
+  win.ok assert_eq '2.7', actual, expected
 end
 
 Test.add '3.1' do |win|
@@ -215,7 +215,7 @@ def _3_2(win)
   @counter = win.counter try
   def test num
     @counter.tick
-    assert_eq `echo #{num} | hw3/run hw3/examples/ex2.k-`, `#{@exename} #{num}`
+    assert_eq "3.2 with #{num}", `echo #{num} | hw3/run hw3/examples/ex2.k-`, `#{@exename} #{num}`
   end
 
   win.print 'Testing '
@@ -238,7 +238,7 @@ def _3_3(win)
 
     expected = File.read("tests/#{name}.out")
 
-    assert_eq actual, expected
+    assert_eq name, actual, expected
   end
 
   win.ok results.all?
@@ -261,7 +261,7 @@ Test.add '5.2' do |win|
   expected = File.read('hw5/gctest.out')
   actual = `hw5/gctest`
 
-  win.ok assert_eq actual, expected
+  win.ok assert_eq '5.2', actual, expected
 end
 
 Test.add '6.1' do |win|
@@ -279,7 +279,7 @@ Test.add '7  ' do |win|
       lines[1] = '201511'
     end
 
-    (assert result, 'Exception sugar is not removed') && (assert_eq lines[4], lines[1])
+    (assert result, 'Exception sugar is not removed') && (assert_eq name, lines[4], lines[1])
   end
 
   win.results results
@@ -288,11 +288,13 @@ end
 Test.add '8  ' do |win|
   `cd hw8 && make 2>/dev/null`
   results = Dir['hw8/examples/*.m'].map do |name|
+    no = File.basename(name, '.m') + ' of hw8'
+
     expected = File.read(name + '.out').chomp
     actual = `hw8/run #{name} 2>/dev/null`.chomp
     if /^Type Checking Failed:/ === actual then actual = 'Type Checking Failed' end
 
-    assert_eq actual, expected
+    assert_eq no, actual, expected
   end
 
   win.results results
