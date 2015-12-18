@@ -1,0 +1,65 @@
+#!/usr/bin/env ruby
+#
+# 학점 계산기
+# ========
+#
+# 원터치로 내 학점을 계산해보자
+#
+limit = 765
+data = [
+  [ '숙제 1', 'http://ropas.snu.ac.kr/~ta/4190.310/15/result/hw1_result.files/sheet001.htm', [3, 6, 9, 12, 15] ],
+  [ '숙제 2', 'http://ropas.snu.ac.kr/~ta/4190.310/15/result/hw2_result.files/sheet001.htm', [3, 6, 9, 12, 15, 18, 21] ],
+  [ '숙제 3', 'http://ropas.snu.ac.kr/~ta/4190.310/15/result/hw3_result.files/sheet001.htm', [3, 6, 9] ],
+  [ '숙제 4', 'http://ropas.snu.ac.kr/~ta/4190.310/15/result/hw4_result.files/sheet001.htm', [2, 4] ],
+  [ '숙제 5', 'http://ropas.snu.ac.kr/~ta/4190.310/15/result/hw5_result.files/sheet001.htm', [3, 6] ],
+  [ '숙제 6', 'http://ropas.snu.ac.kr/~ta/4190.310/15/result/hw6_result.files/sheet001.htm', [3, 6, 9] ],
+  [ '숙제 7', 'http://ropas.snu.ac.kr/~ta/4190.310/15/result/hw7_result.files/sheet001.htm', [3] ],
+  [ '숙제 8', 'http://ropas.snu.ac.kr/~ta/4190.310/15/result/hw8_result.files/sheet001.htm', [3, 5] ],
+  [ '출석',   'http://ropas.snu.ac.kr/~ta/4190.310/15/result/attendance.files/sheet001.htm', [2] ],
+]
+
+
+student_id = nil
+loop do
+  print '자신의 학번을 입력하세요! (ex: 2013-11392): '
+
+  student_id = gets.strip
+  break if student_id.length > 6
+end
+student_id[5..6] = '**'
+puts
+
+
+require 'nokogiri'
+require 'open-uri'
+total = data.map do |name, url, cols|
+  doc = Nokogiri::HTML(open(url), nil, 'EUC-KR')
+  elem = doc.xpath('//tr[td/text()="%s"]' % student_id)
+
+  scores = cols.map { |col| elem.xpath('td[position()=%d]' % col).text.to_i }
+  sum = scores.reduce(:+)
+
+  puts '%6s : %-4d (%s)' % [name, sum, scores.join(', ')]
+  sum
+end.reduce(:+)
+
+percent = total.to_f / limit * 100
+letter =
+  case percent
+  when 95..100; 'A+'
+  when 90..95; 'A0'
+  when 85..90; 'A-'
+  when 80..85; 'B+'
+  when 75..80; 'B0'
+  when 70..75; 'B-'
+  when 65..70; 'C+'
+  when 60..65; 'C0'
+  when 55..60; 'C-'
+  when 50..55; 'D+'
+  when 45..50; 'D0'
+  when 40..45; 'D-'
+  else; 'F'
+  end
+
+puts '-------------------'
+puts '%6s : %g, %s  (%d/%d)' % ['총점', percent, letter, total, limit]
