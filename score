@@ -5,17 +5,42 @@
 #
 # 원터치로 내 학점을 계산해보자
 #
-limit = 765
-data = [
-  [ '숙제 1', 'http://ropas.snu.ac.kr/~ta/4190.310/15/result/hw1_result.files/sheet001.htm', [3, 6, 9, 12, 15] ],
-  [ '숙제 2', 'http://ropas.snu.ac.kr/~ta/4190.310/15/result/hw2_result.files/sheet001.htm', [3, 6, 9, 12, 15, 18, 21] ],
-  [ '숙제 3', 'http://ropas.snu.ac.kr/~ta/4190.310/15/result/hw3_result.files/sheet001.htm', [3, 6, 9] ],
-  [ '숙제 4', 'http://ropas.snu.ac.kr/~ta/4190.310/15/result/hw4_result.files/sheet001.htm', [2, 4] ],
-  [ '숙제 5', 'http://ropas.snu.ac.kr/~ta/4190.310/15/result/hw5_result.files/sheet001.htm', [3, 6] ],
-  [ '숙제 6', 'http://ropas.snu.ac.kr/~ta/4190.310/15/result/hw6_result.files/sheet001.htm', [3, 6, 9] ],
-  [ '숙제 7', 'http://ropas.snu.ac.kr/~ta/4190.310/15/result/hw7_result.files/sheet001.htm', [3] ],
-  [ '숙제 8', 'http://ropas.snu.ac.kr/~ta/4190.310/15/result/hw8_result.files/sheet001.htm', [3, 5] ],
-  [ '출석',   'http://ropas.snu.ac.kr/~ta/4190.310/15/result/attendance.files/sheet001.htm', [2] ],
+names = [ '숙제 1', '숙제 2', '숙제 3', '숙제 4', '숙제 5', '숙제 6', '숙제 7', '숙제 8', '출석' ]
+
+urls = [
+  'http://ropas.snu.ac.kr/~ta/4190.310/15/result/hw1_result.files/sheet001.htm',
+  'http://ropas.snu.ac.kr/~ta/4190.310/15/result/hw2_result.files/sheet001.htm',
+  'http://ropas.snu.ac.kr/~ta/4190.310/15/result/hw3_result.files/sheet001.htm',
+  'http://ropas.snu.ac.kr/~ta/4190.310/15/result/hw4_result.files/sheet001.htm',
+  'http://ropas.snu.ac.kr/~ta/4190.310/15/result/hw5_result.files/sheet001.htm',
+  'http://ropas.snu.ac.kr/~ta/4190.310/15/result/hw6_result.files/sheet001.htm',
+  'http://ropas.snu.ac.kr/~ta/4190.310/15/result/hw7_result.files/sheet001.htm',
+  'http://ropas.snu.ac.kr/~ta/4190.310/15/result/hw8_result.files/sheet001.htm',
+  'http://ropas.snu.ac.kr/~ta/4190.310/15/result/attendance.files/sheet001.htm',
+]
+
+cols = [
+  [3, 6, 9, 12, 15],
+  [3, 6, 9, 12, 15, 18, 21],
+  [3, 6, 9],
+  [2, 4],
+  [3, 6],
+  [3, 6, 9],
+  [3],
+  [3, 5],
+  [2],
+]
+
+limits = [
+  [10, 10, 10, 10, 10],
+  [10, 10, 10, 15, 10, 10, 20],
+  [40, 10, 10],
+  [50, 30],
+  [40, 40],
+  [50, 60, 30],
+  [80],
+  [80, 80],
+  [30],
 ]
 
 
@@ -32,18 +57,30 @@ puts
 
 require 'nokogiri'
 require 'open-uri'
-total = data.map do |name, url, cols|
+
+score, limit = [names, urls, cols, limits]
+.transpose
+.map do |name, url, cols, limits|
   doc = Nokogiri::HTML(open(url), nil, 'EUC-KR')
   elem = doc.xpath('//tr[td/text()="%s"]' % student_id)
 
   scores = cols.map { |col| elem.xpath('td[position()=%d]' % col).text.to_i }
-  sum = scores.reduce(:+)
+  score_sum = scores.reduce(:+)
+  limit_sum = limits.reduce(:+)
 
-  puts '%6s : %-4d (%s)' % [name, sum, scores.join(', ')]
-  sum
-end.reduce(:+)
+  detail = [scores, limits].transpose
+    .map { |score, limit| "#{score}/#{limit}" }
+    .join(', ')
 
-percent = total.to_f / limit * 100
+  puts '%6s : %d/%d (%s)' % [name, score_sum, limit_sum, detail]
+
+  [score_sum, limit_sum]
+end
+.reduce do |left, right|
+  [left[0] + right[0], left[1] + right[1]]
+end
+
+percent = score.to_f / limit * 100
 letter =
   case percent
   when 95..100; 'A+'
@@ -62,4 +99,4 @@ letter =
   end
 
 puts '-------------------'
-puts '%6s : %g, %s  (%d/%d)' % ['총점', percent, letter, total, limit]
+puts '%6s : %g, %s  (%d/%d)' % ['총점', percent, letter, score, limit]
