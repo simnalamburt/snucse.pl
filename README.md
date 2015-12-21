@@ -5,6 +5,21 @@ Programming Languages
 숙제 보러가기 &rarr; [**2015**][hw15], [2014][hw14], [2013][hw13], [2012][hw12], [2011][hw11], [2010][hw10], [2009][hw09], [2008][hw08]<br>
 게시판 가기 &rarr; [**2015**][bb15], [2014][bb14]
 
+### Homeworks
+숙제 보기 - **[HW 1]** | **[HW 2]** | **[HW 3]** | **[HW 4]** | **[HW 5]** | **[HW 6]** | **[HW 7]** | **[HW 8]**
+<br>
+**[제출하기][submit]**
+
+[submit]: http://ropas.snu.ac.kr/~ta/4190.310/15/submit/index.pl
+[HW 1]: http://ropas.snu.ac.kr/~kwang/4190.310/15/hw1.pdf
+[HW 2]: http://ropas.snu.ac.kr/~kwang/4190.310/15/hw2.pdf
+[HW 3]: http://ropas.snu.ac.kr/~kwang/4190.310/15/hw3.pdf
+[HW 4]: http://ropas.snu.ac.kr/~kwang/4190.310/15/hw4.pdf
+[HW 5]: http://ropas.snu.ac.kr/~kwang/4190.310/15/hw5.pdf
+[HW 6]: http://ropas.snu.ac.kr/~kwang/4190.310/15/hw6.pdf
+[HW 7]: http://ropas.snu.ac.kr/~kwang/4190.310/15/hw7.pdf
+[HW 8]: http://ropas.snu.ac.kr/~kwang/4190.310/15/hw8.pdf
+
 [hw15]: http://ropas.snu.ac.kr/~kwang/4190.310/15/#숙제%20Homeworks
 [hw14]: http://ropas.snu.ac.kr/~kwang/4190.310/14/#숙제%20Homeworks
 [hw13]: http://ropas.snu.ac.kr/~kwang/4190.310/13/#숙제%20Homeworks
@@ -16,38 +31,25 @@ Programming Languages
 [bb15]: https://ropas.snu.ac.kr/phpbb/viewforum.php?f=37
 [bb14]: https://ropas.snu.ac.kr/phpbb/viewforum.php?f=34
 
-Testing
---------
+### Testing
 *짱멋진 마PL 채점기*가 들어있어, 쉽고 빠르게 전체 과제에 대한 테스트를 돌려볼 수
 있습니다. 또한 별도로 [**짱멋진 보물섬 자동채점기**](hw4)가 준비되어있어, 쉽고
 편한 보물섬 과제를 즐길 수 있습니다.
 ```console
-# 루비가 설치되어있어야 합니다
+# 루비가 필요합니다
 gem install curses parallel
 ./test
 ```
 ![](http://i.imgur.com/DmbNvZj.gif)
 
-[제출하기][submit]
---------
-- [x] [Homework 1][hw1]
-- [x] [Homework 2][hw2]
-- [x] [Homework 3][hw3]
-- [x] [Homework 4][hw4]
-- [x] [Homework 5][hw5]
-- [x] [Homework 6][hw6]
-- [x] [Homework 7][hw7]
-- [ ] [Homework 8][hw8]
-
-[submit]: http://ropas.snu.ac.kr/~ta/4190.310/15/submit/index.pl
-[hw1]: http://ropas.snu.ac.kr/~kwang/4190.310/15/hw1.pdf
-[hw2]: http://ropas.snu.ac.kr/~kwang/4190.310/15/hw2.pdf
-[hw3]: http://ropas.snu.ac.kr/~kwang/4190.310/15/hw3.pdf
-[hw4]: http://ropas.snu.ac.kr/~kwang/4190.310/15/hw4.pdf
-[hw5]: http://ropas.snu.ac.kr/~kwang/4190.310/15/hw5.pdf
-[hw6]: http://ropas.snu.ac.kr/~kwang/4190.310/15/hw6.pdf
-[hw7]: http://ropas.snu.ac.kr/~kwang/4190.310/15/hw7.pdf
-[hw8]: http://ropas.snu.ac.kr/~kwang/4190.310/15/hw8.pdf
+### Scoring
+실수 정정과 챌린지 점수가 반영되지 않은 점수가 나옵니다.
+```console
+# 루비가 필요합니다
+gem install nokogiri
+./score
+```
+![](http://i.imgur.com/pPPWWqc.png)
 
 --------
 
