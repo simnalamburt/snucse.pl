@@ -1,0 +1,152 @@
+#!/usr/bin/env ruby
+#
+# 학점 계산기
+# ========
+#
+# 원터치로 내 학점을 계산해보자
+#
+require 'nokogiri'
+require 'open-uri'
+require 'awesome_print'
+
+def letter(score)
+  case score/765.0 * 100
+  when 95..100; 'A+'
+  when 90..95; 'A0'
+  when 85..90; 'A-'
+  when 80..85; 'B+'
+  when 75..80; 'B0'
+  when 70..75; 'B-'
+  when 65..70; 'C+'
+  when 60..65; 'C0'
+  when 55..60; 'C-'
+  when 50..55; 'D+'
+  when 45..50; 'D0'
+  when 40..45; 'D-'
+  else; 'F'
+  end
+end
+
+ids = [
+  '2013-**638',
+  '2007-**575',
+  '2013-**732',
+  '2009-**896',
+  '2011-**915',
+  '2013-**894',
+  '2010-**395',
+  '2009-**476',
+  '2013-**798',
+  '2008-**923',
+  '2010-**834',
+  '2010-**898',
+  '2011-**818',
+  '2012-**365',
+  '2009-**874',
+  '2006-**787',
+  '2006-**853',
+  '2007-**927',
+  '2007-**774',
+  '2008-**609',
+  '2009-**671',
+  '2009-**779',
+  '2009-**790',
+  '2009-**841',
+  '2010-**753',
+  '2010-**912',
+  '2010-**920',
+  '2011-**630',
+  '2011-**678',
+  '2011-**816',
+  '2012-**224',
+  '2012-**253',
+  '2013-**383',
+  '2013-**385',
+  '2013-**388',
+  '2013-**391',
+  '2013-**392',
+  '2013-**394',
+  '2013-**404',
+  '2013-**420',
+  '2013-**421',
+  '2013-**422',
+  '2013-**435',
+  '2013-**436',
+  '2013-**494',
+  '2014-**618',
+  '2014-**853',
+  '2014-**884',
+  '2014-**395',
+  '2014-**477',
+  '2014-**184',
+  '2014-**088',
+  '2014-**790',
+  '2014-**992',
+  '2014-**986',
+  '2015-**233',
+  '2015-**914',
+  '2011-**766',
+  '2012-**502',
+  '2009-**801',
+  '2011-**823',
+  '2012-**810',
+  '2014-**963',
+  '2014-**200',
+  '2014-**239',
+  '2010-**379',
+  '2010-**419',
+  '2010-**538',
+  '2011-**343',
+  '2013-**484',
+  '2015-**810',
+]
+
+urls = [
+  'http://ropas.snu.ac.kr/~ta/4190.310/15/result/hw1_result.files/sheet001.htm',
+  'http://ropas.snu.ac.kr/~ta/4190.310/15/result/hw2_result.files/sheet001.htm',
+  'http://ropas.snu.ac.kr/~ta/4190.310/15/result/hw3_result.files/sheet001.htm',
+  'http://ropas.snu.ac.kr/~ta/4190.310/15/result/hw4_result.files/sheet001.htm',
+  'http://ropas.snu.ac.kr/~ta/4190.310/15/result/hw5_result.files/sheet001.htm',
+  'http://ropas.snu.ac.kr/~ta/4190.310/15/result/hw6_result.files/sheet001.htm',
+  'http://ropas.snu.ac.kr/~ta/4190.310/15/result/hw7_result.files/sheet001.htm',
+  'http://ropas.snu.ac.kr/~ta/4190.310/15/result/hw8_result.files/sheet001.htm',
+  'http://ropas.snu.ac.kr/~ta/4190.310/15/result/attendance.files/sheet001.htm',
+]
+
+cols = [
+  [3, 6, 9, 12, 15],
+  [3, 6, 9, 12, 15, 18, 21],
+  [3, 6, 9],
+  [2, 4],
+  [3, 6],
+  [3, 6, 9],
+  [3],
+  [3, 5],
+  [2],
+]
+
+counter = ids.length + 1
+
+score = [urls, cols]
+.transpose
+.map do |url, cols|
+  doc = Nokogiri::HTML(open(url), nil, 'EUC-KR')
+
+  ids.map do |id|
+    elem = doc.xpath('//tr[td/text()="%s"]' % id)
+    cols
+      .map { |col| elem.xpath('td[position()=%d]' % col).text.to_i }
+      .reduce(:+)
+  end
+end
+.transpose
+.map { |scores| scores.reduce(:+) }
+.sort
+.map do |score|
+  counter -= 1
+  "%2d   %-10g  %-5d  %s" % [counter, score/765.0 * 100, score, letter(score)]
+end
+.reverse
+
+
+puts score
