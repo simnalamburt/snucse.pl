@@ -42,14 +42,14 @@ gem install curses parallel
 ```
 ![](http://i.imgur.com/DmbNvZj.gif)
 
-### Scoring
+### Score
 실수 정정과 챌린지 점수가 반영되지 않은 점수가 나옵니다.
 ```console
 # 루비가 필요합니다
 gem install nokogiri
 ./score
+./metric
 ```
-![](http://i.imgur.com/pPPWWqc.png)
 
 --------
 
