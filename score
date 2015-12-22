@@ -64,15 +64,15 @@ score, limit = [names, urls, cols, limits]
   doc = Nokogiri::HTML(open(url), nil, 'EUC-KR')
   elem = doc.xpath('//tr[td/text()="%s"]' % student_id)
 
-  scores = cols.map { |col| elem.xpath('td[position()=%d]' % col).text.to_i }
+  scores = cols.map { |col| elem.xpath('td[position()=%d]' % col).text.to_f }
   score_sum = scores.reduce(:+)
   limit_sum = limits.reduce(:+)
 
   detail = [scores, limits].transpose
-    .map { |score, limit| "#{score}/#{limit}" }
+    .map { |score, limit| '%g/%g' % [score, limit] }
     .join(', ')
 
-  puts '%6s : %d/%d (%s)' % [name, score_sum, limit_sum, detail]
+  puts '%6s : %g/%g (%s)' % [name, score_sum, limit_sum, detail]
 
   [score_sum, limit_sum]
 end
@@ -99,4 +99,4 @@ letter =
   end
 
 puts '-------------------'
-puts '%6s : %g, %s  (%d/%d)' % ['총점', percent, letter, score, limit]
+puts '%6s : %g, %s  (%g/%g)' % ['총점', percent, letter, score, limit]
