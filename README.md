@@ -51,35 +51,7 @@ gem install nokogiri
 ./metric
 ```
 
---------
-
-##### 테스트케이스 출처
-1.  Homework 1
-    * https://ropas.snu.ac.kr/phpbb/viewtopic.php?t=4276
-1.  Homework 2
-    * https://ropas.snu.ac.kr/phpbb/viewtopic.php?t=4315
-    * http://ropas.snu.ac.kr/~ta/4190.310/11s/score/1-8.txt
-    * `crazy2add` 테스트는 만들었음
-    * 숙제 PDF 안내자료에 있는 예제
-1.  Homework 3
-    * https://ropas.snu.ac.kr/phpbb/viewtopic.php?t=4407
-    * https://ropas.snu.ac.kr/phpbb/viewtopic.php?t=4406
-    * https://ropas.snu.ac.kr/phpbb/viewtopic.php?t=4435
-    * 문제를 K-로 한번, C++로 다시 푼 다음, 랜덤입력을 넣어서 결과가 같은지 확인하였음.
-1.  Homework 4
-    * https://ropas.snu.ac.kr/phpbb/viewtopic.php?t=4502
-    * https://ropas.snu.ac.kr/phpbb/viewtopic.php?t=4503
-    * [김형모가 어디서 전부 긁어옴](https://ropas.snu.ac.kr/phpbb/viewtopic.php?t=5098&sid=2189607eb496b4162c01f4a2fb7599b0)
-1.  Homework 5
-    * https://ropas.snu.ac.kr/phpbb/viewtopic.php?t=4537
-    * https://ropas.snu.ac.kr/phpbb/viewtopic.php?t=4600
-1.  Homework 6
-    * https://ropas.snu.ac.kr/phpbb/viewtopic.php?t=4625
-    * https://ropas.snu.ac.kr/phpbb/viewtopic.php?t=4619
-1.  etc
-    * https://github.com/kalaluthien/ProgrammingLanguage
-
-##### 테스트케이스 만드는데에 도움주신분들
+#### Contributors
 * [wook](https://github.com/wookayin)
 * [kcm1700](https://github.com/kcm1700)
 * [김형모](https://github.com/kalaluthien)
